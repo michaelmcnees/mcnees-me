@@ -1,0 +1,39 @@
+---
+import BaseLayout from "@/layouts/base-layout.astro";
+import AboutTimeline from "@/components/about-timeline.astro";
+---
+<BaseLayout title="About — Michael McNees" description="Engineering manager, builder, and writer.">
+  <section class="py-12">
+    <h1 class="text-3xl font-bold text-gray-100 mb-6">About</h1>
+
+    <div class="space-y-4 text-gray-400 leading-relaxed mb-12">
+      <p>
+        I'm an engineering manager who started as a fullstack developer and grew through
+        the frontend engineering track. I've been building for the web for over a decade,
+        and I still get excited about shipping things.
+      </p>
+      <p>
+        These days I spend most of my time leading people — building teams, setting technical
+        direction, and creating environments where engineers do their best work. I've found
+        that AI engineering feels surprisingly similar to leading technical teams, and that
+        parallel fascinates me.
+      </p>
+      <p>
+        I'm a TypeScript-first developer with a soft spot for Go. I've been using
+        Tailwind CSS since v1, and I'll defend utility-first CSS to anyone who'll listen.
+      </p>
+    </div>
+
+    <h2 class="text-xl font-semibold text-gray-100 mb-6">Career</h2>
+    <AboutTimeline />
+
+    <div class="mt-12 pt-8 border-t border-gray-800">
+      <h2 class="text-xl font-semibold text-gray-100 mb-4">Get in touch</h2>
+      <div class="flex gap-4 text-sm">
+        <a href="mailto:mcnees.michael@gmail.com">Email</a>
+        <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GitLab</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

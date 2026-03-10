@@ -1,0 +1,40 @@
+---
+interface TimelineEntry {
+  period: string;
+  role: string;
+  description: string;
+}
+
+const timeline: TimelineEntry[] = [
+  {
+    period: "Now",
+    role: "Engineering Manager",
+    description: "Leading engineering teams, building culture, and bridging the gap between people and technology.",
+  },
+  {
+    period: "Previously",
+    role: "Lead Frontend Engineer",
+    description: "Led frontend architecture and team across React applications. Grew the team and established patterns.",
+  },
+  {
+    period: "Earlier",
+    role: "Frontend Engineer",
+    description: "Deep dive into React, TypeScript, and modern frontend tooling. Discovered Tailwind CSS early (v1!) and never looked back.",
+  },
+  {
+    period: "Started",
+    role: "Fullstack Engineer",
+    description: "Started building web apps with Laravel and PHP. Learned the full stack from databases to deployment.",
+  },
+];
+---
+<div class="space-y-8">
+  {timeline.map((entry) => (
+    <div class="relative pl-6 border-l border-gray-800">
+      <div class="absolute -left-1 top-1 w-2 h-2 rounded-full bg-gray-700" />
+      <p class="text-xs text-gray-600 mb-1">{entry.period}</p>
+      <h3 class="text-gray-100 font-medium">{entry.role}</h3>
+      <p class="text-sm text-gray-500 mt-1">{entry.description}</p>
+    </div>
+  ))}
+</div>
