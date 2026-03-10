@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/base-layout.astro";
+import PostList from "@/components/post-list.astro";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+// Collect all unique tags
+const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+---
+<BaseLayout title="Blog — Michael McNees" description="Writing about engineering leadership, technical topics, and more.">
+  <section class="py-12">
+    <h1 class="text-3xl font-bold text-gray-100 mb-2">Blog</h1>
+    <p class="text-gray-500 mb-8">Writing about leadership, tech, and the things in between.</p>
+
+    <div id="tag-filter" class="mb-8 flex flex-wrap gap-2">
+      {allTags.map((tag) => (
+        <span class="text-xs text-gray-500 bg-gray-900 border border-gray-800 px-2 py-0.5 rounded cursor-default">
+          {tag}
+        </span>
+      ))}
+    </div>
+
+    <div id="search-container" class="mb-8">
+      <!-- Search React island will be mounted here in Task 7 -->
+    </div>
+
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>
