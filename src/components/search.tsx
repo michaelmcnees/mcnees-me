@@ -23,6 +23,7 @@ export default function Search() {
 
   useEffect(() => {
     async function loadPagefind() {
+      if (typeof window === "undefined") return;
       try {
         const pf = await import(/* @vite-ignore */ "/pagefind/pagefind.js");
         await pf.init();

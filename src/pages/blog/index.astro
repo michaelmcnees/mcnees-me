@@ -24,7 +24,7 @@ const serializedPosts = sortedPosts.map((p) => ({
     <p class="text-gray-500 mb-8">Writing about leadership, tech, and the things in between.</p>
 
     <div id="search-container" class="mb-8">
-      <Search client:load />
+      <Search client:only="react" />
     </div>
 
     <TagFilter client:load posts={serializedPosts} allTags={allTags} />

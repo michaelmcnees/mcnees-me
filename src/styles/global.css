@@ -14,7 +14,22 @@ a {
 
 /* Prose overrides for blog content */
 .prose {
-  @apply text-gray-400 max-w-none;
+  @apply text-gray-400 max-w-none leading-relaxed;
+}
+.prose p {
+  @apply mb-5;
+}
+.prose h2 {
+  @apply mt-10 mb-4;
+}
+.prose h3 {
+  @apply mt-8 mb-3;
+}
+.prose ul, .prose ol {
+  @apply mb-5 pl-6;
+}
+.prose li {
+  @apply mb-2;
 }
 .prose h1, .prose h2, .prose h3, .prose h4 {
   @apply text-gray-100;
