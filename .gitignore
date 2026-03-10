@@ -26,3 +26,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# superpowers
+.superpowers/
+
+# claude
+.claude/
