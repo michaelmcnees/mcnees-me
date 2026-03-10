@@ -15,29 +15,16 @@ interface PagefindAPI {
   search: (query: string) => Promise<PagefindResponse>;
 }
 
-declare global {
-  interface Window {
-    pagefind?: PagefindAPI;
-  }
-}
-
 async function getPagefind(): Promise<PagefindAPI | null> {
-  if (window.pagefind) return window.pagefind;
-
-  return new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = "/pagefind/pagefind.js";
-    script.onload = async () => {
-      if (window.pagefind) {
-        await window.pagefind.init();
-        resolve(window.pagefind);
-      } else {
-        resolve(null);
-      }
-    };
-    script.onerror = () => resolve(null);
-    document.head.appendChild(script);
-  });
+  try {
+    // Construct the path dynamically so Vite doesn't try to resolve it
+    const base = "/pagefind/pagefind.js";
+    const pf = await import(/* @vite-ignore */ base);
+    await pf.init();
+    return pf;
+  } catch {
+    return null;
+  }
 }
 
 export default function Search() {
