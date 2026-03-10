@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 
 interface PagefindResult {
   url: string;
@@ -10,34 +10,53 @@ interface PagefindResponse {
   results: { data: () => Promise<PagefindResult> }[];
 }
 
-interface Pagefind {
+interface PagefindAPI {
   init: () => Promise<void>;
   search: (query: string) => Promise<PagefindResponse>;
+}
+
+declare global {
+  interface Window {
+    pagefind?: PagefindAPI;
+  }
+}
+
+async function getPagefind(): Promise<PagefindAPI | null> {
+  if (window.pagefind) return window.pagefind;
+
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "/pagefind/pagefind.js";
+    script.onload = async () => {
+      if (window.pagefind) {
+        await window.pagefind.init();
+        resolve(window.pagefind);
+      } else {
+        resolve(null);
+      }
+    };
+    script.onerror = () => resolve(null);
+    document.head.appendChild(script);
+  });
 }
 
 export default function Search() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PagefindResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const pagefindRef = useRef<Pagefind | null>(null);
-
-  useEffect(() => {
-    async function loadPagefind() {
-      if (typeof window === "undefined") return;
-      try {
-        const pf = await import(/* @vite-ignore */ "/pagefind/pagefind.js");
-        await pf.init();
-        pagefindRef.current = pf;
-      } catch {
-        // Pagefind not available in dev mode — expected
-      }
-    }
-    loadPagefind();
-  }, []);
+  const pagefindRef = useRef<PagefindAPI | null>(null);
 
   const handleSearch = useCallback(async (value: string) => {
     setQuery(value);
-    if (!value.trim() || !pagefindRef.current) {
+    if (!value.trim()) {
+      setResults([]);
+      return;
+    }
+
+    if (!pagefindRef.current) {
+      pagefindRef.current = await getPagefind();
+    }
+    if (!pagefindRef.current) {
       setResults([]);
       return;
     }
@@ -56,8 +75,6 @@ export default function Search() {
     }
   }, []);
 
-  // Note: dangerouslySetInnerHTML is safe here — Pagefind generates excerpt
-  // HTML from our own build-time content, not user input.
   return (
     <div className="relative">
       <input
