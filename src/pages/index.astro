@@ -1,13 +1,18 @@
 ---
+import BaseLayout from "@/layouts/base-layout.astro";
 ---
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Michael McNees</title>
-  </head>
-  <body>
-    <h1>mcnees.me</h1>
-    <p>Site rebuild in progress.</p>
-  </body>
-</html>
+<BaseLayout title="Michael McNees">
+  <section class="py-16">
+    <h1 class="text-4xl font-bold text-gray-100 mb-4">
+      Hi, I'm Michael McNees
+    </h1>
+    <p class="text-lg text-gray-400 leading-relaxed max-w-lg">
+      Engineering manager, builder, and writer. I lead engineering teams and tinker with TypeScript, React, Go, and whatever else catches my attention.
+    </p>
+    <div class="mt-8 flex gap-4 text-sm">
+      <a href="mailto:mcnees.michael@gmail.com">Get in touch</a>
+      <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GitLab</a>
+    </div>
+  </section>
+</BaseLayout>
