@@ -7,7 +7,13 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   site: 'https://mcnees.me',
   output: 'static',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    routes: {
+      extend: {
+        exclude: [{ pattern: '/pagefind/*' }],
+      },
+    },
+  }),
   integrations: [
     react(),
     mdx({
