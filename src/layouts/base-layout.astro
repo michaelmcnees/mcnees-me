@@ -1,0 +1,66 @@
+---
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Engineering manager, builder, writer." } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
+];
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header class="w-full max-w-2xl mx-auto px-6 py-8 flex items-center justify-between">
+      <a href="/" class="text-gray-100 text-lg font-semibold no-underline hover:text-white">
+        Michael McNees
+      </a>
+      <nav class="flex gap-6">
+        {navLinks.map(({ href, label }) => (
+          <a
+            href={href}
+            class:list={[
+              "text-sm no-underline transition-colors",
+              currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))
+                ? "text-gray-100"
+                : "text-gray-500 hover:text-gray-300",
+            ]}
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+    </header>
+
+    <main class="w-full max-w-2xl mx-auto px-6 flex-1">
+      <slot />
+    </main>
+
+    <footer class="w-full max-w-2xl mx-auto px-6 py-8">
+      <p class="text-gray-600 text-xs">
+        &copy; {new Date().getFullYear()} Michael McNees
+      </p>
+    </footer>
+  </body>
+</html>

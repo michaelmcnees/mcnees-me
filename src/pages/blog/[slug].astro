@@ -1,0 +1,34 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/base-layout.astro";
+import PostMeta from "@/components/post-meta.astro";
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+// Estimate reading time: ~200 words per minute
+const wordCount = post.body?.split(/\s+/).length ?? 0;
+const minutesRead = Math.max(1, Math.ceil(wordCount / 200));
+---
+<BaseLayout title={`${post.data.title} — Michael McNees`} description={post.data.description}>
+  <article class="py-12" data-pagefind-body>
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-100 mb-3">{post.data.title}</h1>
+      <PostMeta
+        date={post.data.date}
+        tags={post.data.tags}
+        minutesRead={minutesRead}
+      />
+    </header>
+    <div class="prose prose-invert">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

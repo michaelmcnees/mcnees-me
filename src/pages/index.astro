@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/base-layout.astro";
+import PostList from "@/components/post-list.astro";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+---
+<BaseLayout title="Michael McNees">
+  <section class="py-16">
+    <h1 class="text-4xl font-bold text-gray-100 mb-4">
+      Hi, I'm Michael McNees 🕹️
+    </h1>
+    <p class="text-lg text-gray-400 leading-relaxed max-w-lg">
+      Engineering manager, builder, and writer. I lead engineering teams and tinker with TypeScript, React, Go, and whatever else catches my attention.
+    </p>
+    <div class="mt-6 flex gap-4 text-sm">
+      <a href="mailto:mcnees.michael@gmail.com">Get in touch</a>
+      <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GitLab</a>
+    </div>
+  </section>
+
+  <section class="py-12 border-t border-gray-800">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-gray-100">Latest Posts</h2>
+      <a href="/blog" class="text-sm text-gray-500 hover:text-gray-300 no-underline">View all &rarr;</a>
+    </div>
+    <PostList posts={posts} limit={5} />
+  </section>
+</BaseLayout>

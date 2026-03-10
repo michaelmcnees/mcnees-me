@@ -1,0 +1,68 @@
+---
+import BaseLayout from "@/layouts/base-layout.astro";
+import AboutTimeline from "@/components/about-timeline.astro";
+---
+<BaseLayout title="About — Michael McNees" description="Engineering manager, builder, and writer.">
+  <section class="py-12">
+    <h1 class="text-3xl font-bold text-gray-100 mb-6">About</h1>
+
+    <div class="space-y-4 text-gray-400 leading-relaxed mb-12">
+      <p>
+        I'm an engineering manager at WeGoLook, a Crawford & Company subsidiary, where I lead
+        a multi-functional team of frontend, backend, mobile, and cloud engineers. My path here
+        wasn't exactly traditional — I started in customer support at Sweetwater Sound helping
+        studio engineers troubleshoot complex networked audio systems, fell in love with
+        technology, and never looked back.
+      </p>
+      <p>
+        After earning certifications in digital control systems and moving to Sweetwater's IT team,
+        I enrolled at Full Sail University and got my BS in Web Design & Development. That kicked
+        off a career in software engineering that's taken me from building Laravel apps and wrangling
+        legacy WordPress codebases to leading frontend architecture across React, TypeScript, and
+        Next.js. Frontend has always been my sweet spot, but I've been really enjoying going deeper
+        into backend and cloud engineering lately.
+      </p>
+      <p>
+        These days I spend a lot of my time looking for ways to make my team's work more efficient.
+        I've been digging deeply into how agentic engineering can augment engineering teams — I think
+        it's one of the most interesting problems in our field right now. Our platform is in the
+        middle of major migrations to React Native, Next.js, and Go, and I'm loving every bit of it.
+      </p>
+    </div>
+
+    <h2 class="text-xl font-semibold text-gray-100 mb-6">Career</h2>
+    <AboutTimeline />
+
+    <div class="mt-12 pt-8 border-t border-gray-800">
+      <h2 class="text-xl font-semibold text-gray-100 mb-4">Outside of Work</h2>
+      <div class="space-y-4 text-gray-400 leading-relaxed">
+        <p>
+          I live in West Michigan with my wife and two kids. I love the beach in the summer and
+          the fall colors even more.
+        </p>
+        <p>
+          When I'm not writing code for work, I'm usually writing code for fun. I have a few side
+          projects I tinker with — a budgeting app called Autobudget, a home maintenance system
+          called Honeydew, and a small business toolkit called Workflow. I'm also deep into
+          homelabbing, where I experiment with smart home tech, Plex, and security tooling.
+        </p>
+        <p>
+          I collect retro video games — my favorite is Pokemon Ruby, and I built a custom Gameboy
+          Advance with USB-C charging and an IPS backlit screen. I also play bass and used to run
+          a pop-punk cover band called Never Live This Down before moving back to Michigan in 2022.
+          One of my favorite parts of the band was the technical side — building out backing tracks
+          with clicks, extra instruments, and the ability to trigger lights in sync with the music.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-12 pt-8 border-t border-gray-800">
+      <h2 class="text-xl font-semibold text-gray-100 mb-4">Get in Touch</h2>
+      <div class="flex gap-4 text-sm">
+        <a href="mailto:mcnees.michael@gmail.com">Email</a>
+        <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GitLab</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

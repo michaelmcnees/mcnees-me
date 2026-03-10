@@ -1,0 +1,58 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+html {
+  @apply bg-gray-950 text-gray-400 antialiased;
+}
+
+body {
+  @apply min-h-screen font-sans;
+}
+
+a {
+  @apply text-sky-400 hover:text-sky-300 transition-colors;
+}
+
+/* Focus states for keyboard navigation */
+a:focus-visible,
+button:focus-visible {
+  @apply outline-2 outline-offset-2 outline-sky-400/50 rounded-sm;
+}
+
+/* Prose color theming for dark background */
+.prose {
+  @apply text-gray-400 max-w-none text-lg leading-relaxed;
+}
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-gray-100;
+}
+.prose a {
+  @apply text-sky-400 hover:text-sky-300 no-underline;
+}
+.prose strong {
+  @apply text-gray-200;
+}
+.prose em {
+  @apply text-gray-300;
+}
+.prose code {
+  @apply text-gray-300 bg-gray-900 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+.prose pre {
+  @apply bg-gray-900 border border-gray-800 rounded-lg p-4 overflow-x-auto;
+}
+.prose pre code {
+  @apply bg-transparent p-0 rounded-none text-sm;
+}
+.prose blockquote {
+  @apply border-l-2 border-gray-700 text-gray-500 pl-4 italic;
+}
+.prose ul > li::marker, .prose ol > li::marker {
+  @apply text-gray-600;
+}
+.prose hr {
+  @apply border-gray-800;
+}
+.prose img {
+  @apply rounded-lg;
+}
