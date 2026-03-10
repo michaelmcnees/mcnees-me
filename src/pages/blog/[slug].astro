@@ -18,7 +18,7 @@ const wordCount = post.body?.split(/\s+/).length ?? 0;
 const minutesRead = Math.max(1, Math.ceil(wordCount / 200));
 ---
 <BaseLayout title={`${post.data.title} — Michael McNees`} description={post.data.description}>
-  <article class="py-12">
+  <article class="py-12" data-pagefind-body>
     <header class="mb-8">
       <h1 class="text-3xl font-bold text-gray-100 mb-3">{post.data.title}</h1>
       <PostMeta
