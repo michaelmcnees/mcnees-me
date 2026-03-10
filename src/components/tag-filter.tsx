@@ -58,11 +58,11 @@ export default function TagFilter({ posts, allTags }: Props) {
           return (
             <li key={post.id}>
               <a href={`/blog/${post.id}`} className="group block no-underline">
-                <h3 className="text-gray-100 font-medium group-hover:text-sky-400 transition-colors">
+                <h3 className="text-lg text-gray-100 font-medium group-hover:text-sky-400 transition-colors">
                   {post.title}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">{post.description}</p>
-                <span className="text-xs text-gray-600 mt-1 block">{formattedDate}</span>
+                <span className="text-sm text-gray-500 mt-1 block">{formattedDate}</span>
               </a>
             </li>
           );

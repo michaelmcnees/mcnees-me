@@ -20,6 +20,14 @@ const navLinks = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
     <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
   </head>
@@ -34,7 +42,7 @@ const navLinks = [
             href={href}
             class:list={[
               "text-sm no-underline transition-colors",
-              currentPath === href || (href !== "/" && currentPath.startsWith(href))
+              currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))
                 ? "text-gray-100"
                 : "text-gray-500 hover:text-gray-300",
             ]}
