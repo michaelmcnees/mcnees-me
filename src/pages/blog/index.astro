@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
 import PostList from "@/components/post-list.astro";
+import Search from "@/components/search.tsx";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 
@@ -22,7 +23,7 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
     </div>
 
     <div id="search-container" class="mb-8">
-      <!-- Search React island will be mounted here in Task 7 -->
+<Search client:load />
     </div>
 
     <PostList posts={posts} />
