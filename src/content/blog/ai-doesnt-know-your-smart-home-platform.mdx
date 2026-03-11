@@ -1,0 +1,62 @@
+---
+title: "AI Doesn't Know Your Smart Home Platform (Yet)"
+description: "Homey app development is a blind spot for AI assistants. So I built an Agent Skill to fix that."
+date: 2026-03-10
+tags: ["ai", "smart-home", "tooling"]
+draft: false
+---
+
+I've been a HomeKit user for years. Not casually — dedicated. I like the way Apple does smart home: local control, tight integrations, things mostly just work. When something wasn't supported natively, I'd reach for Homebridge and that was usually enough.
+
+But there are gaps. My Vivint security system, for one. HomeKit doesn't support it. Homebridge doesn't either. So like a lot of people, I begrudgingly set up Home Assistant to fill in the holes.
+
+I don't love Home Assistant. It's powerful, no question. But the UI feels like it was designed by committee, the YAML configuration is its own dialect, and every time I open it I feel like I'm administering a server instead of managing my home. It works. I just don't enjoy working with it.
+
+So when I heard about Homey — and specifically their new self-hosted Homey server — I was genuinely excited. A new option in the space. A platform that seemed to care about user experience. I set it up immediately.
+
+And then I needed to integrate my Vivint system.
+
+## The Home Assistant loop
+
+Homey has a Home Assistant integration. So the "easy" path was to route Vivint through Home Assistant into Homey. Which... works. But the whole reason I was excited about Homey was to get *away* from Home Assistant. Running HA as a dependency for Homey felt like defeating the purpose.
+
+So I decided to just build a native Homey app for Vivint myself.
+
+## The part where AI falls apart
+
+Here's the thing about Homey app development: AI doesn't know how to do it.
+
+Ask Claude or ChatGPT to write you a React component and you'll get something solid. Ask it to set up an Express server, a Django app, a Swift view — it'll do fine. These are well-represented in training data. Millions of examples, thousands of tutorials, years of Stack Overflow answers.
+
+Ask it to scaffold a Homey app with the right Compose structure, create a driver with proper capability mappings, or wire up Flow cards — and it starts making things up. It'll hallucinate directory structures. It'll mix up SDK v2 and v3 patterns. It'll confidently generate files that don't follow Homey Compose conventions at all.
+
+This isn't an AI problem, really. It's a data problem. Homey's developer ecosystem is small compared to mainstream frameworks. There just isn't enough out there for AI models to have learned the patterns.
+
+## So I taught it
+
+This is where Agent Skills come in. If you haven't encountered them yet: an Agent Skill is essentially a structured markdown document that teaches AI assistants domain-specific knowledge. You install one with a single command — `npx skills add dvflw/homey-app-skill` — and it works across basically every AI coding tool: Claude Code, Cursor, GitHub Copilot, Gemini CLI, and others.
+
+Think of it as giving your AI assistant a crash course. Instead of letting it guess at how Homey apps work, the skill provides the actual patterns: project structure, Homey Compose conventions, how drivers and devices are implemented, how Flow cards are defined, widget development, the differences between Homey Pro and Homey Cloud.
+
+The skill covers the full development lifecycle:
+
+- **Project scaffolding** — correct directory structure and Compose layout
+- **Drivers and devices** — SDK v3 class patterns, capability mappings, discovery
+- **Flow cards** — triggers, conditions, and actions
+- **Widgets** — frontend and API integration patterns
+- **CLI workflows** — creating, running, and publishing apps
+- **Common pitfalls** — the stuff that trips you up when you're new to the platform
+
+## Does it work?
+
+I've been using it to build my Vivint integration, and the difference is night and day. Instead of constantly correcting hallucinated file structures and outdated API calls, the AI actually generates code that follows Homey's conventions. It knows where files go. It knows how Compose works. It gets the driver lifecycle right.
+
+That said — I want to be honest about where this is. I'm not a Homey expert. I built this skill because I needed it, and I learned a lot about the SDK in the process, but I'm sure there are things that are wrong or missing. That's kind of the point of putting it out there.
+
+## Try it, break it, tell me what's wrong
+
+The skill is [open source on GitHub](https://github.com/dvflw/homey-app-skill) and MIT licensed. If you're building Homey apps with AI tools, I'd love for you to try it. And if you find something that's off — a pattern that's outdated, a convention I got wrong, a whole area I missed — open an issue or submit a PR.
+
+I also posted about it on the [Homey Community forum](https://community.homey.app/t/i-made-an-ai-skill-for-homey-app-dev-would-love-feedback/152300) if you want to follow the conversation there.
+
+The smart home space has been dominated by a few big platforms for a while now. Homey is doing something interesting, and I think making it easier to build apps for the platform — even if that means teaching AI how to do it — is worth the effort.
