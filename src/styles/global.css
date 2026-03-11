@@ -16,6 +16,29 @@ body {
   @apply min-h-screen font-sans;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      30deg,
+      oklch(0.14 0.01 250) 0px,
+      oklch(0.14 0.01 250) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      150deg,
+      oklch(0.14 0.01 250) 0px,
+      oklch(0.14 0.01 250) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+}
+
 a {
   @apply text-accent hover:text-accent-hover transition-colors;
 }
