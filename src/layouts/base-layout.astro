@@ -33,21 +33,24 @@ const navLinks = [
   </head>
   <body class="min-h-screen flex flex-col">
     <header class="w-full max-w-2xl mx-auto px-6 py-8 flex items-center justify-between">
-      <a href="/" class="text-gray-100 text-lg font-semibold no-underline hover:text-white">
-        Michael McNees
+      <a href="/" class="text-gray-100 text-lg font-semibold no-underline hover:text-white relative">
+        Michael McNees<span class="inline-block w-[0.55em] h-[1.1em] bg-accent align-text-bottom ml-0.5 motion-safe:animate-[blink_1s_step-end_infinite]" aria-hidden="true"></span>
       </a>
       <nav class="flex gap-6">
         {navLinks.map(({ href, label }) => (
           <a
             href={href}
             class:list={[
-              "text-sm no-underline transition-colors",
+              "text-sm no-underline transition-colors relative",
               currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))
                 ? "text-gray-100"
-                : "text-gray-500 hover:text-gray-300",
+                : "text-gray-400 hover:text-gray-200",
             ]}
           >
             {label}
+            {(currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))) && (
+              <span class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-[7px] h-[7px] rounded-full" style="background: radial-gradient(circle at 35% 35%, oklch(0.95 0 0 / 0.15), oklch(0.95 0 0 / 0.05));" aria-hidden="true"></span>
+            )}
           </a>
         ))}
       </nav>
@@ -58,8 +61,9 @@ const navLinks = [
     </main>
 
     <footer class="w-full max-w-2xl mx-auto px-6 py-8">
-      <p class="text-gray-600 text-xs">
-        &copy; {new Date().getFullYear()} Michael McNees
+      <p class="text-gray-500 text-sm flex items-center gap-2">
+        <span class="inline-block w-1.5 h-1.5 rounded-full motion-safe:animate-[pulse-led_3s_ease-in-out_infinite]" style="background: oklch(0.65 0.18 155); box-shadow: 0 0 6px oklch(0.65 0.18 155 / 0.6), 0 0 12px oklch(0.65 0.18 155 / 0.2);" aria-hidden="true"></span>
+        System online &middot; &copy; {new Date().getFullYear()} Michael McNees
       </p>
     </footer>
   </body>
