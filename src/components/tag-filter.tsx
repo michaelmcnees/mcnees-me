@@ -27,8 +27,8 @@ export default function TagFilter({ posts, allTags }: Props) {
           onClick={() => setActiveTag(null)}
           className={`text-xs px-2 py-0.5 rounded border transition-colors cursor-pointer ${
             !activeTag
-              ? "bg-gray-800 border-gray-700 text-gray-200"
-              : "bg-gray-900 border-gray-800 text-gray-500 hover:text-gray-300"
+              ? "bg-gray-700 border-gray-600 text-gray-100"
+              : "bg-gray-800/50 border-gray-700 text-gray-400 hover:text-gray-200"
           }`}
         >
           All
@@ -39,8 +39,8 @@ export default function TagFilter({ posts, allTags }: Props) {
             onClick={() => setActiveTag(activeTag === tag ? null : tag)}
             className={`text-xs px-2 py-0.5 rounded border transition-colors cursor-pointer ${
               activeTag === tag
-                ? "bg-gray-800 border-gray-700 text-gray-200"
-                : "bg-gray-900 border-gray-800 text-gray-500 hover:text-gray-300"
+                ? "bg-gray-700 border-gray-600 text-gray-100"
+                : "bg-gray-800/50 border-gray-700 text-gray-400 hover:text-gray-200"
             }`}
           >
             {tag}
@@ -58,11 +58,11 @@ export default function TagFilter({ posts, allTags }: Props) {
           return (
             <li key={post.id}>
               <a href={`/blog/${post.id}`} className="group block no-underline">
-                <h3 className="text-lg text-gray-100 font-medium group-hover:text-sky-400 transition-colors">
+                <h3 className="text-lg text-gray-100 font-medium group-hover:text-accent transition-colors">
                   {post.title}
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">{post.description}</p>
-                <span className="text-sm text-gray-500 mt-1 block">{formattedDate}</span>
+                <p className="text-sm text-gray-400 mt-1">{post.description}</p>
+                <span className="text-sm text-gray-400 mt-1 block">{formattedDate}</span>
               </a>
             </li>
           );

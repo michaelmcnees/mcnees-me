@@ -69,7 +69,7 @@ export default function Search() {
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Search posts..."
-        className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-gray-700 focus-visible:ring-2 focus-visible:ring-sky-400/50"
+        className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-gray-700 focus-visible:ring-2 focus-visible:ring-accent/50"
       />
       {isLoading && (
         <p className="text-xs text-gray-600 mt-2">Searching...</p>
@@ -82,11 +82,11 @@ export default function Search() {
                 href={result.url}
                 className="block no-underline group rounded-lg px-3 py-2.5 -mx-3 hover:bg-gray-900 transition-colors"
               >
-                <h4 className="text-gray-200 text-sm font-medium group-hover:text-sky-400 transition-colors">
+                <h4 className="text-gray-200 text-sm font-medium group-hover:text-accent transition-colors">
                   {result.meta.title}
                 </h4>
                 <p
-                  className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2 [&_mark]:bg-sky-400/20 [&_mark]:text-sky-300 [&_mark]:rounded-sm [&_mark]:px-0.5"
+                  className="text-xs text-gray-400 mt-1 leading-relaxed line-clamp-2 [&_mark]:bg-accent/20 [&_mark]:text-accent-hover [&_mark]:rounded-sm [&_mark]:px-0.5"
                   dangerouslySetInnerHTML={{ __html: result.excerpt }}
                 />
               </a>
