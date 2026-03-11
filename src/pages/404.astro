@@ -1,0 +1,45 @@
+---
+import BaseLayout from "@/layouts/base-layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+const randomPost = posts[Math.floor(Math.random() * posts.length)];
+const randomUrl = randomPost ? `/blog/${randomPost.id}` : "/blog";
+---
+<BaseLayout title="404 — Michael McNees" description="Page not found.">
+  <section class="py-24 flex flex-col items-center justify-center text-center">
+    <div class="relative">
+      <!-- CRT scanline overlay -->
+      <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(to bottom, transparent 0 2px, oklch(0 0 0 / 0.06) 2px 4px);" aria-hidden="true"></div>
+
+      <h1
+        class="text-6xl font-bold font-mono tracking-widest motion-safe:animate-[flicker_4s_infinite]"
+        style="color: var(--color-accent); text-shadow: 0 0 12px oklch(0.70 0.20 250 / 0.5), 0 0 24px oklch(0.70 0.20 250 / 0.2);"
+      >
+        GAME OVER
+      </h1>
+
+      <p class="mt-6 text-lg font-mono" style="color: oklch(0.55 0.10 250);">
+        CONTINUE?
+        <a href="/" class="no-underline font-bold ml-2" style="color: var(--color-accent-hover);">[Y]</a>
+        <span class="mx-1">/</span>
+        <a href={randomUrl} class="no-underline" style="color: oklch(0.50 0.08 250);">[N]</a>
+      </p>
+
+      <p class="mt-8 text-sm text-gray-500 font-mono">
+        ERR 404 — STAGE NOT FOUND
+      </p>
+    </div>
+  </section>
+
+  <style>
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.97; }
+      94% { opacity: 1; }
+      96% { opacity: 0.98; }
+      97% { opacity: 1; }
+    }
+  </style>
+</BaseLayout>
