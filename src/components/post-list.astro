@@ -21,12 +21,12 @@ const sorted = posts
     });
     return (
       <li>
-        <a href={`/blog/${post.id}`} class="group block no-underline">
-          <h3 class="text-lg text-gray-100 font-medium group-hover:text-sky-400 transition-colors">
+        <a href={`/blog/${post.id}`} class="group block no-underline transition-transform hover:translate-x-1">
+          <h3 class="text-lg text-gray-100 font-medium group-hover:text-accent transition-colors">
             {post.data.title}
           </h3>
-          <p class="text-sm text-gray-500 mt-1">{post.data.description}</p>
-          <span class="text-sm text-gray-500 mt-1 block">{formattedDate}</span>
+          <p class="text-sm text-gray-400 mt-1">{post.data.description}</p>
+          <span class="text-sm text-gray-400 mt-1 block font-mono text-xs">{formattedDate}</span>
         </a>
       </li>
     );
