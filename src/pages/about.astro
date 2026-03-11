@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/base-layout.astro";
 import AboutTimeline from "@/components/about-timeline.astro";
+import CircuitDivider from "@/components/circuit-divider.astro";
 ---
 <BaseLayout title="About — Michael McNees" description="Engineering manager, builder, and writer.">
   <section class="py-12">
@@ -33,7 +34,8 @@ import AboutTimeline from "@/components/about-timeline.astro";
     <h2 class="text-xl font-semibold text-gray-100 mb-6 tracking-tight">Career</h2>
     <AboutTimeline />
 
-    <div class="mt-12 pt-8 border-t border-gray-800">
+    <CircuitDivider class="mt-12" />
+    <div class="pt-4">
       <h2 class="text-xl font-semibold text-gray-100 mb-4 tracking-tight">Outside of Work</h2>
       <div class="space-y-4 text-gray-400 leading-relaxed">
         <p>
@@ -56,7 +58,8 @@ import AboutTimeline from "@/components/about-timeline.astro";
       </div>
     </div>
 
-    <div class="mt-12 pt-8 border-t border-gray-800">
+    <CircuitDivider class="mt-12" />
+    <div class="pt-4">
       <h2 class="text-xl font-semibold text-gray-100 mb-4 tracking-tight">Get in Touch</h2>
       <div class="flex gap-4 text-sm">
         <a href="mailto:mcnees.michael@gmail.com">Email</a>

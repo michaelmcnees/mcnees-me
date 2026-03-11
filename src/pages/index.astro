@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
 import PostList from "@/components/post-list.astro";
+import CircuitDivider from "@/components/circuit-divider.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 ---
@@ -20,7 +21,8 @@ const posts = await getCollection("blog", ({ data }) => !data.draft);
     </div>
   </section>
 
-  <section class="py-12 border-t border-gray-800">
+  <CircuitDivider />
+  <section class="py-12">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-semibold text-gray-100 tracking-tight">Latest Posts</h2>
       <a href="/blog" class="text-sm text-gray-400 hover:text-gray-200 no-underline">View all &rarr;</a>
