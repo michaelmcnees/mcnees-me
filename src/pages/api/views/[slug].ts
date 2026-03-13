@@ -42,11 +42,10 @@ async function getViewCount(
 
   if (!response.ok) return 0;
 
-  const text = await response.text();
-  // Analytics Engine SQL API returns CSV-like text, parse the count from it
-  const lines = text.trim().split("\n");
-  if (lines.length < 2) return 0;
-  const count = parseInt(lines[1], 10);
+  const data = await response.json() as {
+    data?: { views: string }[];
+  };
+  const count = parseInt(data.data?.[0]?.views ?? "0", 10);
   return isNaN(count) ? 0 : count;
 }
 
