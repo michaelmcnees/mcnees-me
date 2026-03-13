@@ -18,6 +18,7 @@ A mix of reassured and clear-eyed. Honest about the disruption, but ultimately o
 - Not cheerleading or dismissive of fear — earns its optimism through honesty
 - Strong convictions stated plainly, especially on the junior pipeline prediction
 - No target word count, but leaning longer — let the ideas breathe
+- Use `##` subheadings to break up sections, consistent with existing posts
 
 ## Structure
 
@@ -48,28 +49,29 @@ Two beats, stated with conviction:
 
 **Broader downsizing beyond what we expect:**
 
-- Not everyone's job survives. Some roles will be eliminated in areas we haven't fully considered yet.
-- Don't sugarcoat, don't dwell — transitional paragraph that sets up the closing section.
+- Not everyone's job survives. Some roles will be eliminated in areas we haven't fully considered yet — keep this abstract, no specific industry examples. Single paragraph.
+- Don't sugarcoat, don't dwell — this is a transitional beat that sets up the closing section, not a section unto itself.
 
 ### Section 4: What Survives and Why — The Artisan Argument
 
 - AI generates average output by nature — trained on the median
 - The professionals who thrive bring what AI can't: novel thinking, quality standards above the mean, genuine care
-- The artisan baker analogy callback: not on every corner, but the ones who remain command a premium because they care in a way a factory line doesn't
+- Brief artisan baker analogy callback (the only analogy that returns from Section 1): not on every corner, but the ones who remain command a premium because they care in a way a factory line doesn't
 - This isn't "learn to prompt and you'll be fine" — it's about craft, taste, judgment, and pride in quality
 - End forward-facing and confident, not with a neat bow. Not promising everyone will be fine. Saying the people who care about being great at this will find AI is the best tool they've ever had.
 
 ## Title
 
-Working direction: something that references the analogies — e.g., "The Calculator Didn't Kill Accounting" or similar. Should be direct and memorable. Final title to be determined during writing.
+Working direction: something that references the analogies — e.g., "The Calculator Didn't Kill Accounting" or similar. Should be a direct statement, no clickbait — consistent with existing post titles. Final title to be determined during writing.
 
 ## Frontmatter
 
 ```yaml
 title: TBD
-description: TBD (1-2 sentence summary for meta/SEO)
+description: TBD — aim for a concise, one-sentence summary with the author's direct voice
 date: 2026-03-12
 tags: ["ai", "career", "leadership"]
+draft: false
 ```
 
 ## File
