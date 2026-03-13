@@ -1,19 +1,31 @@
 {
 	"main": "dist/_worker.js/index.js",
 	"name": "mcnees-me",
-  "compatibility_date": "2026-03-10",
-  "compatibility_flags": [
-    "nodejs_compat",
-    "global_fetch_strictly_public"
-  ],
+	"compatibility_date": "2026-03-10",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"routes": [
+		{
+			"pattern": "mcnees.me",
+			"zone_name": "mcnees.me",
+			"custom_domain": true,
+		},
+	],
 	"assets": {
 		"binding": "ASSETS",
-		"directory": "./dist"
+		"directory": "./dist",
 	},
 	"observability": {
-    "enabled": true
-  },
-  "analytics_engine_datasets": [
-    { "binding": "PAGE_VIEWS", "dataset": "page_views" }
-  ]
+		"enabled": true,
+	},
+	"analytics_engine_datasets": [
+		{
+			"binding": "PAGE_VIEWS",
+			"dataset": "page_views"
+		},
+	],
+	"workers_dev": true,
+	"preview_urls": true,
 }
