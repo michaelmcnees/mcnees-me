@@ -43,10 +43,21 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonResponse(0);
   }
 
+  const referer = request.headers.get("referer");
+  const cf = (request as any).cf as Record<string, string> | undefined;
+  const country = cf?.country ?? null;
+  const city = cf?.city ?? null;
+  const region = cf?.region ?? null;
+
   let views = 0;
   try {
     // Insert row for this view
-    await db.prepare("INSERT INTO page_views (slug) VALUES (?)").bind(slug).run();
+    await db
+      .prepare(
+        "INSERT INTO page_views (slug, user_agent, country, city, region, referer) VALUES (?, ?, ?, ?, ?, ?)"
+      )
+      .bind(slug, userAgent, country, city, region, referer)
+      .run();
 
     // Query total count
     const result = await db
