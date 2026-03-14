@@ -24,44 +24,16 @@ function jsonResponse(views: number, status = 200): Response {
   });
 }
 
-async function getViewCount(
-  accountId: string,
-  apiToken: string,
-  slug: string
-): Promise<number> {
-  const query = `SELECT count() as views FROM page_views WHERE index1 = '${slug}'`;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/analytics_engine/sql`;
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiToken}`,
-    },
-    body: query,
-  });
-
-  if (!response.ok) return 0;
-
-  const data = await response.json() as {
-    data?: { views: string }[];
-  };
-  const count = parseInt(data.data?.[0]?.views ?? "0", 10);
-  return isNaN(count) ? 0 : count;
-}
-
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const slug = params.slug;
   if (!slug || !VALID_SLUG.test(slug)) {
     return jsonResponse(0, 400);
   }
 
-  const env = locals.runtime.env;
-  const pageViews = env.PAGE_VIEWS;
-  const accountId = env.CF_ACCOUNT_ID;
-  const apiToken = env.CF_API_TOKEN;
+  const db = locals.runtime.env.PAGE_VIEWS_DB;
 
-  // If bindings aren't available (local dev), return 0
-  if (!pageViews || !accountId || !apiToken) {
+  // If binding isn't available (local dev without wrangler), return 0
+  if (!db) {
     return jsonResponse(0);
   }
 
@@ -71,15 +43,18 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonResponse(0);
   }
 
-  // Write data point for non-bot visitors
-  pageViews.writeDataPoint({
-    indexes: [slug],
-  });
-
-  // Query count
   let views = 0;
   try {
-    views = await getViewCount(accountId, apiToken, slug);
+    // Insert row for this view
+    await db.prepare("INSERT INTO page_views (slug) VALUES (?)").bind(slug).run();
+
+    // Query total count
+    const result = await db
+      .prepare("SELECT COUNT(*) as views FROM page_views WHERE slug = ?")
+      .bind(slug)
+      .first<{ views: number }>();
+
+    views = result?.views ?? 0;
   } catch {
     // Silently fail — views stays 0
   }
