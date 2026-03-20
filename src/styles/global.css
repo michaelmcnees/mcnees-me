@@ -88,11 +88,6 @@ button:focus-visible {
 }
 
 /* Animations */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
 @keyframes pulse-led {
   0%, 100% { box-shadow: 0 0 6px oklch(0.65 0.18 155 / 0.6), 0 0 12px oklch(0.65 0.18 155 / 0.2); }
   50% { box-shadow: 0 0 4px oklch(0.65 0.18 155 / 0.4), 0 0 8px oklch(0.65 0.18 155 / 0.1); }
