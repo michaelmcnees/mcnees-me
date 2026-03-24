@@ -2,14 +2,45 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-accent: oklch(0.70 0.20 250);
-  --color-accent-hover: oklch(0.80 0.15 245);
-  --color-accent-deep: oklch(0.60 0.22 255);
-  --color-accent-glow: oklch(0.70 0.20 250 / 0.15);
+  /* Surfaces */
+  --color-surface: #0e0e0e;
+  --color-surface-container-lowest: #000000;
+  --color-surface-container-low: #131313;
+  --color-surface-container: #1a1919;
+  --color-surface-container-high: #201f1f;
+  --color-surface-container-highest: #262626;
+  --color-surface-variant: #262626;
+
+  /* Accent — electric blue */
+  --color-primary: #a4d4ff;
+  --color-primary-dim: #00b4ff;
+  --color-secondary: #72d4fb;
+  --color-tertiary: #7ee6ff;
+
+  /* Text */
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #adaaaa;
+  --color-outline: #777575;
+  --color-outline-variant: #494847;
+
+  /* Error */
+  --color-error: #ff716c;
+
+  /* Legacy aliases (for Tailwind classes using 'accent') */
+  --color-accent: #a4d4ff;
+  --color-accent-hover: #00b4ff;
+  --color-accent-glow: oklch(0.70 0.15 230 / 0.15);
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-heading: "Space Grotesk", system-ui, sans-serif;
 }
 
 html {
-  @apply bg-gray-950 text-gray-300 antialiased;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  @apply antialiased;
 }
 
 body {
@@ -25,15 +56,15 @@ body::before {
   background:
     repeating-linear-gradient(
       30deg,
-      oklch(0.14 0.01 250) 0px,
-      oklch(0.14 0.01 250) 1px,
+      oklch(0.14 0.01 220) 0px,
+      oklch(0.14 0.01 220) 1px,
       transparent 1px,
       transparent 40px
     ),
     repeating-linear-gradient(
       150deg,
-      oklch(0.14 0.01 250) 0px,
-      oklch(0.14 0.01 250) 1px,
+      oklch(0.14 0.01 220) 0px,
+      oklch(0.14 0.01 220) 1px,
       transparent 1px,
       transparent 40px
     );
@@ -51,37 +82,49 @@ button:focus-visible {
 
 /* Prose color theming for dark background */
 .prose {
-  @apply text-gray-300 max-w-none text-lg leading-relaxed;
+  color: var(--color-on-surface-variant);
+  @apply max-w-none text-lg leading-relaxed;
 }
 .prose h1, .prose h2, .prose h3, .prose h4 {
-  @apply text-gray-100 tracking-tight;
+  color: var(--color-on-surface);
+  @apply tracking-tight;
 }
 .prose a {
-  @apply text-accent hover:text-accent-hover no-underline;
+  color: var(--color-primary);
+  @apply no-underline;
+}
+.prose a:hover {
+  color: var(--color-primary-dim);
 }
 .prose strong {
-  @apply text-gray-200;
+  color: var(--color-on-surface);
 }
 .prose em {
-  @apply text-gray-300;
+  color: var(--color-on-surface-variant);
 }
 .prose code {
-  @apply text-gray-300 bg-gray-900 px-1.5 py-0.5 rounded text-sm font-mono;
+  color: var(--color-on-surface-variant);
+  background: var(--color-surface-container-low);
+  @apply px-1.5 py-0.5 rounded text-sm font-mono;
 }
 .prose pre {
-  @apply bg-gray-900 border border-gray-800 rounded-lg p-4 overflow-x-auto;
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  @apply rounded-lg p-4 overflow-x-auto;
 }
 .prose pre code {
   @apply bg-transparent p-0 rounded-none text-sm;
 }
 .prose blockquote {
-  @apply border-l-2 border-gray-700 text-gray-400 pl-4 italic;
+  border-left: 2px solid var(--color-outline-variant);
+  color: var(--color-outline);
+  @apply pl-4 italic;
 }
 .prose ul > li::marker, .prose ol > li::marker {
-  @apply text-gray-500;
+  color: var(--color-outline);
 }
 .prose hr {
-  @apply border-gray-800;
+  border-color: var(--color-outline-variant);
 }
 .prose img {
   @apply rounded-lg;
