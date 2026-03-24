@@ -13,13 +13,13 @@ I didn't plan to write a series about this. But the upgrade got complicated enou
 
 ## What we're working with
 
-The core of the lab is four Dell 3050 Micros. Tiny little boxes, each with a quad-core CPU and 32GB of RAM, running Proxmox. They're named charmander, squirtle, bulbasaur, and pikachu — because if you're going to stare at hostnames in a terminal all day, they might as well make you smile.
+The core of the lab is four Dell 3050 Micros. Tiny little boxes, each with an i7-7700T (4 cores, 8 threads with hyperthreading) and 32GB of RAM, running Proxmox. They're named charmander, squirtle, bulbasaur, and pikachu — because if you're going to stare at hostnames in a terminal all day, they might as well make you smile.
 
 Between those four nodes, I'm running about 27 LXC containers. The usual suspects: AdGuard Home for DNS, Traefik as a reverse proxy, Plex, Home Assistant, Homebridge, Homey, the full servarr stack (Sonarr, Radarr, Lidarr, and friends), Uptime Kuma, Tautulli, Grafana with InfluxDB for monitoring, and more recently Ollama with Open WebUI for local AI inference.
 
 Then there's the NAS — a beefy TrueNAS box named snorlax, because it mostly just sits there holding things. Eight 20TB Exos drives giving me roughly 67 TiB of usable storage, almost entirely media.
 
-And then there's mew. Mew is a Dell R730 I picked up from a previous job when they were upgrading their fleet. I threw a pair of E5-2667v2 CPUs and 256GB of RAM in it. It's an insane machine — absolute overkill for a homelab swing node. I was keeping it around for temporary migrations, a place to park workloads while I shuffled things between hosts. The problem? My electric bill went up by literally $100/month just running it. Part of that was stupid summer increased rates (thanks, Consumers Energy...) and part was just the reality of running an old, very powerful server I didn't actually need day-to-day. That's the kind of thing that makes you rethink your whole approach to power and consolidation.
+And then there's mew. Mew is a Dell R730 I picked up from a previous job when they were upgrading their fleet. I threw a pair of Xeon E5-2667v2 CPUs and 256GB of RAM in it. It's an absolutely insane machine. I originally brought it online as a beefy node for AI workloads, game servers, and general experimentation — the kind of stuff the little Dells couldn't touch. The problem? My electric bill went up by literally $100/month just running it. Part of that was stupid summer increased rates (thanks, Consumers Energy...) and part was just the reality of running an old, very powerful server I didn't actually need most of the time. That's the kind of thing that makes you rethink your whole approach to power and consolidation.
 
 This setup has served me well. Everything runs, Plex streams reliably, the smart home stuff stays online. But "it works" is doing a lot of heavy lifting in that sentence.
 
@@ -33,9 +33,9 @@ And then there's monitoring. I have Grafana. I have dashboards. They look great.
 
 You know what my actual alerting system is? My wife. My five-year-old. My roommate. And — worst of all — my mother-in-law, who doesn't even live here.
 
-If I get one more text from my mother-in-law just *telling* me something is down — not asking, telling — I am going to absolutely lose my mind. They don't even bother with "is Plex down?" anymore. They just report the outage like it's a known fact and I should have already fixed it. The whole point of monitoring is to know before your users do, and my users are my family, and they have zero patience for excuses.
+The family doesn't even ask anymore. They just *tell* me. I'll be in the middle of something and get one more text from my mother-in-law matter-of-factly informing me that Plex is down — not a question, a statement — and I had absolutely no idea there was an issue. That's the part that gets me. The whole point of monitoring is to know before your users do, and my users are my family, and they consistently find out before I do. Every single time.
 
-My kid is the worst part, honestly. He doesn't get angry. He just gets *sad*. He walks up and quietly tells me he can't watch the next episode of Pokemon. That's it. No yelling, no demands. Just this little disappointed face because all he wanted was one more episode before bed and now he can't have it. I feel like a complete failure every single time.
+My kid is the worst part, honestly. He doesn't get angry. He just gets *sad*. He walks up and quietly tells me he can't watch the next episode of Pokemon. That's it. No yelling, no demands. Just this little voice and those disappointed eyes because all he wanted was one more episode before bed and now he can't have it. It genuinely breaks my heart. I feel like I've let him down every single time it happens.
 
 ## What I actually want
 
@@ -43,7 +43,7 @@ Once I started thinking about what needed to change, the goals fell into a few c
 
 **Infrastructure as Code.** Everything in Git. OpenTofu for provisioning infrastructure, Ansible for configuration management, Flux CD for Kubernetes workloads. If it's not in a repo, it doesn't exist. No more SSHing into containers to hand-edit config files and hoping I don't break something.
 
-**Kubernetes.** This is the big one. I want to migrate from individual LXC containers to K3s with a proper GitOps workflow. Not because Kubernetes is cool (though it is), but because managing 27 one-off containers is genuinely harder than managing a cluster with declarative manifests. I've run K8s professionally for years. It's time to bring that discipline home. The original plan was straightforward: move everything to K8s and use mew as a temporary stock pen — park workloads there while I spun up K8s VMs and got Flux implemented.
+**Kubernetes.** This is the big one. I want to migrate from individual LXC containers to K3s with a proper GitOps workflow. Not because Kubernetes is cool (though it is), but because managing 27 one-off containers is genuinely harder than managing a cluster with declarative manifests. I've run K8s professionally for years. It's time to bring that discipline home. The original plan was straightforward: move everything to K8s and use mew as a temporary holding pen — park workloads there while I spun up K8s VMs and got Flux implemented.
 
 **Observability.** Real monitoring. Prometheus for metrics, Grafana for dashboards, Loki for logs, Alertmanager pushing notifications to Pushover on my phone. The goal is simple: find out about problems before the family does. Beat the mother-in-law to the punch.
 
@@ -55,21 +55,21 @@ There's one more thing that doesn't fit neatly into a category: VLANs. Right now
 
 Here's where the plan took a turn I didn't expect.
 
-I'd been building something I call Marvin — named after the perpetually depressed android from Hitchhiker's Guide — a household AI bot. The idea is a local-first assistant that can interact with our smart home, answer questions, help with planning, that kind of thing. Marvin runs on Claude, and I've been using [OpenClaw](https://openclaw.ai/) as the agent framework underneath.
+I'd been building something I call Marvin — named after the perpetually depressed android from Hitchhiker's Guide. I'd set up [OpenClaw](https://openclaw.ai/) and started building Marvin on top of it as a household AI assistant: something local-first that can interact with our smart home, answer questions, help with planning, that kind of thing. Marvin runs on Claude, with OpenClaw handling the agent framework underneath.
 
-Marvin normally runs on my Mac Studio, which was fine for a while. But there was almost no redundancy. If I needed to reboot, or if a macOS update decided to install itself overnight, Marvin would just be down — and I wouldn't know until I missed my morning briefing or an important client email slipped past without a notification. Not cool.
+Marvin was running on my Mac Studio, and for a while that was fine. We were chatting one day and realized: the Mac Studio works, but there's almost no redundancy. If I need to reboot, or a macOS update decides to install itself overnight, Marvin would just be down — and I wouldn't know until I missed my morning briefing or an important client email slipped past without a notification. Not cool.
 
-Then we started trying to find room for Ollama to handle embedding memory vectors, but there was basically no headroom on the Dells. Those machines are *maxed out* — highest CPUs available for the platform, most RAM they support, both M.2 and SATA ports occupied. There is nowhere left to grow.
+Then we started trying to find room for Ollama to handle embedding memory vectors on the Dells, but there was basically no headroom. Those machines are *maxed out* — highest CPUs available for the platform, most RAM they can take, both M.2 and SATA ports occupied. There is literally nowhere left to grow.
 
 That's when we started looking at the upcoming AMD 9000 series AI chips and began planning a platform upgrade that would eventually be upgradable to those. The idea became: build on AM5 now with a solid budget-conscious CPU, enough RAM and storage to not be a downgrade from the current cluster, and a clear path to drop in a next-gen chip when the time comes.
 
-This is what pivoted the plan from "just move everything to K8s" to "consolidate AND upgrade the hardware." The original K8s migration didn't require new nodes. But once the AI compute need entered the picture — between Marvin's reliability problems and the Dells having zero room to grow — consolidation became the obvious move.
+This is what pivoted the plan from "just move everything to K8s" to "consolidate AND upgrade the hardware." The original K8s migration didn't require new nodes. But once the AI compute need entered the picture — between Marvin's reliability problems on the Mac Studio and the Dells having zero room to grow — consolidation from four nodes down to two became the obvious move.
 
-And here's the part that still makes me laugh: Marvin helped plan the upgrade. The AI bot that needed better hardware to run properly was actively helping me research and spec out the very infrastructure he'd eventually move into. There's a beautiful circularity to that.
+And here's the part that still makes me laugh: Marvin helped plan the upgrade. The AI bot that needed better hardware to run reliably was actively helping me research and spec out the very infrastructure that would solve its own problems. There's a beautiful circularity to that.
 
 ## From four to two
 
-The decision to consolidate from four nodes to two was a late addition to the plan, and it happened because of the NAS.
+The decision to consolidate from four nodes to two came out of the hardware planning, and it crystallized because of the NAS.
 
 I'd been running snorlax as bare-metal TrueNAS. It's a solid setup, but it means the NAS is an island — it stores data and serves NFS shares, but it doesn't participate in the Proxmox cluster. If I kept four Dell nodes and wanted Proxmox quorum (the mechanism that keeps the cluster sane when a node goes down), I'd need either all four nodes healthy or a QDevice to act as a tiebreaker.
 
@@ -79,13 +79,13 @@ Two new custom nodes plus the converted NAS gives me a clean three-node Proxmox 
 
 ## The builds
 
-The two new nodes are named latios and latias. Identical builds, because symmetry makes clustering simpler and spare parts management trivial. The whole rack lives in the basement storage room, so heat and noise aren't concerns — these are 2U rackmount servers, not living room furniture.
+The two new nodes are named latios and latias. Identical builds, because symmetry makes clustering simpler and spare parts management trivial. The whole rack lives in the basement storage room, so heat and noise aren't concerns — 2U rackmount cases make perfect sense when the rack's tucked away in the basement, not sitting in an office.
 
 For the CPU I went with the AMD Ryzen 7 8700G — eight cores, sixteen threads, 65W TDP. It's a sweet spot chip. Enough cores to run a serious workload mix, efficient enough that I'm not wasting power, and it has integrated Radeon 780M graphics so I don't need a discrete GPU. Plex transcoding stays on the NAS's Intel iGPU via QuickSync anyway, so the AMD integrated graphics are really just there for troubleshooting and console access.
 
 Each node gets 64GB of DDR5-5600. The AM5 platform was a deliberate choice — it gives me an upgrade path to Zen 5 and eventually those AMD AI chips down the road without replacing the motherboard. The MSI Pro B650M-P boards are no-frills but reliable, which is exactly what I want in something that's going to run 24/7 in the basement. Samsung 970 EVO 500GB NVMe drives for boot, and everything goes into Rosewill 2U rackmount cases with EVGA 450BT power supplies.
 
-The consolidation math works out nicely. Four Dell nodes with 32GB each gave me 128GB of total RAM across 16 cores and 32 threads (the 7700T has hyperthreading). Two custom nodes with 64GB each gives me the same 128GB and the same 32 threads across 16 cores — but the per-core performance difference is dramatic. The CPUbench scores aren't even in the same universe. And once the NAS converts to a Proxmox host with its existing 64GB, the total cluster jumps to 192GB. Same thread count, massively more performance, fewer machines, fewer things to manage.
+The consolidation math works out nicely. Four Dell nodes with the i7-7700T give me 16 cores and 32 threads (4 cores / 8 threads each) across 128GB of total RAM. Two custom nodes with the 8700G give me the same 16 cores, same 32 threads, same 128GB — but the per-core performance difference is dramatic. The CPUbench scores between the 7700T and the 8700G aren't even in the same universe. And once the NAS converts to a Proxmox host with its existing 64GB, the total cluster jumps to 192GB. Same thread count, massively more performance, fewer machines, fewer things to manage.
 
 ## What's next
 
