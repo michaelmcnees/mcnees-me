@@ -60,11 +60,12 @@ const navLinks = [
       <slot />
     </main>
 
-    <footer class="w-full max-w-2xl mx-auto px-6 py-8">
-      <p class="text-outline text-sm flex items-center gap-2">
+    <footer class="w-full max-w-2xl mx-auto px-6 py-8 flex items-center justify-between">
+      <span class="text-outline text-sm">&copy; 2026 Michael McNees</span>
+      <span class="text-outline text-sm flex items-center gap-2">
         <span class="inline-block w-1.5 h-1.5 rounded-full motion-safe:animate-[pulse-led_3s_ease-in-out_infinite]" style="background: oklch(0.65 0.18 155); box-shadow: 0 0 6px oklch(0.65 0.18 155 / 0.6), 0 0 12px oklch(0.65 0.18 155 / 0.2);" aria-hidden="true"></span>
-        System online &middot; &copy; {new Date().getFullYear()} Michael McNees
-      </p>
+        System online
+      </span>
     </footer>
     <script>
   if (typeof window !== "undefined") {
