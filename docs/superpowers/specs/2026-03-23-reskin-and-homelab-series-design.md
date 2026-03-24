@@ -124,7 +124,7 @@ seriesOrder: 1
 - The quartet of Dell 3050 Micros — what they are, what's running on them
 - Proxmox + LXC setup, shoutout to Proxmox VE Helper Scripts for reliable deployment
 - Paint the picture of a system that works but has outgrown its management model
-- Pain points: Traefik configs scattered across instances, no centralized observability
+- Pain points: Traefik is a single instance but managed by SSHing into its LXC — 47 routers, each its own file, typos have caused broken routers more than once. No centralized observability
 - The monitoring problem: family members (wife, 5-year-old, roommate, and worst of all the mother-in-law who doesn't even live there) are the alerting system
 
 **Act 2: Setting Goals**
@@ -149,7 +149,7 @@ Placeholder only — establish frontmatter with `series: upgrading-the-homelab` 
 
 ### Authoring Process
 
-1. **Technical Writer subagent** — gather and organize technical details: current hardware specs, new build specs, power consumption numbers, K8s migration rationale, specific workloads being moved
+1. **Technical Writer subagent** — gather and organize technical details: current hardware specs, new build specs, power consumption numbers, K8s migration rationale, specific workloads being moved. Reference `~/Development/homelab` repo for planning docs and specs.
 2. **Co-author subagent** — draft the actual post using the technical details and narrative structure above, in Michael's voice
 
 These agents are dispatched during the implementation phase, not during design.
