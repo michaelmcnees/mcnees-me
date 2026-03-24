@@ -69,10 +69,10 @@ export default function Search() {
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Search posts..."
-        className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-gray-700 focus-visible:ring-2 focus-visible:ring-accent/50"
+        className="w-full bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)] rounded-lg px-4 py-2 text-sm text-[var(--color-on-surface-variant)] placeholder-[var(--color-outline)] focus:outline-none focus:border-[var(--color-outline)] focus-visible:ring-2 focus-visible:ring-accent/50"
       />
       {isLoading && (
-        <p className="text-xs text-gray-600 mt-2">Searching...</p>
+        <p className="text-xs text-[var(--color-outline)] mt-2">Searching...</p>
       )}
       {results.length > 0 && (
         <ul className="mt-4 space-y-1 list-none p-0">
@@ -80,13 +80,13 @@ export default function Search() {
             <li key={result.url}>
               <a
                 href={result.url}
-                className="block no-underline group rounded-lg px-3 py-2.5 -mx-3 hover:bg-gray-900 transition-colors"
+                className="block no-underline group rounded-lg px-3 py-2.5 -mx-3 hover:bg-[var(--color-surface-container-low)] transition-colors"
               >
-                <h4 className="text-gray-200 text-sm font-medium group-hover:text-accent transition-colors">
+                <h4 className="text-[var(--color-on-surface)] text-sm font-medium group-hover:text-accent transition-colors">
                   {result.meta.title}
                 </h4>
                 <p
-                  className="text-xs text-gray-400 mt-1 leading-relaxed line-clamp-2 [&_mark]:bg-accent/20 [&_mark]:text-accent-hover [&_mark]:rounded-sm [&_mark]:px-0.5"
+                  className="text-xs text-[var(--color-on-surface-variant)] mt-1 leading-relaxed line-clamp-2 [&_mark]:bg-accent/20 [&_mark]:text-accent-hover [&_mark]:rounded-sm [&_mark]:px-0.5"
                   dangerouslySetInnerHTML={{ __html: result.excerpt }}
                 />
               </a>
@@ -95,7 +95,7 @@ export default function Search() {
         </ul>
       )}
       {query && !isLoading && results.length === 0 && (
-        <p className="text-xs text-gray-600 mt-2">No results found.</p>
+        <p className="text-xs text-[var(--color-outline)] mt-2">No results found.</p>
       )}
     </div>
   );
