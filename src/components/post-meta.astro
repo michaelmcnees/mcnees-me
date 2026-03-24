@@ -35,8 +35,20 @@ const formattedUpdated = hasUpdated
       <line x1="4" y1="5" x2="4" y2="9" stroke="currentColor" stroke-width="1.2"/>
       <path d="M4 5 Q4 3.5 5.5 3.5 L8.5 3.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
     </svg>
-    <time datetime={date.toISOString()}>{formattedDate}</time>
+    {hasUpdated ? (
+      <>
+        <span style={`color: var(--color-outline);`}>Originally published</span>
+        <time datetime={date.toISOString()}>{formattedDate}</time>
+      </>
+    ) : (
+      <time datetime={date.toISOString()}>{formattedDate}</time>
+    )}
   </span>
+  {hasUpdated && (
+    <span class="font-mono text-xs" style={`color: var(--color-outline);`}>
+      &middot; <span style={`color: var(--color-outline);`}>Updated</span> <time datetime={updated!.toISOString()}>{formattedUpdated}</time>
+    </span>
+  )}
   {slug && <span id="view-count" class="font-mono text-xs hidden" style={`color: var(--color-outline);`} data-views={slug}>&middot; <span data-views-number></span></span>}
   {minutesRead && <span class="font-mono text-xs" style={`color: var(--color-outline);`}>&middot; {minutesRead} min read</span>}
 </div>

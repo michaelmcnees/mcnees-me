@@ -23,6 +23,7 @@ const minutesRead = Math.max(1, Math.ceil(wordCount / 200));
       <h1 class="text-3xl font-bold text-on-surface mb-3 tracking-tight">{post.data.title}</h1>
       <PostMeta
         date={post.data.date}
+        updated={post.data.updated}
         tags={post.data.tags}
         minutesRead={minutesRead}
         slug={post.id}
