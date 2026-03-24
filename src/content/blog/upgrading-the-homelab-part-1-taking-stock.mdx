@@ -25,21 +25,31 @@ This setup has served me well. Everything runs, Plex streams reliably, the smart
 
 ## The cracks
 
+The problems fall into three buckets: configuration management, operational visibility, and the human cost of getting both of those wrong.
+
+### Configuration and state
+
 Let's start with Traefik. I have a single LXC running Traefik as my reverse proxy for everything. That's fine in principle. What's less fine is that I have 47 individual router configuration files in there, and the way I manage them is by SSHing into the container and editing YAML by hand. You can probably guess what happens next. Typos. Typos happen. I've broken routing to services more than once because I fat-fingered a domain name or misindented a line. There's no version control, no review process, no rollback. Just vibes and careful typing.
 
 The broader problem is that nothing in this lab is codified. Every container was set up by hand — some through the Proxmox web UI, some via SSH. The [Proxmox VE Helper Scripts](https://community-scripts.github.io/ProxmoxVE/) deserve a genuine shoutout here because they made spinning up LXCs incredibly reliable. But at 27 containers across four nodes, I've lost track of what's where. There's no single source of truth.
 
-Now, to be fair — it's not total chaos. The important stuff has guardrails. I have a Ceph cluster running across the nodes, and the critical containers are configured for HA in Proxmox. If a node goes down, those workloads migrate automatically. That part works well. But the lack of IaC means I have to *remember* things, and I am genuinely bad at taking notes. I forget where things are running, how they're configured, and sometimes even *what* I have running. I'm a software engineer by trade — I spend my days in Zed with Claude helping me write code — and yet my own infrastructure has less documentation than a weekend hackathon project. If a node died tomorrow, I'd be reconstructing things from memory and hoping I remember which container had the weird NFS mount.
+Now, to be fair — it's not total chaos. The important stuff has guardrails. I have a Ceph cluster running across the nodes, and the critical containers are configured for HA in Proxmox. If a node goes down, those workloads migrate automatically. That part works well. But the lack of IaC means I have to *remember* things, and I am genuinely bad at taking notes. I forget where things are running, how they're configured, and sometimes even *what* I have running. I'm a software engineer by trade — I spend my days in Zed with Claude helping me write code — and yet my own infrastructure has less documentation than a weekend hackathon project.
 
-And then there's monitoring. I have Grafana. I connected the data sources. I was going to build dashboards. Then I got distracted and never came back to it. So I have a monitoring stack that's technically running and monitoring absolutely nothing useful.
+Here's a perfect example: you can't do NFS mounts directly in LXC containers. My workaround was to set up a host-level mount on each of the Dells, then add a mount point to the individual containers so they can migrate across nodes as needed via HA. It works great. You know who I forgot to add that mount to? Mew. The very machine I planned to use as a temporary holding pen during the K8s migration. Guess where all the workloads were supposed to go temporarily, and now they can't unless I pause everything and go set up that mount first. This is what happens when your infrastructure lives in your head instead of in Git.
 
-Speaking of things I forgot to do: you can't do NFS mounts directly in LXC containers. My workaround was to set up a host-level mount on each of the Dells, then add a mount point to the individual containers so they can migrate across nodes as needed via HA. It works great. You know who I forgot to add that mount to? Mew. The very machine I planned to use as a temporary holding pen during the K8s migration. Guess where all the workloads were supposed to go temporarily, and now they can't unless I pause everything and go set up that mount first. This is what happens when your infrastructure lives in your head instead of in Git.
+### Monitoring (or the lack of it)
+
+The configuration problems are bad, but at least I *know* when I've broken a Traefik route — I broke it, so I'm already looking at it. The scarier failure mode is the one where something breaks on its own and nobody tells you.
+
+I have Grafana. I connected the data sources. I was going to build dashboards. Then I got distracted and never came back to it. So I have a monitoring stack that's technically running and monitoring absolutely nothing useful.
 
 You know what my actual alerting system is? My wife. My five-year-old. My roommate. And — worst of all — my mother-in-law, who doesn't even live here.
 
 The family doesn't even ask anymore. They just *tell* me. I'll be in the middle of something and get one more text from my mother-in-law matter-of-factly informing me that Plex is down — not a question, a statement — and I had absolutely no idea there was an issue. That's the part that gets me. The whole point of monitoring is to know before your users do, and my users are my family, and they consistently find out before I do. Every single time.
 
 My kid is the worst part, honestly. He doesn't get angry. He just gets *sad*. He walks up and quietly tells me he can't watch the next episode of Pokemon. That's it. No yelling, no demands. Just this little voice and those disappointed eyes because all he wanted was one more episode before bed and now he can't have it. It genuinely breaks my heart. I feel like I've let him down every single time it happens.
+
+So yeah — the cracks aren't just technical. They're the look on my kid's face when the infrastructure I'm responsible for lets him down. That's what makes this more than a fun weekend project.
 
 ## What I actually want
 
