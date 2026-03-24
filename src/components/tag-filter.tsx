@@ -31,7 +31,7 @@ export default function TagFilter({ posts, allTags }: Props) {
     } else {
       url.searchParams.delete("tag");
     }
-    window.history.pushState({}, "", url.toString());
+    window.history.replaceState({}, "", url.toString());
   }
 
   const filtered = activeTag
