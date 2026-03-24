@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { hashToHue } from "@/utils/tag-color";
 
 interface Post {
@@ -15,7 +15,24 @@ interface Props {
 }
 
 export default function TagFilter({ posts, allTags }: Props) {
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("tag");
+    }
+    return null;
+  });
+
+  function selectTag(tag: string | null) {
+    setActiveTag(tag);
+    const url = new URL(window.location.href);
+    if (tag) {
+      url.searchParams.set("tag", tag);
+    } else {
+      url.searchParams.delete("tag");
+    }
+    window.history.pushState({}, "", url.toString());
+  }
 
   const filtered = activeTag
     ? posts.filter((p) => p.tags.includes(activeTag))
@@ -25,7 +42,7 @@ export default function TagFilter({ posts, allTags }: Props) {
     <div>
       <div className="flex flex-wrap gap-2 mb-8">
         <button
-          onClick={() => setActiveTag(null)}
+          onClick={() => selectTag(null)}
           className={`text-xs font-mono px-2 py-0.5 rounded-sm transition-colors cursor-pointer ${
             !activeTag
               ? "text-[var(--color-on-surface)] border-l-[3px] border-l-[var(--color-primary)]"
@@ -45,7 +62,7 @@ export default function TagFilter({ posts, allTags }: Props) {
           return (
             <button
               key={tag}
-              onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+              onClick={() => selectTag(activeTag === tag ? null : tag)}
               className={`text-xs font-mono px-2 py-0.5 rounded-sm transition-colors cursor-pointer ${
                 isActive
                   ? "text-[var(--color-on-surface)]"
