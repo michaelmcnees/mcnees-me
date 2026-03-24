@@ -101,7 +101,7 @@ function hashToHue(str: string): number {
 - Layout structure: `max-w-2xl` (672px), single `base-layout.astro`
 - Content: all existing blog posts and pages
 - D1 view counter, Pagefind search indexing
-- Background pattern (update hue from blue-tinted to match new surface colors)
+- Background pattern structure (hue will be updated to match new surface colors, but the diagonal stripe pattern itself is unchanged)
 
 ## Workstream 2: Homelab Blog Series
 
