@@ -1,0 +1,88 @@
+---
+title: "Upgrading the Homelab, Part 1: Taking Stock"
+description: "How we inventoried what we had, set our goals, and picked the hardware for the next generation."
+date: 2026-03-23
+tags: ["homelab", "hardware"]
+series: upgrading-the-homelab
+seriesOrder: 1
+---
+
+Every homelab has a moment where it stops being a hobby project and starts being infrastructure you're responsible for. Mine hit that threshold somewhere around the twenty-seventh LXC container.
+
+I didn't plan to write a series about this. But the upgrade got complicated enough — and interesting enough — that it felt worth documenting. This is Part 1: what I had, what I wanted, and the hardware decisions that set everything in motion.
+
+## What we're working with
+
+The core of the lab is four Dell 3050 Micros. Tiny little boxes, each with a quad-core CPU and 32GB of RAM, running Proxmox. They're named charmander, squirtle, bulbasaur, and pikachu — because if you're going to stare at hostnames in a terminal all day, they might as well make you smile.
+
+Between those four nodes, I'm running about 27 LXC containers. The usual suspects: AdGuard Home for DNS, Traefik as a reverse proxy, Plex, Home Assistant, Homebridge, Homey, the full servarr stack (Sonarr, Radarr, Lidarr, and friends), Uptime Kuma, Tautulli, Grafana with InfluxDB for monitoring, and more recently Ollama with Open WebUI for local AI inference.
+
+Then there's the NAS — a beefy TrueNAS box named snorlax, because it mostly just sits there holding things. Eight 20TB Exos drives giving me roughly 67 TiB of usable storage, almost entirely media. And rounding things out is mew, a swing node I keep around for temporary migrations when I need to move workloads between hosts.
+
+This setup has served me well. Everything runs, Plex streams reliably, the smart home stuff stays online. But "it works" is doing a lot of heavy lifting in that sentence.
+
+## The cracks
+
+Let's start with Traefik. I have a single LXC running Traefik as my reverse proxy for everything. That's fine in principle. What's less fine is that I have 47 individual router configuration files in there, and the way I manage them is by SSHing into the container and editing YAML by hand. You can probably guess what happens next. Typos. Typos happen. I've broken routing to services more than once because I fat-fingered a domain name or misindented a line. There's no version control, no review process, no rollback. Just vibes and careful typing.
+
+The broader problem is that nothing in this lab is codified. Every container was set up by hand — some through the Proxmox web UI, some via SSH. The [Proxmox VE Helper Scripts](https://community-scripts.github.io/ProxmoxVE/) deserve a genuine shoutout here because they made spinning up LXCs incredibly reliable. But at 27 containers across four nodes, I've lost track of what's where. There's no single source of truth. If a node died tomorrow, I'd be reconstructing things from memory and hoping I remember which container had the weird NFS mount.
+
+And then there's monitoring. I have Grafana. I have dashboards. They look great. I almost never check them.
+
+You know what my actual alerting system is? My wife. My five-year-old. My roommate. And — worst of all — my mother-in-law, who doesn't even live here.
+
+If I get a text that says "is Plex down?" I've already failed. The whole point of monitoring is to know before your users do, and my users are my family, and they are ruthlessly efficient at detecting outages. My kid doesn't file a Jira ticket. He just stands in the doorway and says "the TV isn't working" with the energy of a VP escalating a P0.
+
+## What I actually want
+
+Once I started thinking about what needed to change, the goals fell into five categories pretty quickly.
+
+**Consolidation.** Fewer nodes, more power per node. Four tiny Dells made sense when I was starting out, but the overhead of managing four separate hosts — updates, reboots, resource balancing — is real. I'd rather have fewer, beefier machines.
+
+**Infrastructure as Code.** Everything in Git. OpenTofu for provisioning infrastructure, Ansible for configuration management, Flux CD for Kubernetes workloads. If it's not in a repo, it doesn't exist. No more SSHing into containers to hand-edit config files and hoping I don't break something.
+
+**Kubernetes.** This is the big one. I want to migrate from individual LXC containers to K3s with a proper GitOps workflow. Not because Kubernetes is cool (though it is), but because managing 27 one-off containers is genuinely harder than managing a cluster with declarative manifests. I've run K8s professionally for years. It's time to bring that discipline home.
+
+**Observability.** Real monitoring. Prometheus for metrics, Grafana for dashboards, Loki for logs, Alertmanager pushing notifications to Pushover on my phone. The goal is simple: find out about problems before the family does. Beat the mother-in-law to the punch.
+
+**Power efficiency.** The four Dells actually sip power, which is one of their best qualities. Whatever replaces them needs to maintain that. Same or lower power budget, dramatically more headroom.
+
+There's one more thing that doesn't fit neatly into a category: VLANs. Right now, everything — IoT devices, personal laptops, infrastructure, guest devices — lives on one flat /22 subnet. My smart plugs can talk to my NAS. My guests can see my Proxmox management interface. It's fine until it isn't. That's changing.
+
+## The Marvin factor
+
+Here's where the plan took a turn I didn't expect.
+
+I'd been experimenting with [OpenClaw](https://github.com/openclaw), an AI agent framework, to build something I've been calling Marvin — a household AI bot. The idea is a local-first assistant that can interact with our smart home, answer questions, help with planning, that kind of thing. Marvin runs on Claude through Mantle, a custom automation platform I've been building.
+
+Getting Marvin to a useful state meant running local AI models, and running local AI models on Dell 3050 Micros is... aspirational. The CPUs are fine for containers but they choke on inference workloads. I needed more compute.
+
+This is what shifted the plan from "upgrade the Dells in place" to "replace them with something meaningfully different." The original idea was to bump RAM and maybe swap in slightly better CPUs. But once local AI entered the picture, the math changed completely.
+
+And here's the part that still makes me laugh: Marvin helped plan the upgrade. The AI bot that needed better hardware to run properly was, through Mantle, actively helping me research and spec out the very infrastructure he'd eventually move into. There's a beautiful circularity to that.
+
+## From four to two
+
+The decision to go from four nodes to two was a late pivot, and it happened because of the NAS.
+
+I'd been running snorlax as bare-metal TrueNAS. It's a solid setup, but it means the NAS is an island — it stores data and serves NFS shares, but it doesn't participate in the Proxmox cluster. If I kept four Dell nodes and wanted Proxmox quorum (the mechanism that keeps the cluster sane when a node goes down), I'd need either all four nodes healthy or a QDevice to act as a tiebreaker.
+
+But what if the NAS wasn't just a NAS? What if I converted snorlax into a Proxmox host — renamed it rayquaza, because it's getting a promotion — and ran TrueNAS as a VM with HBA passthrough? The storage performance stays the same (the drives are passed directly to the VM), but now the NAS can join the Proxmox cluster and contribute a K3s control plane node.
+
+Two new custom nodes plus the converted NAS gives me a clean three-node Proxmox cluster. Three is the magic number for quorum — no QDevice needed, native fault tolerance. And two powerful custom builds plus a beefy NAS-turned-hybrid gives me more compute, more RAM, and more flexibility than four Dells ever could.
+
+## The builds
+
+The two new nodes are named latios and latias. Identical builds, because symmetry makes clustering simpler and spare parts management trivial.
+
+For the CPU I went with the AMD Ryzen 7 8700G — eight cores, sixteen threads, 65W TDP. It's a sweet spot chip. Enough cores to run a serious workload mix, efficient enough that I'm not heating my office, and it has integrated Radeon 780M graphics so I don't need a discrete GPU. Plex transcoding stays on the NAS's Intel iGPU via QuickSync anyway, so the AMD integrated graphics are really just there for troubleshooting and console access.
+
+Each node gets 64GB of DDR5-5600. The AM5 platform was a deliberate choice — it gives me an upgrade path to Zen 5 chips down the road without replacing the motherboard. The MSI Pro B650M-P boards are no-frills but reliable, which is exactly what I want in something that's going to run 24/7 in a closet. Samsung 970 EVO 500GB NVMe drives for boot, and everything goes into Rosewill 2U rackmount cases with EVGA 450BT power supplies.
+
+The consolidation math works out nicely. Four Dell nodes with 32GB each gave me 128GB of total RAM across 16 cores and 16 threads. Two custom nodes with 64GB each gives me the same 128GB, but across 16 cores and 32 threads with dramatically faster DDR5 bandwidth. And once the NAS converts to a Proxmox host with its existing 64GB, the total cluster jumps to 192GB. More RAM, more compute, fewer machines, fewer things to manage.
+
+## What's next
+
+That's the plan on paper. Two custom builds, a NAS conversion, and a complete rethink of how everything is deployed and managed.
+
+Next up: actually building these things and getting our hands dirty.
