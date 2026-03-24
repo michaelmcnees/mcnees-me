@@ -2,6 +2,7 @@
 title: "AI Doesn't Know Your Smart Home Platform (Yet)"
 description: "Homey app development is a blind spot for AI assistants. So I built an Agent Skill to fix that."
 date: 2026-03-10
+updated: 2026-03-23
 tags: ["ai", "smart-home", "tooling"]
 draft: false
 ---
@@ -10,9 +11,9 @@ I've been a HomeKit user for years. Not casually — dedicated. I like the way A
 
 But there are gaps. My Vivint security system, for one. HomeKit doesn't support it. Homebridge doesn't either. So like a lot of people, I begrudgingly set up Home Assistant to fill in the holes.
 
-I don't love Home Assistant. It's powerful, no question. But the UI feels like it was designed by committee, the YAML configuration is its own dialect, and every time I open it I feel like I'm administering a server instead of managing my home. It works. I just don't enjoy working with it.
+I don't love Home Assistant. It's powerful, no question. But the UI feels like it was designed by committee, the YAML configuration is its own dialect, and every time I open it I feel like I'm administering a server instead of managing my home. It works. I just don't enjoy using it.
 
-So when I heard about Homey — and specifically their new self-hosted Homey server — I was genuinely excited. A new option in the space. A platform that seemed to care about user experience. I set it up immediately.
+So when I heard about Homey — and specifically their new self-hosted Homey server — I was genuinely excited. A new option in the space. A platform that actually seemed to care about user experience. I set it up immediately.
 
 And then I needed to integrate my Vivint system.
 
@@ -26,7 +27,7 @@ So I decided to just build a native Homey app for Vivint myself.
 
 Here's the thing about Homey app development: AI doesn't know how to do it.
 
-Ask Claude or ChatGPT to write you a React component and you'll get something solid. Ask it to set up an Express server, a Django app, a Swift view — it'll do fine. These are well-represented in training data. Millions of examples, thousands of tutorials, years of Stack Overflow answers.
+Ask Claude or ChatGPT to write a React component and you'll get something solid. Ask it to set up an Express server, a Django app, a Swift view — it'll do fine. These are well-represented in training data. Millions of examples, thousands of tutorials, years of Stack Overflow answers.
 
 Ask it to scaffold a Homey app with the right Compose structure, create a driver with proper capability mappings, or wire up Flow cards — and it starts making things up. It'll hallucinate directory structures. It'll mix up SDK v2 and v3 patterns. It'll confidently generate files that don't follow Homey Compose conventions at all.
 
@@ -51,7 +52,7 @@ The skill covers the full development lifecycle:
 
 I've been using it to build my Vivint integration, and the difference is night and day. Instead of constantly correcting hallucinated file structures and outdated API calls, the AI actually generates code that follows Homey's conventions. It knows where files go. It knows how Compose works. It gets the driver lifecycle right.
 
-That said — I want to be honest about where this is. I'm not a Homey expert. I built this skill because I needed it, and I learned a lot about the SDK in the process, but I'm sure there are things that are wrong or missing. That's kind of the point of putting it out there.
+That said — I want to be honest about where this is. I'm not a Homey expert. I built this skill because I needed it, and I learned a lot about the SDK in the process. I'm sure there are things wrong or missing. That's kind of the point of putting it out there.
 
 ## Try it, break it, tell me what's wrong
 
