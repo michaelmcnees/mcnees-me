@@ -2,16 +2,15 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
 import PostList from "@/components/post-list.astro";
-import CircuitDivider from "@/components/circuit-divider.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 ---
 <BaseLayout title="Michael McNees">
   <section class="py-16">
-    <h1 class="text-5xl font-bold text-gray-100 mb-4 tracking-tight">
+    <h1 class="text-5xl font-bold text-on-surface mb-4 tracking-tight" style="font-family: var(--font-heading);">
       Hi, I'm Michael McNees 🕹️
     </h1>
-    <p class="text-lg text-gray-300 leading-relaxed max-w-lg">
+    <p class="text-lg text-on-surface-variant leading-relaxed max-w-lg">
       Engineering manager, builder, and writer. I lead engineering teams and tinker with TypeScript, React, Go, and whatever else catches my attention.
     </p>
     <div class="mt-6 flex gap-4 text-sm">
@@ -21,11 +20,10 @@ const posts = await getCollection("blog", ({ data }) => !data.draft);
     </div>
   </section>
 
-  <CircuitDivider />
   <section class="py-12">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-semibold text-gray-100 tracking-tight">Latest Posts</h2>
-      <a href="/blog" class="text-sm text-gray-400 hover:text-gray-200 no-underline">View all &rarr;</a>
+      <h2 class="text-xl font-semibold text-on-surface tracking-tight">Latest Posts</h2>
+      <a href="/blog" class="text-sm text-on-surface-variant hover:text-on-surface no-underline">View all &rarr;</a>
     </div>
     <PostList posts={posts} limit={5} />
   </section>

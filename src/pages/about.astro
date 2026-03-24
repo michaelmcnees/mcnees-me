@@ -1,13 +1,12 @@
 ---
 import BaseLayout from "@/layouts/base-layout.astro";
 import AboutTimeline from "@/components/about-timeline.astro";
-import CircuitDivider from "@/components/circuit-divider.astro";
 ---
 <BaseLayout title="About — Michael McNees" description="Engineering manager, builder, and writer.">
   <section class="py-12">
-    <h1 class="text-3xl font-bold text-gray-100 mb-6 tracking-tight">About</h1>
+    <h1 class="text-3xl font-bold text-on-surface mb-6 tracking-tight">About</h1>
 
-    <div class="space-y-4 text-gray-400 leading-relaxed mb-12">
+    <div class="space-y-4 text-on-surface-variant leading-relaxed mb-12">
       <p>
         I'm an engineering manager at WeGoLook, a Crawford & Company subsidiary, where I lead
         a multi-functional team of frontend, backend, mobile, and cloud engineers. My path here
@@ -31,13 +30,13 @@ import CircuitDivider from "@/components/circuit-divider.astro";
       </p>
     </div>
 
-    <h2 class="text-xl font-semibold text-gray-100 mb-6 tracking-tight">Career</h2>
+    <h2 class="text-xl font-semibold text-on-surface mb-6 tracking-tight">Career</h2>
     <AboutTimeline />
 
-    <CircuitDivider class="mt-12" />
+    <hr class="mt-12 border-outline-variant" />
     <div class="pt-4">
-      <h2 class="text-xl font-semibold text-gray-100 mb-4 tracking-tight">Outside of Work</h2>
-      <div class="space-y-4 text-gray-400 leading-relaxed">
+      <h2 class="text-xl font-semibold text-on-surface mb-4 tracking-tight">Outside of Work</h2>
+      <div class="space-y-4 text-on-surface-variant leading-relaxed">
         <p>
           I live in West Michigan with my wife and two kids. I love the beach in the summer and
           the fall colors even more.
@@ -58,9 +57,9 @@ import CircuitDivider from "@/components/circuit-divider.astro";
       </div>
     </div>
 
-    <CircuitDivider class="mt-12" />
+    <hr class="mt-12 border-outline-variant" />
     <div class="pt-4">
-      <h2 class="text-xl font-semibold text-gray-100 mb-4 tracking-tight">Get in Touch</h2>
+      <h2 class="text-xl font-semibold text-on-surface mb-4 tracking-tight">Get in Touch</h2>
       <div class="flex gap-4 text-sm">
         <a href="mailto:mcnees.michael@gmail.com">Email</a>
         <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a>
