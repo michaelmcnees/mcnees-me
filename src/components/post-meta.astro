@@ -1,4 +1,6 @@
 ---
+import { hashToHue } from "@/utils/tag-color";
+
 interface Props {
   date: Date;
   tags: string[];
@@ -14,8 +16,8 @@ const formattedDate = date.toLocaleDateString("en-US", {
   day: "numeric",
 });
 ---
-<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-400">
-  <span class="inline-flex items-center gap-1 font-mono text-xs rounded px-2 py-0.5" style="background: oklch(0.15 0.01 250); color: oklch(0.55 0.04 250);">
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-on-surface-variant">
+  <span class="inline-flex items-center gap-1 font-mono text-xs rounded px-2 py-0.5" style={`background: var(--color-surface-container-high); color: var(--color-outline);`}>
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="shrink-0" aria-hidden="true">
       <circle cx="4" cy="3.5" r="1.5" fill="currentColor"/>
       <circle cx="4" cy="10.5" r="1.5" fill="currentColor"/>
@@ -25,16 +27,23 @@ const formattedDate = date.toLocaleDateString("en-US", {
     </svg>
     <time datetime={date.toISOString()}>{formattedDate}</time>
   </span>
-  {slug && <span id="view-count" class="font-mono text-xs hidden" style="color: oklch(0.45 0.03 250);" data-views={slug}>&middot; <span data-views-number></span></span>}
-  {minutesRead && <span class="font-mono text-xs" style="color: oklch(0.45 0.03 250);">&middot; {minutesRead} min read</span>}
+  {slug && <span id="view-count" class="font-mono text-xs hidden" style={`color: var(--color-outline);`} data-views={slug}>&middot; <span data-views-number></span></span>}
+  {minutesRead && <span class="font-mono text-xs" style={`color: var(--color-outline);`}>&middot; {minutesRead} min read</span>}
 </div>
 {tags.length > 0 && (
   <div class="flex flex-wrap gap-2 mt-2">
-    {tags.map((tag) => (
-      <a href="/blog" class="text-xs text-gray-300 bg-gray-800/50 border border-gray-700 px-2 py-0.5 rounded no-underline hover:text-gray-100 hover:border-gray-600 transition-colors">
-        {tag}
-      </a>
-    ))}
+    {tags.map((tag) => {
+      const hue = hashToHue(tag);
+      return (
+        <a
+          href="/blog"
+          class="text-xs font-mono text-on-surface-variant px-2 py-0.5 rounded-sm no-underline hover:text-on-surface transition-colors"
+          style={`background: var(--color-surface-container-high); border-left: 3px solid oklch(0.72 0.15 ${hue}); box-shadow: 0 1px 2px rgba(0,0,0,0.4);`}
+        >
+          {tag}
+        </a>
+      );
+    })}
   </div>
 )}
 
