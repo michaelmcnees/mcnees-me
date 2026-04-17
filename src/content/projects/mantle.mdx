@@ -12,4 +12,4 @@ repo: https://github.com/dvflw/mantle
 order: 1
 ---
 
-Mantle takes the IaC lifecycle I already trust — validate, plan, apply, run — and points it at AI workflow automation. It's a single Go binary with BYOK, Postgres-only state, and crash recovery that actually works. I built it because every workflow tool I tried either pretended AI didn't exist or drowned in it.
+Mantle is a workflow automation tool built for cloud engineers who already live in Terraform and want something with the same shape — validate, plan, apply, run — for AI and general automation. The top goals are security and ease of use: BYOK, single Go binary, Postgres-only state, and a threat model that assumes your workflows touch sensitive things. I built it because the existing AI workflow tools don't take security seriously enough.

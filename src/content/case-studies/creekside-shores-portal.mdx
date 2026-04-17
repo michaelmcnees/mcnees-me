@@ -15,22 +15,26 @@ stack:
   - Cloudflare KV
   - SendGrid
   - Twilio
-outcome: The neighborhood has a legally sound, private communication channel the board actually controls.
-summary: Replacing a problematic neighborhood Facebook group with a Cloudflare-first portal — because the HOA's lawyer said the Facebook group had to go.
+outcome: A Cloudflare-first portal that saved the HOA the cost of third-party property management and a separate web design contract.
+summary: How I volunteered to build the neighborhood portal before joining the board — because the alternative was hiring a property management firm and paying for it in my own dues.
 date: 2026-02-01
 ---
 
 This project started the way a lot of volunteer work starts: an email I almost didn't open.
 
-I'm an owner and resident at Creekside Shores. One afternoon a message went out saying the current HOA board wanted to step down and was looking for volunteers to take over. I read it twice, thought about it for a day, and replied. A few weeks later I was on the board, in a meeting where someone explained — calmly, the way people explain things they've already stopped being shocked by — that our HOA's lawyer had advised the board to stop using the neighborhood Facebook group.
+I'm an owner and resident at Creekside Shores. One afternoon a message went out from the current HOA board. The gist was that they were looking for enough homeowners to volunteer for the upcoming board term — and, buried a little further down, the proposed 2026 budget. I read the whole thing twice.
 
-Not "consider migrating." Stop.
+Two things jumped out.
 
-The short version of why: a Facebook group is not a legally defensible communication channel for an HOA. The board doesn't own the data. The board doesn't control the archive. Members can delete posts. Meta can change the rules. When something goes wrong — a dispute, a vote, a rule change — and somebody's lawyer asks for the record, "we had a Facebook group" is not an answer that ends the conversation. It starts a worse one.
+The first was a clause I had glossed over when I bought the house: our bylaws require the HOA to hire a third-party property management firm if not enough homeowners volunteer to run the board. That is not a small line item. That is a standing, recurring expense that shows up in everyone's dues, forever, because a handful of neighbors didn't want to sit in meetings. I did not want to pay for that. More specifically, I did not want to watch my own dues go up to pay for it.
 
-The previous board had been looking at building a site to replace it. They'd gotten as far as the idea. I inherited the project.
+The second was a line in the proposed budget for hiring a web designer to build a community site. The board had already concluded the neighborhood needed a real, board-owned communication channel, and the plan on the table was to contract it out.
 
-This is the kind of thing I actually like. A real problem with real constraints, a small group of people who just need it to work, and no appetite for anything fancy. Nobody on the board wants to hear about architectures. They want a place where the board can post an update, homeowners can read it, the record survives, and nobody has to call a lawyer.
+I'm a software engineer. I already host things on Cloudflare. I know what a portal for a couple hundred households looks like, and it is not a thing you should be paying a web design firm to build from scratch. So I replied to the email and volunteered to build it — as a homeowner, before the board term I'm now running for had even started. The motivation was not resume-building. The motivation was not paying for something I could do myself, and not letting the community pay for it either.
+
+This is the kind of thing I actually like. A real problem with real constraints, a small group of people who just need it to work, and no appetite for anything fancy. Nobody wants to hear about architectures. They want a place where the board can post an update, homeowners can read it, the record survives, and nobody has to call a lawyer.
+
+On the "nobody has to call a lawyer" part: there's context. The neighborhood has had a Facebook group for years, and for a while it doubled as the board's informal announcement channel. That ended when a homeowner tried to post some personal relationship drama on the group's feed, the board moderated the post, and the homeowner threatened to sue the board for a First Amendment violation — their reading, not the law's. The HOA's lawyer advised the board to step away from administering the group entirely, because a volunteer board moderating a private social platform is a risk vector nobody on the board is paid enough to absorb. Another resident volunteered to take over the group as a non-board admin. The group still exists. It's the unofficial social channel for the neighborhood now, run by a neighbor, not the board. The portal is the board's official channel. They're not competing — they're just finally in the right lanes.
 
 I made one big decision early and everything else followed from it: Cloudflare-first. That's not a resume bullet — it's a practical choice for a volunteer-run HOA with zero on-call rotation. The free tier covers a staggering amount of what a small community actually needs. The global edge means the site is fast from anyone's couch. And when something does go wrong at 11pm, it tends to be a deploy issue I can roll back, not a server I have to SSH into and rescue.
 
@@ -46,8 +50,8 @@ Outbound communication is where it gets interesting. The board needs to send not
 
 Then there's the in-app side. When a homeowner is actively on the site and something relevant happens — a new document gets posted, a reply comes in on a board announcement — I wanted that to feel alive, not require a refresh. That's Durable Objects. Each active session can open a realtime channel, and the DO fans updates out to the right people without me having to run a separate websocket service or pay for a third-party pub/sub.
 
-What all of that adds up to, from the board's perspective, is undramatic in exactly the right way. They log in. They post an update. Homeowners get notified through whichever channel they've opted into. The post sits in the archive, signed, timestamped, and searchable. If a dispute comes up six months later and somebody asks "what did the board actually say about the short-term rental rule," there's a single answer and a link to it.
+What all of that adds up to, from the board's perspective, is undramatic in exactly the right way. They log in. They post. Homeowners get notified through whichever channel they've opted into. The post sits in the archive, signed, timestamped, and searchable. If a dispute comes up six months later and somebody asks "what did the board actually say about the short-term rental rule," there's a single answer and a link to it.
 
-The Facebook group is gone. The board owns the conversation and the archive. The HOA's lawyer is no longer sending nervous emails. And because the whole thing sits on Cloudflare's free and pay-as-you-go tiers, the monthly bill is small enough that nobody on the board has to defend it at the annual meeting.
+The community isn't paying a property management firm. The community isn't paying a web designer. The board owns its channel and its archive. The monthly Cloudflare bill is small enough that nobody has to defend it at the annual meeting.
 
 It's not a flashy project. It's the kind of thing you build once, maintain lightly, and forget about — which, for an HOA portal, is the entire point.
