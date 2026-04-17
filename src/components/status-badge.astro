@@ -1,0 +1,20 @@
+---
+interface Props {
+  status: "alpha" | "beta" | "stable";
+}
+
+const { status } = Astro.props;
+
+const colors: Record<Props["status"], string> = {
+  alpha: "oklch(0.72 0.15 40)",
+  beta: "oklch(0.72 0.15 200)",
+  stable: "oklch(0.72 0.15 155)",
+};
+const color = colors[status];
+---
+<span
+  class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded-sm"
+  style={`color: ${color}; background: var(--color-surface-container-high); border: 1px solid ${color};`}
+>
+  {status}
+</span>
