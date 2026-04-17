@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/base-layout.astro";
+import CaseStudySidebar from "@/components/case-study-sidebar.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("case-studies", ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<BaseLayout title={`${entry.data.title} — Michael McNees`} description={entry.data.summary}>
+  <article class="py-12">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-on-surface mb-3 tracking-tight">{entry.data.title}</h1>
+      <p class="text-on-surface-variant">{entry.data.summary}</p>
+    </header>
+    <div class="grid gap-10 md:grid-cols-[1fr_16rem]">
+      <div class="prose prose-invert max-w-none order-2 md:order-1">
+        <Content />
+      </div>
+      <div class="order-1 md:order-2">
+        <CaseStudySidebar
+          role={entry.data.role}
+          timeframe={entry.data.timeframe}
+          client={entry.data.client}
+          stack={entry.data.stack}
+          outcome={entry.data.outcome}
+          url={entry.data.url}
+          repo={entry.data.repo}
+        />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
