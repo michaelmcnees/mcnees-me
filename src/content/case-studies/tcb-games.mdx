@@ -1,0 +1,34 @@
+---
+title: TCB Games
+role: Builder & friend of the shop
+timeframe: 2023 – present
+client: TCB Games
+url: https://tcb.games
+stack:
+  - Next.js
+  - Retro UI
+  - Shopify
+  - Lightspeed
+  - SkuIQ
+outcome: Local retro game shop became a full eCommerce channel without abandoning the store that made it special.
+summary: How a conversation overheard at the counter turned into a custom eCommerce build for a local retro game shop.
+date: 2024-06-01
+---
+
+I was just a customer when this started. TCB Games is the kind of place you end up at on a Saturday afternoon because your kid wants to see if they have a working copy of some SNES cart you half-remember from childhood, and then two hours later you're deep in a crate of PS1 discs and nobody's trying to rush you out. That's the vibe. Glass cases full of cartridges, CRTs humming in the corner, and staff who actually know what they're talking about.
+
+I'd been in there enough times to recognize the owner. One afternoon I overheard him talking to one of his staff at the counter — the shop was up for some kind of industry award, and one of the qualifying criteria was having a real web presence. Not a Facebook page. An actual storefront. They didn't have one, and the deadline was tighter than anyone would want.
+
+I'm not usually the guy who jumps into conversations at the register. But this one I couldn't let go of. I introduced myself, told him what I do for a living, and said if he wanted help, I'd help. That was the start of it. We've been friends since.
+
+The problem itself was straightforward on paper and genuinely thorny in practice. The shop ran entirely in-person. Every cart, every controller, every box of loose Game Boy games sitting in a bin by the door — all of it lived in Lightspeed, the POS system driving the counter. Lightspeed is great at what it does. It is not, however, a storefront. If we wanted an online channel, we couldn't just spin up a Shopify store and call it done, because then inventory would live in two places at once, and two places at once is a special kind of hell when you're selling one-of-a-kind used games. Someone buys the last copy of Chrono Trigger online at 2 a.m., and if the shop doesn't know until morning, it's already been sold again in person.
+
+So the first real decision was the plumbing. Shopify was the right storefront — it's where the eCommerce gravity is, it has the payment rails figured out, and the admin UX is good enough that shop staff can manage orders without me in the loop. Lightspeed stays the source of truth for inventory because that's where the register is, and the register is never going away. The bridge is SkuIQ, which sits between the two and keeps one listing synced to one physical item. Sell it at the counter, it disappears from the site. Sell it on the site, it disappears from the shelf. That's the whole ballgame when your catalog is thousands of unique SKUs that exist exactly once.
+
+With the plumbing settled, the fun part was the front of the house. A default Shopify theme would have been fine. It would have worked. It also would have been a betrayal of what TCB actually is. The whole appeal of the shop is that it's *for* people who care — people who notice the little stuff, who'll pick up on a reference, who know the difference between a Japanese Saturn import and a grey-market bootleg. You can't put a beige theme on that and expect it to feel like the shop.
+
+So we built a custom storefront in Next.js on top of Retro UI, hitting Shopify's APIs for the catalog and checkout. Retro UI gave us the right starting vocabulary — chunky pixels, unapologetic color, the visual language of the consoles the shop sells — and from there it was late nights in the details. The loading states, the hover transitions, the way the add-to-cart button clicks, the easter eggs tucked into corners for people who look. The 404 page. The footer. None of it was strictly necessary. All of it mattered. That's the thing about building for a shop whose whole brand is *caring about the craft* — if the site doesn't care about its own craft, the site is a lie.
+
+What shipped was a complete eCommerce channel with the soul of the store intact. Inventory flows from the counter to the web and back. Customers who could only shop in-store can now shop from anywhere, and the people who walk in on Saturdays still get the same experience they always did. The shop qualified for what it needed to qualify for. And I got a friend out of it, which was not the point but is maybe the best part.
+
+It's been running since 2023, and I'm still the guy they call when something needs a nudge. Friend of the shop is a role I'm happy to keep.

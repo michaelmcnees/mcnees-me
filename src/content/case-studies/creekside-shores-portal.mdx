@@ -1,0 +1,53 @@
+---
+title: Creekside Shores Portal
+role: Board volunteer & builder
+timeframe: 2025 – present
+client: Creekside Shores HOA
+url: https://creeksideshores.com
+stack:
+  - Astro
+  - Better Auth
+  - Drizzle
+  - Cloudflare D1
+  - Cloudflare R2
+  - Cloudflare Queues
+  - Durable Objects
+  - Cloudflare KV
+  - SendGrid
+  - Twilio
+outcome: The neighborhood has a legally sound, private communication channel the board actually controls.
+summary: Replacing a problematic neighborhood Facebook group with a Cloudflare-first portal — because the HOA's lawyer said the Facebook group had to go.
+date: 2026-02-01
+---
+
+This project started the way a lot of volunteer work starts: an email I almost didn't open.
+
+I'm an owner and resident at Creekside Shores. One afternoon a message went out saying the current HOA board wanted to step down and was looking for volunteers to take over. I read it twice, thought about it for a day, and replied. A few weeks later I was on the board, in a meeting where someone explained — calmly, the way people explain things they've already stopped being shocked by — that our HOA's lawyer had advised the board to stop using the neighborhood Facebook group.
+
+Not "consider migrating." Stop.
+
+The short version of why: a Facebook group is not a legally defensible communication channel for an HOA. The board doesn't own the data. The board doesn't control the archive. Members can delete posts. Meta can change the rules. When something goes wrong — a dispute, a vote, a rule change — and somebody's lawyer asks for the record, "we had a Facebook group" is not an answer that ends the conversation. It starts a worse one.
+
+The previous board had been looking at building a site to replace it. They'd gotten as far as the idea. I inherited the project.
+
+This is the kind of thing I actually like. A real problem with real constraints, a small group of people who just need it to work, and no appetite for anything fancy. Nobody on the board wants to hear about architectures. They want a place where the board can post an update, homeowners can read it, the record survives, and nobody has to call a lawyer.
+
+I made one big decision early and everything else followed from it: Cloudflare-first. That's not a resume bullet — it's a practical choice for a volunteer-run HOA with zero on-call rotation. The free tier covers a staggering amount of what a small community actually needs. The global edge means the site is fast from anyone's couch. And when something does go wrong at 11pm, it tends to be a deploy issue I can roll back, not a server I have to SSH into and rescue.
+
+The site itself is Astro. Static where it can be, dynamic where it has to be. Most of what a homeowner sees — documents, announcements, the directory of who does what on the board — is content that doesn't need to be rendered on every request. Astro's mix of static output and selective interactivity fits that shape exactly.
+
+Identity is Better Auth. The board needed something that could handle real-world messiness: homeowners who share an email with a spouse, renters who aren't owners but still need access to certain things, board members with elevated permissions, and the slow trickle of people who move in, move out, or forget their password once a year. Better Auth gave me session management, email verification, and role boundaries without me having to hand-roll any of it. Sessions sit in Cloudflare KV, which means auth checks are fast from anywhere the site is served.
+
+The data layer is Drizzle against Cloudflare D1. D1 is SQLite at the edge, which sounds unusual until you realize that an HOA portal is, at its heart, a small amount of important data read by a small number of people. It's the right size database for the problem. Drizzle gives me type-safe queries and migrations that run in CI, so schema changes aren't a thing I do at midnight with my fingers crossed.
+
+Documents — meeting minutes, financials, covenants, the PDF of the rules everybody signed and nobody reads — go into R2. R2 is cheap, it doesn't charge egress, and for an HOA that occasionally gets a burst of traffic when something contentious happens, "doesn't charge egress" is not nothing. The archive is the product here. If the archive costs more to maintain than the HOA can justify, the project fails. R2 makes that math stay boring.
+
+Outbound communication is where it gets interesting. The board needs to send notifications — meeting reminders, dues notices, emergency alerts about things like a water main break. Some of those go out by email (SendGrid), some by SMS (Twilio), and the scheduling has to survive the board member who queues it up on a Sunday night and then goes to bed. That's what Cloudflare Queues is for. A board member schedules a notification, it lands in a queue, and a worker picks it up when it's supposed to go out. If SendGrid hiccups, the job retries. Nobody has to babysit it.
+
+Then there's the in-app side. When a homeowner is actively on the site and something relevant happens — a new document gets posted, a reply comes in on a board announcement — I wanted that to feel alive, not require a refresh. That's Durable Objects. Each active session can open a realtime channel, and the DO fans updates out to the right people without me having to run a separate websocket service or pay for a third-party pub/sub.
+
+What all of that adds up to, from the board's perspective, is undramatic in exactly the right way. They log in. They post an update. Homeowners get notified through whichever channel they've opted into. The post sits in the archive, signed, timestamped, and searchable. If a dispute comes up six months later and somebody asks "what did the board actually say about the short-term rental rule," there's a single answer and a link to it.
+
+The Facebook group is gone. The board owns the conversation and the archive. The HOA's lawyer is no longer sending nervous emails. And because the whole thing sits on Cloudflare's free and pay-as-you-go tiers, the monthly bill is small enough that nobody on the board has to defend it at the annual meeting.
+
+It's not a flashy project. It's the kind of thing you build once, maintain lightly, and forget about — which, for an HOA portal, is the entire point.
