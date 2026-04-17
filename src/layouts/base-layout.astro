@@ -10,7 +10,7 @@ const { title, description = "Engineering manager, builder, writer." } = Astro.p
 const currentPath = Astro.url.pathname;
 
 const navLinks = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Home", mobileHidden: true },
   { href: "/blog", label: "Blog" },
   { href: "/case-studies", label: "Case Studies" },
   { href: "/projects", label: "Projects" },
@@ -37,16 +37,17 @@ const navLinks = [
     <title>{title}</title>
   </head>
   <body class="min-h-screen flex flex-col">
-    <header class="w-full max-w-2xl mx-auto px-6 py-8 flex items-center justify-between">
-      <a href="/" class="text-on-surface text-lg font-semibold no-underline hover:text-white relative" style="font-family: var(--font-heading);">
+    <header class="w-full max-w-2xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center sm:justify-between gap-4 sm:gap-0">
+      <a href="/" class="text-on-surface text-lg font-semibold no-underline hover:text-white relative text-center sm:text-left" style="font-family: var(--font-heading);">
         Michael McNees
       </a>
-      <nav class="flex gap-6">
-        {navLinks.map(({ href, label }) => (
+      <nav class="flex gap-6 w-full sm:w-auto overflow-x-auto whitespace-nowrap justify-center sm:justify-end -mx-6 px-6 sm:mx-0 sm:px-0">
+        {navLinks.map(({ href, label, mobileHidden }) => (
           <a
             href={href}
             class:list={[
-              "text-sm no-underline transition-colors pb-1",
+              "text-sm no-underline transition-colors pb-1 shrink-0",
+              mobileHidden && "hidden sm:inline-block",
               currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))
                 ? "text-primary border-b-2 border-primary"
                 : "text-on-surface-variant hover:text-on-surface border-b-2 border-transparent",
