@@ -1,0 +1,38 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/base-layout.astro";
+import ProjectCard from "@/components/project-card.astro";
+
+const entries = await getCollection("projects", ({ data }) => !data.draft);
+const sorted = entries.sort((a, b) => {
+  const orderDelta = (a.data.order ?? Infinity) - (b.data.order ?? Infinity);
+  if (orderDelta !== 0) return orderDelta;
+  return a.data.name.localeCompare(b.data.name);
+});
+
+const rendered = await Promise.all(
+  sorted.map(async (entry) => {
+    const { Content } = await render(entry);
+    return { entry, Content };
+  }),
+);
+---
+<BaseLayout title="Projects — Michael McNees" description="Side projects, tools, and experiments.">
+  <section class="py-16">
+    <h1 class="text-4xl font-bold text-on-surface mb-3 tracking-tight" style="font-family: var(--font-heading);">Projects</h1>
+    <p class="text-lg text-on-surface-variant leading-relaxed max-w-lg">
+      Side projects, tools, and experiments — some shipping, some still finding their shape.
+    </p>
+  </section>
+  <section class="pb-16">
+    {rendered.length === 0 ? (
+      <p class="text-on-surface-variant">No projects yet.</p>
+    ) : (
+      rendered.map(({ entry, Content }) => (
+        <ProjectCard entry={entry}>
+          <Content />
+        </ProjectCard>
+      ))
+    )}
+  </section>
+</BaseLayout>
