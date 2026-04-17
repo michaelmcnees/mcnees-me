@@ -1,0 +1,51 @@
+---
+import StackChip from "@/components/stack-chip.astro";
+
+interface Props {
+  role: string;
+  timeframe: string;
+  client?: string;
+  stack: string[];
+  outcome: string;
+  url?: string;
+  repo?: string;
+}
+
+const { role, timeframe, client, stack, outcome, url, repo } = Astro.props;
+---
+<aside class="text-sm space-y-4 md:sticky md:top-8 md:self-start">
+  <dl class="space-y-3">
+    {client && (
+      <div>
+        <dt class="text-outline font-mono text-xs uppercase tracking-wider">Client</dt>
+        <dd class="text-on-surface mt-1">{client}</dd>
+      </div>
+    )}
+    <div>
+      <dt class="text-outline font-mono text-xs uppercase tracking-wider">Role</dt>
+      <dd class="text-on-surface mt-1">{role}</dd>
+    </div>
+    <div>
+      <dt class="text-outline font-mono text-xs uppercase tracking-wider">Timeframe</dt>
+      <dd class="text-on-surface mt-1">{timeframe}</dd>
+    </div>
+    <div>
+      <dt class="text-outline font-mono text-xs uppercase tracking-wider">Outcome</dt>
+      <dd class="text-on-surface mt-1">{outcome}</dd>
+    </div>
+    {stack.length > 0 && (
+      <div>
+        <dt class="text-outline font-mono text-xs uppercase tracking-wider">Stack</dt>
+        <dd class="mt-2 flex flex-wrap gap-2">
+          {stack.map((s) => <StackChip label={s} />)}
+        </dd>
+      </div>
+    )}
+  </dl>
+  {(url || repo) && (
+    <div class="flex flex-col gap-2 pt-2 border-t border-outline/20">
+      {url && <a href={url} target="_blank" rel="noopener" class="text-sm">Visit site &rarr;</a>}
+      {repo && <a href={repo} target="_blank" rel="noopener" class="text-sm">View repo &rarr;</a>}
+    </div>
+  )}
+</aside>
