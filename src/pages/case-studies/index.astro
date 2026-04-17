@@ -1,0 +1,29 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/base-layout.astro";
+import CaseStudyCard from "@/components/case-study-card.astro";
+
+const entries = await getCollection("case-studies", ({ data }) => !data.draft);
+const sorted = entries.sort((a, b) => {
+  const orderDelta = (a.data.order ?? Infinity) - (b.data.order ?? Infinity);
+  if (orderDelta !== 0) return orderDelta;
+  return b.data.date.getTime() - a.data.date.getTime();
+});
+---
+<BaseLayout title="Case Studies — Michael McNees" description="Long-form write-ups of client and community work.">
+  <section class="py-16">
+    <h1 class="text-4xl font-bold text-on-surface mb-3 tracking-tight" style="font-family: var(--font-heading);">Case Studies</h1>
+    <p class="text-lg text-on-surface-variant leading-relaxed max-w-lg">
+      Longer write-ups of work I've done for clients, communities, and friends.
+    </p>
+  </section>
+  <section class="pb-16">
+    {sorted.length === 0 ? (
+      <p class="text-on-surface-variant">No case studies yet.</p>
+    ) : (
+      <div class="list-none p-0">
+        {sorted.map((entry) => <CaseStudyCard entry={entry} />)}
+      </div>
+    )}
+  </section>
+</BaseLayout>
