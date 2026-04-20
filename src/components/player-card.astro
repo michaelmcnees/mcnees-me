@@ -1,0 +1,99 @@
+---
+interface Row {
+  k: string;
+  v: string;
+}
+
+interface Props {
+  size?: "hero" | "about";
+  rows?: Row[];
+}
+
+const defaultRows: Row[] = [
+  { k: "TITLE", v: "ENG MGR" },
+  { k: "LOCATION", v: "WEST MICHIGAN" },
+  { k: "CLASS", v: "BUILDER / WRITER" },
+  { k: "CURRENT BUILD", v: "MANTLE // HONEYDEW" },
+];
+
+const { size = "hero", rows = defaultRows } = Astro.props;
+---
+<div class:list={["sw-id-card", `sw-id-${size}`]}>
+  <div class="sw-id-photo" aria-hidden="true"></div>
+  <dl class="sw-id-rows">
+    {rows.map((row) => (
+      <div class="sw-id-row">
+        <dt class="k">{row.k}</dt>
+        <dd class="v">{row.v}</dd>
+      </div>
+    ))}
+  </dl>
+</div>
+
+<style>
+  .sw-id-card {
+    padding: 20px;
+    border: 1px solid rgba(34, 231, 255, 0.3);
+    background: linear-gradient(180deg, rgba(20, 8, 50, 0.7), rgba(10, 2, 32, 0.9));
+    border-radius: 4px;
+    position: relative;
+  }
+  .sw-id-card::before {
+    content: "PLAYER 1";
+    position: absolute; top: -8px; left: 12px;
+    background: var(--sw-bg-0);
+    padding: 0 8px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--mag-2);
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 6px var(--mag);
+  }
+  .sw-id-photo {
+    width: 100%; aspect-ratio: 1/1;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #241050, #3d0a6b 40%, #8a1fa0 100%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .sw-id-photo::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg,
+      transparent 0, transparent 5px,
+      rgba(34, 231, 255, 0.07) 5px, rgba(34, 231, 255, 0.07) 6px);
+  }
+  .sw-id-photo::after {
+    content: "[ PORTRAIT ]";
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: var(--font-pixel);
+    color: var(--cyan-2);
+    font-size: 20px;
+    letter-spacing: 0.3em;
+    opacity: 0.6;
+  }
+  .sw-id-rows { margin: 0; padding: 0; }
+  .sw-id-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(34, 231, 255, 0.2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .sw-id-row:last-child { border-bottom: none; }
+  .sw-id-row .k {
+    color: var(--sw-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .sw-id-row .v {
+    color: var(--cyan-2);
+    margin: 0;
+  }
+
+  .sw-id-hero { max-width: 360px; margin: 0 auto; }
+  .sw-id-about { max-width: 100%; }
+</style>
