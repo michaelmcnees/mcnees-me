@@ -1,20 +1,28 @@
 ---
 import "@/styles/global.css";
+import Backdrop from "@/components/backdrop.astro";
+import Scanlines from "@/components/scanlines.astro";
+import Vignette from "@/components/vignette.astro";
+import Brand from "@/components/brand.astro";
+import Sysbar from "@/components/sysbar.astro";
+import ScrollIndicator from "@/components/scroll-indicator.astro";
+import TweaksPanel from "@/components/tweaks-panel.astro";
 
 interface Props {
   title: string;
   description?: string;
+  reading?: boolean;
 }
 
-const { title, description = "Engineering manager, builder, writer." } = Astro.props;
+const { title, description = "Engineering manager, builder, writer.", reading = false } = Astro.props;
 const currentPath = Astro.url.pathname;
 
 const navLinks = [
-  { href: "/", label: "Home", mobileHidden: true },
-  { href: "/blog", label: "Blog" },
-  { href: "/case-studies", label: "Case Studies" },
-  { href: "/projects", label: "Projects" },
-  { href: "/about", label: "About" },
+  { href: "/", label: "HOME", mobileHidden: true },
+  { href: "/blog", label: "BLOG" },
+  { href: "/case-studies", label: "CASE STUDIES" },
+  { href: "/projects", label: "PROJECTS" },
+  { href: "/about", label: "ABOUT" },
 ];
 ---
 <html lang="en">
@@ -36,87 +44,198 @@ const navLinks = [
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen flex flex-col">
-    <header class="w-full max-w-2xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center sm:justify-between gap-4 sm:gap-0">
-      <a href="/" class="text-on-surface text-lg font-semibold no-underline hover:text-white relative text-center sm:text-left" style="font-family: var(--font-heading);">
-        Michael McNees
-      </a>
-      <nav class="flex gap-6 w-full sm:w-auto overflow-x-auto whitespace-nowrap justify-center sm:justify-end -mx-6 px-6 sm:mx-0 sm:px-0">
-        {navLinks.map(({ href, label, mobileHidden }) => (
-          <a
-            href={href}
-            class:list={[
-              "text-sm no-underline transition-colors pb-1 shrink-0",
-              mobileHidden && "hidden sm:inline-block",
-              currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))
-                ? "text-primary border-b-2 border-primary"
-                : "text-on-surface-variant hover:text-on-surface border-b-2 border-transparent",
-            ]}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
-    </header>
+  <body data-reading={reading ? "true" : undefined}>
+    <Backdrop />
+    <Vignette />
+    <Scanlines />
+    <ScrollIndicator />
 
-    <main class="w-full max-w-2xl mx-auto px-6 flex-1">
-      <slot />
-    </main>
+    <div class="sw-shell">
+      <header class="sw-top">
+        <Brand />
+        <nav class="sw-nav">
+          {navLinks.map(({ href, label, mobileHidden }) => (
+            <a
+              href={href}
+              class:list={[
+                "sw-nav-link",
+                mobileHidden && "sw-nav-link--mobile-hide",
+                currentPath === href || (href !== "/" && currentPath.startsWith(href + "/"))
+                  ? "active"
+                  : "",
+              ]}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+        <Sysbar />
+      </header>
 
-    <footer class="w-full max-w-2xl mx-auto px-6 py-8 flex items-center justify-between">
-      <span class="text-outline text-sm">&copy; 2026 Michael McNees</span>
-      <span class="text-outline text-sm flex items-center gap-2">
-        <span class="inline-block w-1.5 h-1.5 rounded-full motion-safe:animate-[pulse-led_3s_ease-in-out_infinite]" style="background: oklch(0.65 0.18 155); box-shadow: 0 0 6px oklch(0.65 0.18 155 / 0.6), 0 0 12px oklch(0.65 0.18 155 / 0.2);" aria-hidden="true"></span>
-        System online
-      </span>
-    </footer>
-    <script>
-  if (typeof window !== "undefined") {
-    requestIdleCallback(() => {
-      const code = [38,38,40,40,37,39,37,39,66,65];
-      let pos = 0;
-      document.addEventListener("keydown", (e) => {
-        if (e.keyCode === code[pos]) {
-          pos++;
-          if (pos === code.length) {
-            pos = 0;
-            // Scanline flash
-            const overlay = document.createElement("div");
-            Object.assign(overlay.style, {
-              position: "fixed", inset: "0", zIndex: "9999",
-              pointerEvents: "none", opacity: "0",
-              background: "repeating-linear-gradient(to bottom, transparent 0 2px, oklch(0 0 0 / 0.08) 2px 4px)"
-            });
-            document.body.appendChild(overlay);
-            overlay.animate([
-              { opacity: 0 }, { opacity: 0.15, offset: 0.3 }, { opacity: 0 }
-            ], { duration: 2000 }).onfinish = () => overlay.remove();
-            // Toast
-            const toast = document.createElement("div");
-            toast.textContent = "30 extra lives granted";
-            Object.assign(toast.style, {
-              position: "fixed", bottom: "2rem", left: "50%",
-              transform: "translateX(-50%) translateY(1rem)",
-              fontFamily: "ui-monospace, monospace", fontSize: "0.875rem",
-              color: "var(--color-accent)", padding: "0.5rem 1rem",
-              border: "1px solid var(--color-accent)",
-              borderRadius: "0.5rem", background: "var(--color-surface-container-low)",
-              zIndex: "10000", opacity: "0", whiteSpace: "nowrap"
-            });
-            document.body.appendChild(toast);
-            toast.animate([
-              { opacity: 0, transform: "translateX(-50%) translateY(1rem)" },
-              { opacity: 1, transform: "translateX(-50%) translateY(0)", offset: 0.15 },
-              { opacity: 1, transform: "translateX(-50%) translateY(0)", offset: 0.7 },
-              { opacity: 0, transform: "translateX(-50%) translateY(-0.5rem)" }
-            ], { duration: 3000 }).onfinish = () => toast.remove();
-          }
-        } else {
-          pos = e.keyCode === code[0] ? 1 : 0;
+      <main class="sw-page page active">
+        <slot />
+      </main>
+
+      <footer class="sw-bottom">
+        <span>© 2026 MICHAEL McNEES · ALL RIGHTS RESERVED</span>
+        <div class="sw-bottom-right">
+          <a href="mailto:mcnees.michael@gmail.com">EMAIL</a>
+          <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GITHUB</a>
+          <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GITLAB</a>
+          <span class="sw-bottom-status">● SYSTEM ONLINE</span>
+        </div>
+      </footer>
+    </div>
+
+    <TweaksPanel />
+
+    <style>
+      .sw-shell {
+        position: relative;
+        max-width: 1180px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 28px 32px 32px;
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .sw-page { flex: 1 0 auto; }
+      .sw-bottom { flex-shrink: 0; margin-top: auto; }
+
+      .sw-top {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 24px;
+        padding: 16px 20px;
+        border: 1px solid rgba(34, 231, 255, 0.35);
+        border-radius: 4px;
+        background: linear-gradient(180deg, rgba(20, 8, 50, 0.7), rgba(10, 2, 32, 0.85));
+        backdrop-filter: blur(6px);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 43, 214, 0.15),
+          0 0 20px rgba(34, 231, 255, calc(0.25 * var(--glow))),
+          0 0 40px rgba(255, 43, 214, calc(0.18 * var(--glow)));
+      }
+
+      .sw-nav {
+        display: flex;
+        gap: 6px;
+        justify-self: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .sw-nav-link {
+        font-family: var(--font-display);
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        font-weight: 600;
+        color: var(--sw-white);
+        text-decoration: none;
+        padding: 10px 14px;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        position: relative;
+        transition: all 0.18s ease;
+        cursor: pointer;
+      }
+      .sw-nav-link:hover {
+        color: var(--cyan-2);
+        text-shadow: 0 0 6px rgba(34, 231, 255, 0.9);
+        box-shadow: inset 0 0 0 1px rgba(34, 231, 255, 0.8), 0 0 10px rgba(34, 231, 255, 0.5);
+      }
+      .sw-nav-link.active {
+        color: var(--mag-2);
+        text-shadow: 0 0 8px rgba(255, 43, 214, 0.9);
+        box-shadow: inset 0 0 0 1px rgba(255, 43, 214, 0.8), 0 0 10px rgba(255, 43, 214, 0.55);
+      }
+
+      .sw-bottom {
+        margin-top: 80px;
+        padding: 24px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba(34, 231, 255, 0.2);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--sw-dim);
+        letter-spacing: 0.12em;
+      }
+      .sw-bottom-right { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+      .sw-bottom a { color: var(--cyan-2); text-decoration: none; }
+      .sw-bottom a:hover { color: var(--mag-2); }
+      .sw-bottom-status { color: #6bff9e; }
+
+      /* Responsive: stack nav below brand on mobile */
+      @media (max-width: 880px) {
+        .sw-top {
+          grid-template-columns: 1fr;
+          justify-items: center;
+          gap: 12px;
         }
-      });
-    });
-  }
-</script>
+        .sw-nav {
+          width: 100%;
+          overflow-x: auto;
+          white-space: nowrap;
+          flex-wrap: nowrap;
+          justify-content: center;
+        }
+        .sw-nav-link--mobile-hide { display: none; }
+        .sw-bottom { flex-direction: column; gap: 10px; text-align: center; }
+      }
+    </style>
+
+    <script is:inline>
+      // Konami easter egg (preserved from original site).
+      if (typeof window !== "undefined") {
+        requestIdleCallback(() => {
+          const code = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+          let pos = 0;
+          document.addEventListener("keydown", (e) => {
+            if (e.keyCode === code[pos]) {
+              pos++;
+              if (pos === code.length) {
+                pos = 0;
+                const overlay = document.createElement("div");
+                Object.assign(overlay.style, {
+                  position: "fixed", inset: "0", zIndex: "9999",
+                  pointerEvents: "none", opacity: "0",
+                  background: "repeating-linear-gradient(to bottom, transparent 0 2px, oklch(0 0 0 / 0.08) 2px 4px)",
+                });
+                document.body.appendChild(overlay);
+                overlay.animate([
+                  { opacity: 0 }, { opacity: 0.15, offset: 0.3 }, { opacity: 0 },
+                ], { duration: 2000 }).onfinish = () => overlay.remove();
+
+                const toast = document.createElement("div");
+                toast.textContent = "↑↑↓↓←→←→BA · 30 extra lives granted";
+                Object.assign(toast.style, {
+                  position: "fixed", bottom: "2rem", left: "50%",
+                  transform: "translateX(-50%) translateY(1rem)",
+                  fontFamily: "var(--font-mono)", fontSize: "0.875rem",
+                  color: "var(--mag-2)", padding: "0.5rem 1rem",
+                  border: "1px solid var(--mag)",
+                  borderRadius: "0.5rem", background: "rgba(10,2,32,0.95)",
+                  zIndex: "10000", opacity: "0", whiteSpace: "nowrap",
+                  boxShadow: "0 0 14px rgba(255,43,214,0.8)",
+                });
+                document.body.appendChild(toast);
+                toast.animate([
+                  { opacity: 0, transform: "translateX(-50%) translateY(1rem)" },
+                  { opacity: 1, transform: "translateX(-50%) translateY(0)", offset: 0.15 },
+                  { opacity: 1, transform: "translateX(-50%) translateY(0)", offset: 0.7 },
+                  { opacity: 0, transform: "translateX(-50%) translateY(-0.5rem)" },
+                ], { duration: 3000 }).onfinish = () => toast.remove();
+              }
+            } else {
+              pos = e.keyCode === code[0] ? 1 : 0;
+            }
+          });
+        });
+      }
+    </script>
   </body>
 </html>
