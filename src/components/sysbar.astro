@@ -1,0 +1,46 @@
+---
+// System bar: pulsing LED + live clock + status. JS updates clock every 1s.
+---
+<div class="sw-sysbar" aria-label="System status">
+  <span class="sw-led"></span>
+  <span id="sw-sys-time">--:--:--</span>
+  <span>SYS ONLINE</span>
+</div>
+
+<style>
+  .sw-sysbar {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan-2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .sw-led {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #6bff9e;
+    box-shadow: 0 0 8px #6bff9e, 0 0 16px rgba(107, 255, 158, 0.5);
+    animation: sw-led 2.4s ease-in-out infinite;
+  }
+  @keyframes sw-led {
+    0%, 100% { box-shadow: 0 0 8px #6bff9e, 0 0 16px rgba(107, 255, 158, 0.5); }
+    50%      { box-shadow: 0 0 4px #6bff9e, 0 0 8px rgba(107, 255, 158, 0.3); }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const el = document.getElementById('sw-sys-time');
+    if (!el) return;
+    const pad = (n) => String(n).padStart(2, '0');
+    function tick() {
+      const d = new Date();
+      el.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
