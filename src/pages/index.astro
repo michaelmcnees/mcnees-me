@@ -1,30 +1,114 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
+import Panel from "@/components/panel.astro";
+import PlayerCard from "@/components/player-card.astro";
 import PostList from "@/components/post-list.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 ---
-<BaseLayout title="Michael McNees">
-  <section class="py-16">
-    <h1 class="text-5xl font-bold text-on-surface mb-4 tracking-tight" style="font-family: var(--font-heading);">
-      Hi, I'm Michael McNees 🕹️
-    </h1>
-    <p class="text-lg text-on-surface-variant leading-relaxed max-w-lg">
-      Engineering manager, builder, and writer. I lead engineering teams and tinker with TypeScript, React, Go, and whatever else catches my attention.
-    </p>
-    <div class="mt-6 flex gap-4 text-sm">
-      <a href="mailto:mcnees.michael@gmail.com">Get in touch</a>
-      <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GitLab</a>
+<BaseLayout title="Michael McNees // NEON.SYS">
+  <Panel title="// NODE_01 :: IDENTITY" sub="INSERT COIN ⟶" class="sw-hero">
+    <div class="sw-hero-grid">
+      <div>
+        <div class="sw-hero-tagline">Player Profile · West Michigan, USA</div>
+        <h1 class="sw-hero-title">
+          Michael<br />McNees
+          <span class="sub">Engineering Manager</span>
+        </h1>
+        <p class="sw-hero-bio">
+          I lead engineering teams and tinker with TypeScript, React, Go, and whatever else
+          catches my attention. Currently shipping platform migrations by day, building
+          side-quests by night — mostly from a homelab somewhere north of the 43rd parallel.
+        </p>
+        <div class="sw-hero-ctas">
+          <a class="btn primary" href="mailto:mcnees.michael@gmail.com">
+            <span>Get in touch</span><span class="arrow">▷</span>
+          </a>
+          <a class="btn ghost" href="https://github.com/michaelmcnees" target="_blank" rel="noopener">
+            <span>GitHub</span><span class="arrow">▷</span>
+          </a>
+        </div>
+      </div>
+      <div class="sw-hero-right">
+        <PlayerCard size="hero" />
+      </div>
     </div>
-  </section>
+  </Panel>
 
-  <section class="py-12">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-semibold text-on-surface tracking-tight">Latest Posts</h2>
-      <a href="/blog" class="text-sm text-on-surface-variant hover:text-on-surface no-underline">View all &rarr;</a>
-    </div>
+  <div class="section-head">
+    <h2>Latest Transmissions <span class="meta">// /blog</span></h2>
+    <a class="right" href="/blog">View all ▷</a>
+  </div>
+
+  <Panel>
     <PostList posts={posts} limit={5} />
-  </section>
+  </Panel>
 </BaseLayout>
+
+<style>
+  .sw-hero { padding: 64px 48px 56px; margin-top: 24px; }
+  .sw-hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .sw-hero-tagline {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-2);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sw-hero-tagline::before {
+    content: "";
+    width: 24px; height: 1px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  .sw-hero-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 0.98;
+    letter-spacing: 0.01em;
+    margin: 0 0 24px;
+    background: linear-gradient(180deg, #fff 0%, #fff 45%, #ff62e6 70%, #b03cff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 12px rgba(255, 43, 214, calc(0.55 * var(--glow))))
+            drop-shadow(0 0 2px rgba(34, 231, 255, 0.6));
+    text-transform: uppercase;
+  }
+  .sw-hero-title .sub {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(14px, 1.4vw, 18px);
+    letter-spacing: 0.6em;
+    color: var(--cyan-2);
+    background: none;
+    -webkit-text-fill-color: var(--cyan-2);
+    margin-top: 14px;
+    filter: drop-shadow(0 0 4px rgba(34, 231, 255, 0.8));
+  }
+  .sw-hero-bio {
+    font-size: 16px;
+    line-height: 1.65;
+    color: #cbc1e8;
+    max-width: 500px;
+    margin: 0 0 32px;
+  }
+  .sw-hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+  @media (max-width: 880px) {
+    .sw-hero { padding: 48px 24px 40px; }
+    .sw-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+    .sw-hero-right { order: -1; }
+  }
+</style>
