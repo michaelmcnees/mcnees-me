@@ -1,0 +1,2068 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Michael McNees // NEON.SYS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=VT323&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+// Persisted tweak defaults — edited via the Tweaks panel
+window.__TWEAKS = /*EDITMODE-BEGIN*/{
+  "vibe": "minimal",
+  "accentHue": "cyan",
+  "glow": 0.85,
+  "horizon": 0.55,
+  "gridFloor": 0.7,
+  "scan": 0.16
+}/*EDITMODE-END*/;
+</script>
+<style>
+  :root {
+    /* palette */
+    --bg-0: #05020f;
+    --bg-1: #0a0520;
+    --bg-2: #140832;
+
+    --mag: #ff2bd6;       /* hot magenta */
+    --mag-2: #ff62e6;
+    --cyan: #22e7ff;      /* neon cyan */
+    --cyan-2: #7df4ff;
+    --violet: #8a4cff;
+    --yellow: #f9d65c;    /* sunset peak */
+    --orange: #ff6a3d;    /* sunset belly */
+    --white: #ecf6ff;
+    --dim: #8a7fb0;
+    --rule: rgba(138, 76, 255, 0.25);
+
+    --font-display: "Orbitron", "Space Grotesk", sans-serif;
+    --font-body: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --font-pixel: "VT323", ui-monospace, monospace;
+
+    --glow: 0.85;
+    --scan-alpha: 0.30;
+    --horizon: 0.55;
+    --floor-opacity: 0.7;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-0);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+  /* hide native scrollbars (kept functional) */
+  html { scrollbar-width: none; -ms-overflow-style: none; }
+  html::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  body { scrollbar-width: none; }
+  body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+  /* Sticky-footer shell: body becomes a column so the shell can flex-grow */
+  body { display: flex; flex-direction: column; }
+
+  /* ---------- BACKDROP: stars, sunset, grid floor, scanlines ---------- */
+
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(2px 2px at 12% 18%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 22% 42%, #c8b8ff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 38% 12%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 55% 28%, #8ae9ff 50%, transparent 51%),
+      radial-gradient(2px 2px at 72% 8%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 81% 35%, #e0d2ff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 92% 22%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 7% 6%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 48% 48%, #aeb8ff 50%, transparent 51%),
+      radial-gradient(1px 1px at 65% 52%, #e0caff 50%, transparent 51%);
+    opacity: 0.9;
+    animation: twinkle 6s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.9; }
+    50%      { opacity: 0.55; }
+  }
+
+  /* A bigger moon / planet, soft halo */
+  .planet {
+    position: absolute;
+    width: 180px; height: 180px;
+    top: 8%;
+    right: 10%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe6fb 0%, #ff8fe7 25%, #8a4cff 65%, rgba(138,76,255,0) 72%);
+    filter: blur(0.4px) drop-shadow(0 0 40px rgba(255, 43, 214, 0.45));
+    opacity: calc(0.85 * var(--glow));
+  }
+  .planet::after {
+    content: "";
+    position: absolute;
+    left: -8%; right: -8%;
+    top: 50%;
+    height: 8px;
+    transform: translateY(-50%) rotate(-10deg);
+    background:
+      linear-gradient(90deg, transparent, rgba(34,231,255,.6), rgba(255,43,214,.5), transparent);
+    filter: blur(1px);
+    border-radius: 50%;
+    opacity: 0.75;
+  }
+
+  /* Sky gradient / sunset */
+  .sky {
+    position: absolute;
+    inset: 0 0 calc(100% - var(--horizon) * 100%) 0;
+    background:
+      linear-gradient(180deg, #0a0220 0%, #1a0540 35%, #3a0a6b 70%, #691a8a 100%);
+  }
+
+  /* The sunset sun — striped gradient circle */
+  .sun {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--horizon) * 100% - 2px);
+    transform: translate(-50%, 50%);
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background:
+      linear-gradient(180deg,
+        #fff5c7 0%,
+        #f9d65c 18%,
+        #ff9c3a 40%,
+        #ff4da6 65%,
+        #b03cff 88%);
+    filter: drop-shadow(0 0 60px rgba(255, 106, 61, calc(0.5 * var(--glow))))
+            drop-shadow(0 0 100px rgba(255, 43, 214, calc(0.45 * var(--glow))));
+    mask:
+      linear-gradient(#000, #000),
+      repeating-linear-gradient(180deg,
+        transparent 0,
+        transparent calc(50% + 60px),
+        #000 calc(50% + 60px),
+        #000 calc(50% + 68px),
+        transparent calc(50% + 68px),
+        transparent calc(50% + 82px),
+        #000 calc(50% + 82px),
+        #000 calc(50% + 92px),
+        transparent calc(50% + 92px),
+        transparent calc(50% + 112px),
+        #000 calc(50% + 112px),
+        #000 calc(50% + 124px),
+        transparent calc(50% + 124px),
+        transparent calc(50% + 150px),
+        #000 calc(50% + 150px),
+        #000 calc(50% + 164px),
+        transparent calc(50% + 164px));
+    mask-composite: subtract;
+    -webkit-mask:
+      linear-gradient(#000, #000),
+      repeating-linear-gradient(180deg,
+        transparent 0,
+        transparent calc(50% + 60px),
+        #000 calc(50% + 60px),
+        #000 calc(50% + 68px),
+        transparent calc(50% + 68px),
+        transparent calc(50% + 82px),
+        #000 calc(50% + 82px),
+        #000 calc(50% + 92px),
+        transparent calc(50% + 92px),
+        transparent calc(50% + 112px),
+        #000 calc(50% + 112px),
+        #000 calc(50% + 124px),
+        transparent calc(50% + 124px),
+        transparent calc(50% + 150px),
+        #000 calc(50% + 150px),
+        #000 calc(50% + 164px),
+        transparent calc(50% + 164px));
+    -webkit-mask-composite: source-out;
+    opacity: 0.92;
+  }
+
+  /* horizon glow line */
+  .horizon-glow {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: calc(var(--horizon) * 100% - 2px);
+    height: 4px;
+    background: linear-gradient(90deg,
+      transparent 0%, #22e7ff 20%, #ff2bd6 50%, #22e7ff 80%, transparent 100%);
+    filter: blur(1px) drop-shadow(0 0 12px rgba(255, 43, 214, 0.9))
+                      drop-shadow(0 0 24px rgba(34, 231, 255, 0.6));
+    opacity: calc(0.9 * var(--glow));
+  }
+
+  /* The neon wireframe grid floor */
+  .floor {
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    top: calc(var(--horizon) * 100%);
+    bottom: 0;
+    perspective: 500px;
+    overflow: hidden;
+    opacity: var(--floor-opacity);
+  }
+  .floor::before {
+    content: "";
+    position: absolute;
+    left: -25%;
+    right: -25%;
+    top: 0;
+    height: 220%;
+    transform-origin: 50% 0%;
+    transform: rotateX(62deg);
+    background:
+      linear-gradient(to right,
+        transparent calc(50% - 1px),
+        rgba(34, 231, 255, 0.7) calc(50% - 1px),
+        rgba(34, 231, 255, 0.7) calc(50% + 1px),
+        transparent calc(50% + 1px)),
+      repeating-linear-gradient(90deg,
+        rgba(34, 231, 255, 0.55) 0,
+        rgba(34, 231, 255, 0.55) 1px,
+        transparent 1px,
+        transparent 56px),
+      repeating-linear-gradient(0deg,
+        rgba(255, 43, 214, 0.55) 0,
+        rgba(255, 43, 214, 0.55) 1px,
+        transparent 1px,
+        transparent 60px);
+    filter: drop-shadow(0 0 6px rgba(34, 231, 255, calc(0.9 * var(--glow))))
+            drop-shadow(0 0 8px rgba(255, 43, 214, calc(0.55 * var(--glow))));
+    animation: gridscroll 3.2s linear infinite;
+  }
+  @keyframes gridscroll {
+    from { background-position: 0 0, 0 0, 0 0; }
+    to   { background-position: 0 0, 0 0, 0 60px; }
+  }
+  .floor::after {
+    /* fade to horizon mist */
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, var(--bg-0) 0%, rgba(10,2,32,0) 18%, rgba(10,2,32,0) 80%, var(--bg-0) 100%),
+      radial-gradient(ellipse at 50% 0%, rgba(255, 43, 214, 0.35) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* distant mountain wireframes */
+  .mountains {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: calc(var(--horizon) * 100%);
+    height: 140px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .mountains svg { width: 45%; height: 140px; overflow: visible; }
+  .mountains path {
+    fill: none;
+    stroke: url(#mgrad);
+    stroke-width: 1.2;
+    filter: drop-shadow(0 0 4px rgba(34, 231, 255, calc(0.8 * var(--glow))));
+  }
+
+  /* CRT scanlines */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) 2px,
+      rgba(0,0,0, var(--scan-alpha)) 2px,
+      rgba(0,0,0, var(--scan-alpha)) 3px);
+    mix-blend-mode: multiply;
+  }
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  }
+
+  /* ---------- LAYOUT / CHROME ---------- */
+
+  .shell {
+    position: relative;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 28px 32px 32px;
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .shell > .page { flex: 1 0 auto; }
+  .shell > footer.bottom { flex-shrink: 0; margin-top: auto; }
+
+  header.top {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 20px;
+    border: 1px solid rgba(34,231,255,0.35);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(20,8,50,0.7), rgba(10,2,32,0.85));
+    backdrop-filter: blur(6px);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,43,214,0.15),
+      0 0 20px rgba(34,231,255, calc(0.25 * var(--glow))),
+      0 0 40px rgba(255,43,214, calc(0.18 * var(--glow)));
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-self: start;
+    text-decoration: none;
+    color: var(--white);
+  }
+  .brand .logo {
+    width: 38px; height: 38px;
+    position: relative;
+  }
+  .brand .logo svg { display: block; width: 100%; height: 100%;
+    filter: drop-shadow(0 0 8px rgba(34,231,255, calc(0.9 * var(--glow))))
+            drop-shadow(0 0 12px rgba(255,43,214, calc(0.55 * var(--glow))));
+  }
+  .brand .name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    font-size: 14px;
+  }
+  .brand .sub {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan-2);
+    letter-spacing: 0.3em;
+    margin-top: 2px;
+  }
+
+  nav.primary {
+    display: flex;
+    gap: 6px;
+    justify-self: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  nav.primary a {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    font-weight: 600;
+    color: var(--white);
+    text-decoration: none;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    position: relative;
+    transition: all .18s ease;
+    cursor: pointer;
+  }
+  nav.primary a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(34,231,255,0.0);
+    transition: box-shadow .18s;
+  }
+  nav.primary a:hover {
+    color: var(--cyan-2);
+    text-shadow: 0 0 6px rgba(34,231,255,0.9);
+  }
+  nav.primary a:hover::before {
+    box-shadow: inset 0 0 0 1px rgba(34,231,255,0.8), 0 0 10px rgba(34,231,255,0.5);
+  }
+  nav.primary a.active {
+    color: var(--mag-2);
+    text-shadow: 0 0 8px rgba(255, 43, 214, 0.9);
+  }
+  nav.primary a.active::before {
+    box-shadow: inset 0 0 0 1px rgba(255,43,214,0.8), 0 0 10px rgba(255,43,214,0.55);
+  }
+
+  .sysbar {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan-2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .sysbar .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #6bff9e;
+    box-shadow: 0 0 8px #6bff9e, 0 0 16px rgba(107,255,158,0.5);
+    animation: led 2.4s ease-in-out infinite;
+  }
+  @keyframes led {
+    0%, 100% { box-shadow: 0 0 8px #6bff9e, 0 0 16px rgba(107,255,158,0.5); }
+    50%      { box-shadow: 0 0 4px #6bff9e, 0 0 8px rgba(107,255,158,0.3); }
+  }
+
+  /* ---------- PANEL helper ---------- */
+  .panel {
+    border: 1px solid rgba(34,231,255, 0.25);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(20,8,50,0.6), rgba(10,2,32,0.75));
+    position: relative;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,43,214,0.08),
+      0 0 18px rgba(138, 76, 255, calc(0.15 * var(--glow)));
+  }
+  .panel-title {
+    position: absolute;
+    top: -9px;
+    left: 16px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    background: var(--bg-0);
+    padding: 0 10px;
+    color: var(--cyan-2);
+    text-shadow: 0 0 6px rgba(34,231,255,0.7);
+  }
+  .panel-sub {
+    position: absolute;
+    top: -9px;
+    right: 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: var(--bg-0);
+    padding: 0 10px;
+    color: var(--mag-2);
+    letter-spacing: 0.2em;
+  }
+
+  /* ---------- HERO ---------- */
+
+  .hero {
+    position: relative;
+    margin-top: 48px;
+    padding: 64px 48px 56px;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .hero-tagline {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-2);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-tagline::before {
+    content: "";
+    width: 24px; height: 1px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+  h1.hero-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 0.98;
+    letter-spacing: 0.01em;
+    margin: 0 0 24px;
+    background: linear-gradient(180deg, #fff 0%, #fff 45%, #ff62e6 70%, #b03cff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 12px rgba(255, 43, 214, calc(0.55 * var(--glow))))
+            drop-shadow(0 0 2px rgba(34, 231, 255, 0.6));
+    text-transform: uppercase;
+  }
+  h1.hero-title .sub {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(14px, 1.4vw, 18px);
+    letter-spacing: 0.6em;
+    color: var(--cyan-2);
+    background: none;
+    -webkit-text-fill-color: var(--cyan-2);
+    margin-top: 14px;
+    filter: drop-shadow(0 0 4px rgba(34,231,255,0.8));
+  }
+  .hero-bio {
+    font-size: 16px;
+    line-height: 1.65;
+    color: #cbc1e8;
+    max-width: 500px;
+    margin: 0 0 32px;
+  }
+
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--white);
+    padding: 12px 18px;
+    border: 1px solid;
+    border-radius: 3px;
+    background: rgba(10,2,32,0.6);
+    cursor: pointer;
+    transition: all .18s ease;
+    position: relative;
+  }
+  .btn.primary {
+    border-color: var(--mag);
+    color: var(--mag-2);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,43,214,0.3),
+      0 0 12px rgba(255, 43, 214, 0.55),
+      0 0 24px rgba(255, 43, 214, 0.25);
+    text-shadow: 0 0 6px rgba(255,43,214,0.9);
+  }
+  .btn.primary:hover {
+    color: #fff;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,43,214,0.6),
+      0 0 18px rgba(255, 43, 214, 0.85),
+      0 0 36px rgba(255, 43, 214, 0.45);
+  }
+  .btn.ghost {
+    border-color: var(--cyan);
+    color: var(--cyan-2);
+    box-shadow:
+      inset 0 0 0 1px rgba(34,231,255,0.25),
+      0 0 10px rgba(34, 231, 255, 0.4);
+    text-shadow: 0 0 4px rgba(34,231,255,0.8);
+  }
+  .btn.ghost:hover {
+    color: #fff;
+    box-shadow:
+      inset 0 0 0 1px rgba(34,231,255,0.55),
+      0 0 16px rgba(34, 231, 255, 0.7),
+      0 0 28px rgba(34, 231, 255, 0.35);
+  }
+  .btn .arrow { font-family: var(--font-mono); }
+
+  /* Giant neon triangle in hero (inspired by reference) */
+  .hero-triangle {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1.02;
+    max-width: 460px;
+    margin: 0 auto;
+    display: grid;
+    place-items: center;
+  }
+  .hero-triangle svg { width: 100%; height: 100%; }
+  .tri-stroke {
+    fill: none;
+    stroke-width: 4;
+    stroke-linejoin: miter;
+    stroke-linecap: square;
+  }
+
+  /* Avatar/portrait placeholder inside triangle */
+  .tri-inner {
+    position: absolute;
+    inset: 22% 20% 20% 20%;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-pixel);
+    color: var(--cyan-2);
+    text-align: center;
+    line-height: 1.1;
+  }
+  .tri-inner .bignum {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 3vw, 40px);
+    color: #fff;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 10px rgba(255,43,214,0.9), 0 0 18px rgba(34,231,255,0.6);
+  }
+  .tri-inner .smallnum {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--mag-2);
+    margin-top: 4px;
+  }
+
+  /* Reflection underline */
+  .hero-reflection {
+    position: absolute;
+    left: 50%; bottom: 0;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 18px;
+    background:
+      radial-gradient(ellipse at center, rgba(255,43,214,0.55) 0%, transparent 65%);
+    filter: blur(2px);
+  }
+
+  /* stat strip */
+  .stats {
+    margin-top: 44px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid rgba(34,231,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .stat {
+    padding: 18px 22px;
+    background: rgba(10,2,32,0.55);
+    border-right: 1px solid rgba(34,231,255,0.15);
+    position: relative;
+  }
+  .stat:last-child { border-right: none; }
+  .stat .k {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .stat .v {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cyan-2);
+    margin-top: 6px;
+    text-shadow: 0 0 10px rgba(34,231,255,0.8);
+  }
+  .stat.mag .v { color: var(--mag-2); text-shadow: 0 0 10px rgba(255,43,214,0.8); }
+
+  /* ---------- SECTION HEAD ---------- */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 72px 0 20px;
+    gap: 24px;
+  }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.25em;
+    margin: 0;
+    text-transform: uppercase;
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-head h2::before {
+    content: "▶";
+    color: var(--mag-2);
+    font-size: 14px;
+    text-shadow: 0 0 8px var(--mag);
+  }
+  .section-head .meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    text-transform: uppercase;
+  }
+  .section-head .right {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mag-2);
+    letter-spacing: 0.22em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .section-head .right:hover { text-shadow: 0 0 6px var(--mag); }
+
+  /* ---------- POST LIST ---------- */
+  .post-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .post {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: center;
+    gap: 28px;
+    padding: 22px 24px;
+    border-top: 1px solid rgba(34,231,255,0.12);
+    text-decoration: none;
+    color: var(--white);
+    transition: background .18s, transform .18s;
+    position: relative;
+  }
+  .post:first-child { border-top: 1px solid rgba(34,231,255,0.28); }
+  .post:hover {
+    background: linear-gradient(90deg, rgba(255,43,214,0.08), rgba(34,231,255,0.05));
+  }
+  .post:hover .post-title { color: var(--mag-2); text-shadow: 0 0 10px rgba(255,43,214,0.8); }
+  .post:hover::before {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--mag);
+    box-shadow: 0 0 10px var(--mag);
+  }
+  .post-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-2);
+    letter-spacing: 0.12em;
+  }
+  .post-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 0 0 4px;
+    color: var(--white);
+    transition: color .18s;
+  }
+  .post-desc {
+    font-size: 13.5px;
+    color: #bcb0d8;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .post-tags {
+    display: flex;
+    gap: 6px;
+  }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    border: 1px solid rgba(34,231,255,0.45);
+    padding: 3px 8px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    background: rgba(34, 231, 255, 0.06);
+  }
+  .tag.m { color: var(--mag-2); border-color: rgba(255,43,214,0.5); background: rgba(255,43,214,0.06); }
+  .tag.y { color: var(--yellow); border-color: rgba(249,214,92,0.5); background: rgba(249,214,92,0.06); }
+
+  /* ---------- PROJECTS GRID ---------- */
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .project {
+    position: relative;
+    padding: 26px 24px 22px;
+    border: 1px solid rgba(34,231,255,0.22);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(20,8,50,0.55), rgba(10,2,32,0.8));
+    overflow: hidden;
+    transition: border-color .18s, transform .18s;
+    cursor: pointer;
+  }
+  .project::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--mag), transparent);
+    opacity: 0.4;
+    transition: opacity .18s;
+  }
+  .project:hover { border-color: var(--mag); transform: translateY(-2px); }
+  .project:hover::after { opacity: 1; }
+  .project-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 10px;
+  }
+  .project-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(34,231,255,0.45);
+  }
+  .status {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .status.alpha { color: #ff9c3a; border-color: #ff9c3a; background: rgba(255,156,58,0.08); box-shadow: 0 0 8px rgba(255,156,58,0.35); }
+  .status.beta  { color: var(--cyan-2); border-color: var(--cyan); background: rgba(34,231,255,0.08); box-shadow: 0 0 8px rgba(34,231,255,0.35); }
+  .status.stable { color: #6bff9e; border-color: #6bff9e; background: rgba(107,255,158,0.08); box-shadow: 0 0 8px rgba(107,255,158,0.35); }
+  .project-tag {
+    font-size: 13.5px;
+    color: #c6b9e6;
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+  .stack {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #d1c6ec;
+    padding: 3px 8px 3px 10px;
+    background: rgba(138,76,255,0.12);
+    border-left: 2px solid var(--violet);
+    border-radius: 0 2px 2px 0;
+  }
+  .project-links {
+    display: flex; gap: 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .project-links a {
+    color: var(--cyan-2);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+  }
+  .project-links a:hover { color: var(--mag-2); text-shadow: 0 0 6px var(--mag); }
+
+  /* ---------- FOOTER ---------- */
+  footer.bottom {
+    margin-top: 80px;
+    padding: 24px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(34,231,255,0.2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+  }
+  footer.bottom .right { display: flex; gap: 18px; align-items: center; }
+  footer.bottom a { color: var(--cyan-2); text-decoration: none; }
+  footer.bottom a:hover { color: var(--mag-2); }
+
+  /* ---------- PAGE views (all-in-one single-file routing) ---------- */
+  .page { display: none; }
+  .page.active { display: block; }
+  /* Animate the page's main content, NOT the breadcrumb overlays (.panel-title / .panel-sub).
+     Breadcrumbs are anchored to panel edges and shouldn't fade in from below. */
+  .page.active > .panel > :not(.panel-title):not(.panel-sub),
+  .page.active > .projects,
+  .page.active > .section-head {
+    animation: boot .45s ease-out both;
+  }
+  @keyframes boot {
+    0%   { opacity: 0; transform: translateY(6px); filter: blur(3px) saturate(200%); }
+    100% { opacity: 1; transform: none; filter: none; }
+  }
+
+  /* ---------- Custom scroll indicator ---------- */
+  #scrollrail {
+    position: fixed;
+    top: 80px;
+    bottom: 80px;
+    right: 10px;
+    width: 6px;
+    z-index: 60;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+      rgba(34,231,255,0.0),
+      rgba(34,231,255,0.18),
+      rgba(255,43,214,0.18),
+      rgba(255,43,214,0.0));
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(138,76,255,0.2);
+  }
+  #scrollrail::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    transform: translateX(-50%);
+    background: repeating-linear-gradient(180deg,
+      rgba(138,76,255,0.35) 0 6px,
+      transparent 6px 12px);
+  }
+  #scrollthumb {
+    position: fixed;
+    right: 6px;
+    width: 14px;
+    height: 60px;
+    z-index: 61;
+    pointer-events: auto;
+    cursor: grab;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--cyan) 0%, var(--mag) 100%);
+    box-shadow:
+      0 0 10px rgba(34,231,255, calc(0.8 * var(--glow))),
+      0 0 18px rgba(255,43,214, calc(0.6 * var(--glow))),
+      inset 0 0 0 1px rgba(255,255,255,0.25);
+    transition: height .15s ease, transform .08s ease;
+  }
+  #scrollthumb::before {
+    content: "";
+    position: absolute;
+    inset: 4px 4px;
+    border-left: 1px solid rgba(255,255,255,0.45);
+    border-right: 1px solid rgba(255,255,255,0.45);
+    background: repeating-linear-gradient(180deg,
+      rgba(255,255,255,0.25) 0 1px,
+      transparent 1px 4px);
+  }
+  #scrollthumb:hover { transform: scaleX(1.15); }
+  #scrollthumb.dragging { cursor: grabbing; }
+  #scrollpct {
+    position: fixed;
+    right: 26px;
+    z-index: 61;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    background: rgba(10,2,32,0.8);
+    border: 1px solid rgba(34,231,255,0.3);
+    padding: 2px 6px;
+    border-radius: 2px;
+    pointer-events: none;
+    text-shadow: 0 0 4px rgba(34,231,255,0.6);
+    transform: translateY(-50%);
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 48px;
+    padding: 36px 32px;
+  }
+  .about-grid h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 44px;
+    margin: 0 0 24px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #fff 40%, #ff62e6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 8px rgba(255,43,214,0.5));
+  }
+  .about-grid p {
+    line-height: 1.75;
+    color: #cfc3ec;
+    font-size: 15.5px;
+  }
+  .about-grid h2 {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin: 36px 0 16px;
+    color: var(--cyan-2);
+    text-shadow: 0 0 6px rgba(34,231,255,0.6);
+  }
+  .about-side {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+  }
+  .id-card {
+    padding: 20px;
+    border: 1px solid rgba(34,231,255,0.3);
+    background: linear-gradient(180deg, rgba(20,8,50,0.7), rgba(10,2,32,0.9));
+    border-radius: 4px;
+    position: relative;
+  }
+  .id-card::before {
+    content: "PLAYER 1";
+    position: absolute; top: -8px; left: 12px;
+    background: var(--bg-0);
+    padding: 0 8px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--mag-2);
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 6px var(--mag);
+  }
+  .id-photo {
+    width: 100%; aspect-ratio: 1/1;
+    border-radius: 3px;
+    background:
+      linear-gradient(135deg, #241050, #3d0a6b 40%, #8a1fa0 100%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .id-photo::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg,
+      transparent 0, transparent 5px,
+      rgba(34,231,255,0.07) 5px, rgba(34,231,255,0.07) 6px);
+  }
+  .id-photo::after {
+    content: "[ PORTRAIT ]";
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: var(--font-pixel);
+    color: var(--cyan-2);
+    font-size: 20px;
+    letter-spacing: 0.3em;
+    opacity: 0.6;
+  }
+  .id-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(34,231,255,0.2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .id-row:last-child { border-bottom: none; }
+  .id-row .k { color: var(--dim); letter-spacing: 0.18em; text-transform: uppercase; }
+  .id-row .v { color: var(--cyan-2); }
+
+  /* Timeline */
+  .timeline { display: grid; gap: 26px; }
+  .tl-item {
+    position: relative;
+    padding-left: 26px;
+    border-left: 1px solid rgba(138,76,255,0.35);
+  }
+  .tl-item::before {
+    content: ""; position: absolute; left: -6px; top: 3px;
+    width: 11px; height: 11px;
+    background: var(--mag); border-radius: 50%;
+    box-shadow: 0 0 10px var(--mag), 0 0 18px rgba(255,43,214,0.5);
+  }
+  .tl-item.cyan::before { background: var(--cyan); box-shadow: 0 0 10px var(--cyan), 0 0 18px rgba(34,231,255,0.5); }
+  .tl-period {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    color: var(--mag-2);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .tl-role {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    margin: 0 0 6px;
+  }
+  .tl-desc { font-size: 13.5px; line-height: 1.6; color: #c0b4dc; margin: 0; }
+
+  /* ---------- BLOG index ---------- */
+  .blog-top {
+    padding: 36px 32px 28px;
+  }
+  .blog-top h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 44px;
+    margin: 0 0 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(34,231,255,0.7);
+  }
+  .blog-top p { color: #c8bce4; font-size: 15px; margin: 0 0 22px; }
+
+  .search-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .search-row input {
+    background: rgba(10,2,32,0.8);
+    border: 1px solid rgba(34,231,255,0.35);
+    color: var(--white);
+    padding: 12px 14px 12px 36px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    background-image:
+      linear-gradient(45deg, transparent 48%, var(--cyan-2) 48% 52%, transparent 52%),
+      linear-gradient(-45deg, transparent 48%, var(--cyan-2) 48% 52%, transparent 52%);
+    background-repeat: no-repeat;
+    background-position: 12px 50%, 16px 50%;
+    background-size: 6px 6px, 6px 6px;
+  }
+  .search-row input::placeholder { color: var(--dim); letter-spacing: 0.12em; }
+  .search-row input:focus {
+    border-color: var(--mag);
+    box-shadow: 0 0 10px rgba(255,43,214,0.5);
+  }
+  .tagstrip {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 22px;
+  }
+  .tagbtn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 5px 10px;
+    border: 1px solid rgba(138,76,255,0.45);
+    color: #c7bae4;
+    background: rgba(138,76,255,0.08);
+    border-radius: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all .15s;
+  }
+  .tagbtn:hover { color: var(--cyan-2); border-color: var(--cyan); box-shadow: 0 0 8px rgba(34,231,255,0.4); }
+  .tagbtn.on {
+    color: #fff;
+    border-color: var(--mag);
+    background: rgba(255,43,214,0.18);
+    box-shadow: 0 0 10px rgba(255,43,214,0.5);
+  }
+
+  /* ---------- PROJECTS page ---------- */
+  .projects-top {
+    padding: 36px 32px 8px;
+  }
+  .projects-top h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+    background: linear-gradient(180deg, #fff 40%, #7df4ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 6px rgba(34,231,255,0.55));
+  }
+  .projects-top p { color: #c8bce4; font-size: 15px; margin: 0 0 20px; }
+
+  /* ---------- TWEAKS PANEL ---------- */
+  #tweaks {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 80;
+    width: 280px;
+    padding: 18px 18px 14px;
+    border: 1px solid rgba(34,231,255,0.5);
+    background: linear-gradient(180deg, rgba(20,8,50,0.95), rgba(10,2,32,0.97));
+    border-radius: 4px;
+    box-shadow:
+      0 0 20px rgba(34,231,255, 0.4),
+      0 0 40px rgba(255,43,214, 0.25),
+      inset 0 0 0 1px rgba(255,43,214,0.15);
+    font-family: var(--font-mono);
+    color: var(--white);
+    display: none;
+    backdrop-filter: blur(6px);
+  }
+  #tweaks.open { display: block; }
+  #tweaks h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--mag-2);
+    margin: 0 0 12px;
+    text-shadow: 0 0 6px var(--mag);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #tweaks label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    text-transform: uppercase;
+    margin: 10px 0 6px;
+  }
+  #tweaks input[type="range"] {
+    width: 100%;
+    accent-color: var(--mag);
+  }
+  #tweaks .vibe-row, #tweaks .hue-row { display: flex; gap: 6px; }
+  #tweaks .vibe-row button, #tweaks .hue-row button {
+    flex: 1;
+    background: rgba(10,2,32,0.6);
+    color: var(--cyan-2);
+    border: 1px solid rgba(34,231,255,0.3);
+    padding: 6px 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  #tweaks .vibe-row button.on, #tweaks .hue-row button.on {
+    color: #fff;
+    border-color: var(--mag);
+    background: rgba(255,43,214,0.18);
+    box-shadow: 0 0 8px rgba(255,43,214,0.5);
+  }
+
+  /* selection */
+  ::selection { background: var(--mag); color: #fff; }
+
+  /* responsive */
+  @media (max-width: 880px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-triangle { max-width: 340px; }
+    .projects { grid-template-columns: 1fr; }
+    .about-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .post { grid-template-columns: 1fr; gap: 6px; }
+    .post-date { font-size: 10px; }
+    header.top { grid-template-columns: 1fr; justify-items: center; }
+    .brand, .sysbar { justify-self: center; }
+    .sysbar { order: 3; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Backdrop -->
+<div class="backdrop">
+  <div class="sky"></div>
+  <div class="stars"></div>
+  <div class="planet"></div>
+  <div class="mountains">
+    <svg viewBox="0 0 600 140" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="mgrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ff62e6"/>
+          <stop offset="100%" stop-color="#22e7ff"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,140 L40,90 L85,120 L130,70 L165,100 L210,55 L255,95 L290,70 L330,105 L370,80 L410,120 L460,85 L500,115 L550,80 L600,120 L600,140 Z"/>
+      <path d="M0,140 L25,115 L55,125 L90,100 L120,115 L155,95 L200,120 L240,100 L290,120 L330,105 L380,125 L420,115 L470,130 L520,110 L600,130 L600,140 Z" opacity="0.55"/>
+    </svg>
+    <svg viewBox="0 0 600 140" preserveAspectRatio="none">
+      <path d="M0,140 L30,80 L75,115 L115,60 L155,100 L195,50 L240,95 L285,65 L325,100 L365,75 L410,120 L450,80 L495,115 L540,75 L600,115 L600,140 Z"/>
+      <path d="M0,140 L35,120 L75,130 L115,105 L155,120 L195,95 L235,125 L280,105 L325,125 L375,115 L420,130 L470,120 L520,135 L580,115 L600,125 L600,140 Z" opacity="0.55"/>
+    </svg>
+  </div>
+  <div class="horizon-glow"></div>
+  <div class="floor"></div>
+</div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+
+<!-- Custom synthwave scroll indicator -->
+<div id="scrollrail"></div>
+<div id="scrollthumb" aria-hidden="true"></div>
+<div id="scrollpct">00%</div>
+
+<div class="shell">
+
+  <!-- ============ HEADER ============ -->
+  <header class="top">
+    <a class="brand" href="#" data-nav="home">
+      <span class="logo">
+        <svg viewBox="0 0 40 40" fill="none">
+          <polygon points="20,4 36,34 4,34" stroke="url(#lg1)" stroke-width="2" fill="none"/>
+          <polygon points="20,14 30,32 10,32" stroke="url(#lg2)" stroke-width="1.5" fill="none" opacity=".8"/>
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#22e7ff"/>
+              <stop offset="1" stop-color="#ff2bd6"/>
+            </linearGradient>
+            <linearGradient id="lg2" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stop-color="#ff2bd6"/>
+              <stop offset="1" stop-color="#22e7ff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <span>
+        <span class="name">MCNEES</span>
+        <span class="sub">//NEON.SYS v2.86</span>
+      </span>
+    </a>
+    <nav class="primary">
+      <a data-nav="home" class="active">Home</a>
+      <a data-nav="blog">Blog</a>
+      <a data-nav="case">Case Studies</a>
+      <a data-nav="projects">Projects</a>
+      <a data-nav="about">About</a>
+    </nav>
+    <div class="sysbar">
+      <span class="dot"></span>
+      <span id="sys-time">00:00:00</span>
+      <span>SYS ONLINE</span>
+    </div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <div class="page active" data-page="home">
+
+    <!-- HERO -->
+    <div class="panel hero">
+      <span class="panel-title">// NODE_01 :: IDENTITY</span>
+      <span class="panel-sub">INSERT COIN ⟶</span>
+
+      <div class="hero-grid">
+        <div>
+          <div class="hero-tagline">Player Profile &middot; West Michigan, USA</div>
+          <h1 class="hero-title">
+            Michael<br/>McNees
+            <span class="sub">Engineering Manager</span>
+          </h1>
+          <p class="hero-bio">
+            I lead engineering teams and tinker with TypeScript, React, Go, and whatever else catches my attention.
+            Currently shipping platform migrations by day, building side-quests by night — mostly from a homelab
+            somewhere north of the 43rd parallel.
+          </p>
+          <div class="hero-ctas">
+            <a class="btn primary" href="mailto:mcnees.michael@gmail.com">
+              <span>Get in touch</span><span class="arrow">▷</span>
+            </a>
+            <a class="btn ghost" href="#" data-nav="projects">
+              <span>View projects</span><span class="arrow">▷</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-triangle">
+          <svg viewBox="0 0 400 400">
+            <defs>
+              <linearGradient id="triGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#22e7ff"/>
+                <stop offset="50%" stop-color="#a45bff"/>
+                <stop offset="100%" stop-color="#ff2bd6"/>
+              </linearGradient>
+              <filter id="neonBlur" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4"/>
+              </filter>
+            </defs>
+            <!-- outer glow -->
+            <polygon class="tri-stroke" points="200,60 350,320 50,320"
+              stroke="url(#triGrad)" stroke-width="18" opacity="0.25" filter="url(#neonBlur)"/>
+            <polygon class="tri-stroke" points="200,60 350,320 50,320"
+              stroke="url(#triGrad)" stroke-width="10" opacity="0.55" filter="url(#neonBlur)"/>
+            <polygon class="tri-stroke" points="200,60 350,320 50,320" stroke="#ffffff" stroke-width="3"/>
+            <polygon class="tri-stroke" points="200,60 350,320 50,320" stroke="url(#triGrad)" stroke-width="1.2"/>
+            <!-- inner triangle -->
+            <polygon class="tri-stroke" points="200,140 300,300 100,300" stroke="url(#triGrad)" stroke-width="1.5" opacity="0.6"/>
+          </svg>
+          <div class="tri-inner">
+            <div class="bignum">10+</div>
+            <div class="smallnum">YEARS SHIPPING</div>
+          </div>
+          <div class="hero-reflection"></div>
+        </div>
+      </div>
+
+      <!-- stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="k">Current Role</div>
+          <div class="v">ENG MGR</div>
+        </div>
+        <div class="stat mag">
+          <div class="k">At</div>
+          <div class="v">WeGoLook</div>
+        </div>
+        <div class="stat">
+          <div class="k">Stack</div>
+          <div class="v">TS · GO · RN</div>
+        </div>
+        <div class="stat mag">
+          <div class="k">Posts Shipped</div>
+          <div class="v">06</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LATEST POSTS -->
+    <div class="section-head">
+      <h2>Latest Transmissions <span class="meta">// /blog</span></h2>
+      <a class="right" href="#" data-nav="blog">View all ▷</a>
+    </div>
+
+    <div class="panel">
+      <div class="post-list">
+        <a class="post">
+          <span class="post-date">2026.03.14</span>
+          <div>
+            <h3 class="post-title">AI doesn't know your smart-home platform</h3>
+            <p class="post-desc">Why I ported a Vivint integration to Homey by hand, and what happens when LLMs meet an obscure SDK.</p>
+          </div>
+          <div class="post-tags"><span class="tag">SMART HOME</span><span class="tag m">AI</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2026.01.22</span>
+          <div>
+            <h3 class="post-title">From engineer to engineering manager</h3>
+            <p class="post-desc">The loop that took me from IC to lead to manager, and the things nobody tells you about that middle stretch.</p>
+          </div>
+          <div class="post-tags"><span class="tag m">LEADERSHIP</span><span class="tag">CAREER</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.11.08</span>
+          <div>
+            <h3 class="post-title">The calculator didn't kill accounting</h3>
+            <p class="post-desc">Agentic engineering isn't a replacement tech, it's a leverage tech. A short piece on what that actually means for teams.</p>
+          </div>
+          <div class="post-tags"><span class="tag">AI</span><span class="tag y">OPINION</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.09.17</span>
+          <div>
+            <h3 class="post-title">Upgrading the homelab, part 2 — the build</h3>
+            <p class="post-desc">Proxmox, Unifi, a new NAS, and a pile of cables I didn't expect. Parts list, rack photos, and lessons learned.</p>
+          </div>
+          <div class="post-tags"><span class="tag">HOMELAB</span><span class="tag m">HARDWARE</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.08.29</span>
+          <div>
+            <h3 class="post-title">Upgrading the homelab, part 1 — taking stock</h3>
+            <p class="post-desc">Every overhaul starts with an honest inventory. Here's mine, wires and all.</p>
+          </div>
+          <div class="post-tags"><span class="tag">HOMELAB</span></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PROJECTS preview -->
+    <div class="section-head">
+      <h2>Side-Quests <span class="meta">// /projects</span></h2>
+      <a class="right" href="#" data-nav="projects">All projects ▷</a>
+    </div>
+
+    <div class="projects">
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">Mantle</span>
+          <span class="status beta">Beta</span>
+        </div>
+        <p class="project-tag">Terraform for AI workflows. YAML definitions, Postgres state, one Go binary.</p>
+        <div class="stack">
+          <span class="chip">Go</span><span class="chip">Postgres</span><span class="chip">YAML</span>
+        </div>
+        <div class="project-links">
+          <a>Visit site ▷</a><a>View repo ▷</a>
+        </div>
+      </div>
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">Honeydew</span>
+          <span class="status beta">Beta</span>
+        </div>
+        <p class="project-tag">A complete digital record of your home — maintenance, appliances, everything in one place.</p>
+        <div class="stack">
+          <span class="chip">Next.js</span><span class="chip">Cloudflare</span><span class="chip">D1</span>
+        </div>
+        <div class="project-links">
+          <a>Visit site ▷</a>
+        </div>
+      </div>
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">Retro Estates</span>
+          <span class="status alpha">Alpha</span>
+        </div>
+        <p class="project-tag">Cozy mobile-first neighborhood stewardship sim. Paid upfront, strictly anti-dark-pattern.</p>
+        <div class="stack">
+          <span class="chip">SwiftUI</span><span class="chip">SpriteKit</span><span class="chip">iOS</span>
+        </div>
+        <div class="project-links">
+          <a>Coming soon ▷</a>
+        </div>
+      </div>
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">homey-vivint</span>
+          <span class="status alpha">Alpha</span>
+        </div>
+        <p class="project-tag">Homey integration for Vivint security — alarms, locks, thermostats, cameras.</p>
+        <div class="stack">
+          <span class="chip">TypeScript</span><span class="chip">Homey SDK 3</span>
+        </div>
+        <div class="project-links">
+          <a>View repo ▷</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ BLOG ============ -->
+  <div class="page" data-page="blog">
+    <div class="panel blog-top">
+      <span class="panel-title">// NODE_02 :: ARCHIVE</span>
+      <span class="panel-sub">TRANSMISSIONS</span>
+      <h1>BLOG</h1>
+      <p>Writing about leadership, tech, and the things in between.</p>
+
+      <div class="search-row">
+        <input id="blog-search" type="text" placeholder="SEARCH ARCHIVE..." />
+      </div>
+      <div class="tagstrip">
+        <button class="tagbtn on">ALL</button>
+        <button class="tagbtn">LEADERSHIP</button>
+        <button class="tagbtn">AI</button>
+        <button class="tagbtn">HOMELAB</button>
+        <button class="tagbtn">CAREER</button>
+        <button class="tagbtn">HARDWARE</button>
+        <button class="tagbtn">OPINION</button>
+        <button class="tagbtn">SMART HOME</button>
+      </div>
+
+      <div class="post-list" id="archive-list">
+        <a class="post">
+          <span class="post-date">2026.03.14</span>
+          <div>
+            <h3 class="post-title">AI doesn't know your smart-home platform</h3>
+            <p class="post-desc">Why I ported a Vivint integration to Homey by hand, and what happens when LLMs meet an obscure SDK.</p>
+          </div>
+          <div class="post-tags"><span class="tag">SMART HOME</span><span class="tag m">AI</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2026.01.22</span>
+          <div>
+            <h3 class="post-title">From engineer to engineering manager</h3>
+            <p class="post-desc">The loop that took me from IC to lead to manager, and the things nobody tells you about that middle stretch.</p>
+          </div>
+          <div class="post-tags"><span class="tag m">LEADERSHIP</span><span class="tag">CAREER</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.11.08</span>
+          <div>
+            <h3 class="post-title">The calculator didn't kill accounting</h3>
+            <p class="post-desc">Agentic engineering isn't a replacement tech, it's a leverage tech. What that actually means for teams.</p>
+          </div>
+          <div class="post-tags"><span class="tag">AI</span><span class="tag y">OPINION</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.09.17</span>
+          <div>
+            <h3 class="post-title">Upgrading the homelab, part 2 — the build</h3>
+            <p class="post-desc">Proxmox, Unifi, a new NAS, and a pile of cables I didn't expect. Parts list, rack photos, lessons learned.</p>
+          </div>
+          <div class="post-tags"><span class="tag">HOMELAB</span><span class="tag m">HARDWARE</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.08.29</span>
+          <div>
+            <h3 class="post-title">Upgrading the homelab, part 1 — taking stock</h3>
+            <p class="post-desc">Every overhaul starts with an honest inventory. Here's mine, wires and all.</p>
+          </div>
+          <div class="post-tags"><span class="tag">HOMELAB</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2025.06.03</span>
+          <div>
+            <h3 class="post-title">Welcome</h3>
+            <p class="post-desc">A short hello, and what you can expect to see here going forward.</p>
+          </div>
+          <div class="post-tags"><span class="tag y">META</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CASE STUDIES ============ -->
+  <div class="page" data-page="case">
+    <div class="panel blog-top">
+      <span class="panel-title">// NODE_03 :: CASE FILES</span>
+      <span class="panel-sub">FIELD REPORTS</span>
+      <h1>CASE STUDIES</h1>
+      <p>Deeper write-ups on the work, the tradeoffs, and what I'd do differently.</p>
+
+      <div class="post-list">
+        <a class="post">
+          <span class="post-date">2024 — 2025</span>
+          <div>
+            <h3 class="post-title">Creekside Shores Portal</h3>
+            <p class="post-desc">A lakeside association's member portal — payments, docs, and a board that actually uses it. Role: lead engineer.</p>
+          </div>
+          <div class="post-tags"><span class="tag m">LEAD</span><span class="tag">NEXT.JS</span></div>
+        </a>
+        <a class="post">
+          <span class="post-date">2021 — 2022</span>
+          <div>
+            <h3 class="post-title">TCB Games</h3>
+            <p class="post-desc">A small indie storefront built on a shoestring and a deadline. Shipping mechanics, cart abandonment, the whole arc.</p>
+          </div>
+          <div class="post-tags"><span class="tag">E-COMMERCE</span><span class="tag m">FOUNDER</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROJECTS ============ -->
+  <div class="page" data-page="projects">
+    <div class="panel projects-top">
+      <span class="panel-title">// NODE_04 :: SIDE-QUESTS</span>
+      <span class="panel-sub">ACTIVE BUILDS</span>
+      <h1>PROJECTS</h1>
+      <p>Side projects, tools, and experiments — some shipping, some still finding their shape.</p>
+    </div>
+
+    <div class="projects" style="margin-top: 18px;">
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">Mantle</span>
+          <span class="status beta">Beta</span>
+        </div>
+        <p class="project-tag">Terraform for AI workflows. YAML definitions, Postgres state, one Go binary. Built because existing AI workflow tools don't take security seriously enough.</p>
+        <div class="stack">
+          <span class="chip">Go</span><span class="chip">Postgres</span><span class="chip">YAML</span><span class="chip">BSL 1.1</span>
+        </div>
+        <div class="project-links"><a>Visit site ▷</a><a>View repo ▷</a></div>
+      </div>
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">Honeydew</span>
+          <span class="status beta">Beta</span>
+        </div>
+        <p class="project-tag">The digital record of a home — appliances, maintenance schedules, the quiet everyday things that get forgotten until they break. A transferable data model: when the house sells, the history goes with it.</p>
+        <div class="stack">
+          <span class="chip">Next.js</span><span class="chip">Cloudflare Workers</span><span class="chip">D1</span><span class="chip">Drizzle</span>
+        </div>
+        <div class="project-links"><a>Visit site ▷</a></div>
+      </div>
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">Retro Estates</span>
+          <span class="status alpha">Alpha</span>
+        </div>
+        <p class="project-tag">You're the unofficial president of a tiny HOA, and the whole fantasy is watching small policy choices ripple through neighbors you've grown to care about. No timers, no FOMO — just consequence.</p>
+        <div class="stack">
+          <span class="chip">SwiftUI</span><span class="chip">SpriteKit</span><span class="chip">iOS</span><span class="chip">iPadOS</span>
+        </div>
+        <div class="project-links"><a>Coming soon ▷</a></div>
+      </div>
+      <div class="project">
+        <div class="project-head">
+          <span class="project-name">homey-vivint</span>
+          <span class="status alpha">Alpha</span>
+        </div>
+        <p class="project-tag">I wanted to migrate off Home Assistant, and the existing Vivint integrations were the inspiration. Ported what I needed into the Homey Apps SDK. App Store listing will follow once it's ready.</p>
+        <div class="stack">
+          <span class="chip">TypeScript</span><span class="chip">Homey Apps SDK 3</span>
+        </div>
+        <div class="project-links"><a>View repo ▷</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ABOUT ============ -->
+  <div class="page" data-page="about">
+    <div class="panel">
+      <span class="panel-title">// NODE_05 :: ABOUT</span>
+      <span class="panel-sub">LORE DUMP</span>
+
+      <div class="about-grid">
+        <div>
+          <h1>ABOUT</h1>
+          <p>
+            I'm an engineering manager at WeGoLook, a Crawford &amp; Company subsidiary, where I lead a
+            multi-functional team of frontend, backend, mobile, and cloud engineers. My path here wasn't
+            traditional — I started in customer support at Sweetwater Sound helping studio engineers
+            troubleshoot complex networked audio systems, fell in love with technology, and never looked back.
+          </p>
+          <p>
+            After certifications in digital control systems and a move to Sweetwater's IT team, I enrolled
+            at Full Sail and got my BS in Web Design &amp; Development. That kicked off a career that's
+            taken me from Laravel apps and legacy WordPress to leading frontend architecture across React,
+            TypeScript, and Next.js. Frontend is my sweet spot, but I've been going deeper into backend
+            and cloud engineering lately.
+          </p>
+          <p>
+            These days I spend a lot of time looking for ways to make my team's work more efficient.
+            Agentic engineering is one of the most interesting problems in our field right now — and our
+            platform is in the middle of major migrations to React Native, Next.js, and Go.
+          </p>
+
+          <h2>// CAREER.LOG</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-period">2025 — PRESENT</div>
+              <h3 class="tl-role">Engineering Manager — WeGoLook / Crawford &amp; Company</h3>
+              <p class="tl-desc">Leading a multi-functional team across frontend, backend, mobile, and cloud. Driving platform migrations to React Native, Next.js, and Go while exploring agentic engineering.</p>
+            </div>
+            <div class="tl-item cyan">
+              <div class="tl-period">2022 — 2025</div>
+              <h3 class="tl-role">Lead Frontend Engineer — WeGoLook</h3>
+              <p class="tl-desc">Took over frontend leadership mid-modernization. Trained the team on TypeScript, Next.js, and Tailwind; led a full frontend ecosystem transition.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-period">2023</div>
+              <h3 class="tl-role">Software Engineer — Hygieia Inc.</h3>
+              <p class="tl-desc">Led frontend engineering for a health-tech startup building a type 2 diabetes management platform.</p>
+            </div>
+            <div class="tl-item cyan">
+              <div class="tl-period">2022</div>
+              <h3 class="tl-role">Senior Frontend Engineer — Rural Sourcing (now Sparq)</h3>
+              <p class="tl-desc">Grew from frontend engineer to senior, picked up a direct report, joined the interview team.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-period">2021 — 2022</div>
+              <h3 class="tl-role">Software Engineer — Sweetwater Sound</h3>
+              <p class="tl-desc">Promoted from IT. Built internal apps in Laravel and WordPress — full stack, databases to deployment.</p>
+            </div>
+            <div class="tl-item cyan">
+              <div class="tl-period">2018 — 2021</div>
+              <h3 class="tl-role">IT Delivery Analyst — Sweetwater Sound</h3>
+              <p class="tl-desc">Coordinated releases, produced documentation, managed third-party dev relationships, maintained WP/PHP apps.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-period">2015 — 2018</div>
+              <h3 class="tl-role">Support Technician — Sweetwater Sound</h3>
+              <p class="tl-desc">Started in customer support helping studio engineers with complex networked audio systems. Certifications in digital control systems.</p>
+            </div>
+          </div>
+
+          <h2>// OUTSIDE_OF_WORK</h2>
+          <p>
+            I live in West Michigan with my wife and two kids. I love the beach in the summer and the fall
+            colors even more. When I'm not writing code for work, I'm usually writing code for fun —
+            Autobudget, Honeydew, Workflow. I'm also deep into homelabbing.
+          </p>
+          <p>
+            I collect retro video games — my favorite is Pokémon Ruby, and I built a custom Game Boy Advance
+            with USB-C charging and an IPS backlit screen. I also play bass; used to run a pop-punk cover
+            band called <em style="color:var(--mag-2);">Never Live This Down</em> before moving back to
+            Michigan in 2022.
+          </p>
+
+          <h2>// GET_IN_TOUCH</h2>
+          <div class="hero-ctas">
+            <a class="btn primary">Email ▷</a>
+            <a class="btn ghost">GitHub ▷</a>
+            <a class="btn ghost">GitLab ▷</a>
+          </div>
+        </div>
+
+        <aside class="about-side">
+          <div class="id-card">
+            <div class="id-photo"></div>
+            <div class="id-row"><span class="k">NAME</span><span class="v">M. McNees</span></div>
+            <div class="id-row"><span class="k">CLASS</span><span class="v">Eng. Manager</span></div>
+            <div class="id-row"><span class="k">LEVEL</span><span class="v">10+ yrs</span></div>
+            <div class="id-row"><span class="k">REGION</span><span class="v">W. Michigan</span></div>
+            <div class="id-row"><span class="k">WEAPONS</span><span class="v">TS · Go · RN</span></div>
+            <div class="id-row"><span class="k">HOMELAB</span><span class="v">ONLINE</span></div>
+            <div class="id-row"><span class="k">STATUS</span><span class="v" style="color:#6bff9e;">ACTIVE</span></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="bottom">
+    <span>© 2026 MICHAEL MCNEES · ALL RIGHTS RESERVED</span>
+    <div class="right">
+      <a>EMAIL</a><a>GITHUB</a><a>GITLAB</a>
+      <span style="color:#6bff9e;">● SYSTEM ONLINE</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ============ TWEAKS PANEL ============ -->
+<div id="tweaks">
+  <h3>
+    <span>TWEAKS</span>
+    <span style="color:var(--cyan-2);font-size:10px;letter-spacing:.2em;">NEON.CTRL</span>
+  </h3>
+
+  <label>VIBE</label>
+  <div class="vibe-row" id="vibe-row">
+    <button data-vibe="minimal">MINIMAL</button>
+    <button data-vibe="classic">CLASSIC</button>
+    <button data-vibe="full">FULL</button>
+  </div>
+
+  <label>ACCENT HUE</label>
+  <div class="hue-row" id="hue-row">
+    <button data-hue="violet">VIOLET</button>
+    <button data-hue="magenta">MAGENTA</button>
+    <button data-hue="cyan">CYAN</button>
+    <button data-hue="sunset">SUNSET</button>
+  </div>
+
+  <label id="lbl-glow">NEON GLOW · <span id="v-glow">0.85</span></label>
+  <input id="s-glow" type="range" min="0" max="1.2" step="0.05" value="0.85"/>
+
+  <label>HORIZON · <span id="v-horizon">0.55</span></label>
+  <input id="s-horizon" type="range" min="0.35" max="0.8" step="0.01" value="0.55"/>
+
+  <label>GRID FLOOR · <span id="v-floor">0.7</span></label>
+  <input id="s-floor" type="range" min="0" max="1" step="0.05" value="0.7"/>
+
+  <label>SCANLINES · <span id="v-scan">0.30</span></label>
+  <input id="s-scan" type="range" min="0" max="0.6" step="0.02" value="0.30"/>
+</div>
+
+<script>
+(function(){
+  // ----- Nav routing -----
+  const pages = document.querySelectorAll('.page');
+  const navLinks = document.querySelectorAll('[data-nav]');
+  function go(page) {
+    pages.forEach(p => p.classList.toggle('active', p.dataset.page === page));
+    document.querySelectorAll('nav.primary a').forEach(a =>
+      a.classList.toggle('active', a.dataset.nav === page));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    try { localStorage.setItem('mcnees-page', page); } catch(e){}
+  }
+  navLinks.forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    go(a.dataset.nav);
+  }));
+  try {
+    const saved = localStorage.getItem('mcnees-page');
+    if (saved) go(saved);
+  } catch(e){}
+
+  // ----- Clock -----
+  function tick() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('sys-time').textContent =
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ----- Blog tag/search filter -----
+  const archive = document.getElementById('archive-list');
+  const search = document.getElementById('blog-search');
+  const tagBtns = document.querySelectorAll('.tagstrip .tagbtn');
+  let activeTag = 'ALL';
+  function applyFilter() {
+    if (!archive) return;
+    const q = (search.value || '').toLowerCase().trim();
+    archive.querySelectorAll('.post').forEach(p => {
+      const text = p.innerText.toLowerCase();
+      const tags = [...p.querySelectorAll('.tag')].map(t => t.innerText.trim().toUpperCase());
+      const tagMatch = activeTag === 'ALL' || tags.includes(activeTag);
+      const qMatch = !q || text.includes(q);
+      p.style.display = (tagMatch && qMatch) ? '' : 'none';
+    });
+  }
+  tagBtns.forEach(b => b.addEventListener('click', () => {
+    tagBtns.forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    activeTag = b.innerText.trim().toUpperCase();
+    applyFilter();
+  }));
+  if (search) search.addEventListener('input', applyFilter);
+
+  // ----- Konami easter egg -----
+  const code = [38,38,40,40,37,39,37,39,66,65]; let pos = 0;
+  document.addEventListener('keydown', e => {
+    if (e.keyCode === code[pos]) {
+      pos++;
+      if (pos === code.length) {
+        pos = 0;
+        const toast = document.createElement('div');
+        toast.textContent = '↑↑↓↓←→←→BA · 30 extra lives granted';
+        Object.assign(toast.style, {
+          position:'fixed', bottom:'24px', left:'50%',
+          transform:'translateX(-50%)', zIndex:100,
+          padding:'10px 18px', border:'1px solid var(--mag)',
+          background:'rgba(10,2,32,.95)',
+          color:'#fff', fontFamily:'var(--font-mono)',
+          fontSize:'12px', letterSpacing:'.2em',
+          boxShadow:'0 0 14px rgba(255,43,214,.8)'
+        });
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+      }
+    } else pos = (e.keyCode === code[0]) ? 1 : 0;
+  });
+
+  // ----- Tweaks panel -----
+  const T = window.__TWEAKS || {};
+  const root = document.documentElement;
+  function applyAll() {
+    root.style.setProperty('--glow', String(T.glow ?? 0.85));
+    root.style.setProperty('--horizon', String(T.horizon ?? 0.55));
+    root.style.setProperty('--floor-opacity', String(T.gridFloor ?? 0.7));
+    root.style.setProperty('--scan-alpha', String(T.scan ?? 0.30));
+
+    // hue
+    const hues = {
+      violet:  { mag:'#ff2bd6', mag2:'#ff62e6', cyan:'#22e7ff', cyan2:'#7df4ff', violet:'#8a4cff' },
+      magenta: { mag:'#ff1f9c', mag2:'#ff6ac4', cyan:'#ff9a4a', cyan2:'#ffc07d', violet:'#ff3672' },
+      cyan:    { mag:'#22e7ff', mag2:'#7df4ff', cyan:'#6bff9e', cyan2:'#b0ffca', violet:'#22c0ff' },
+      sunset:  { mag:'#ff6a3d', mag2:'#ff9063', cyan:'#f9d65c', cyan2:'#ffe89c', violet:'#ff4da6' }
+    };
+    const h = hues[T.accentHue] || hues.violet;
+    root.style.setProperty('--mag', h.mag);
+    root.style.setProperty('--mag-2', h.mag2);
+    root.style.setProperty('--cyan', h.cyan);
+    root.style.setProperty('--cyan-2', h.cyan2);
+    root.style.setProperty('--violet', h.violet);
+
+    // vibe
+    document.querySelector('.scanlines').style.display = (T.vibe === 'minimal') ? 'none' : '';
+    document.querySelector('.stars').style.display = (T.vibe === 'minimal') ? 'none' : '';
+    document.querySelector('.vignette').style.opacity = (T.vibe === 'minimal') ? '0.4' : '1';
+    document.querySelector('.mountains').style.display = (T.vibe === 'minimal') ? 'none' : '';
+    document.querySelector('.planet').style.display = (T.vibe === 'full') ? '' : 'none';
+
+    // sync UI
+    document.getElementById('v-glow').textContent = Number(T.glow).toFixed(2);
+    document.getElementById('v-horizon').textContent = Number(T.horizon).toFixed(2);
+    document.getElementById('v-floor').textContent = Number(T.gridFloor).toFixed(2);
+    document.getElementById('v-scan').textContent = Number(T.scan).toFixed(2);
+    document.getElementById('s-glow').value = T.glow;
+    document.getElementById('s-horizon').value = T.horizon;
+    document.getElementById('s-floor').value = T.gridFloor;
+    document.getElementById('s-scan').value = T.scan;
+    document.querySelectorAll('#vibe-row button').forEach(b =>
+      b.classList.toggle('on', b.dataset.vibe === T.vibe));
+    document.querySelectorAll('#hue-row button').forEach(b =>
+      b.classList.toggle('on', b.dataset.hue === T.accentHue));
+  }
+  applyAll();
+
+  function set(key, val) {
+    T[key] = val;
+    applyAll();
+    try {
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits:{ [key]: val } }, '*');
+    } catch(e){}
+  }
+
+  document.querySelectorAll('#vibe-row button').forEach(b =>
+    b.addEventListener('click', () => set('vibe', b.dataset.vibe)));
+  document.querySelectorAll('#hue-row button').forEach(b =>
+    b.addEventListener('click', () => set('accentHue', b.dataset.hue)));
+  document.getElementById('s-glow').addEventListener('input', e => set('glow', parseFloat(e.target.value)));
+  document.getElementById('s-horizon').addEventListener('input', e => set('horizon', parseFloat(e.target.value)));
+  document.getElementById('s-floor').addEventListener('input', e => set('gridFloor', parseFloat(e.target.value)));
+  document.getElementById('s-scan').addEventListener('input', e => set('scan', parseFloat(e.target.value)));
+
+  // Tweaks protocol
+  window.addEventListener('message', e => {
+    const d = e.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('open');
+    if (d.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('open');
+  });
+  window.parent.postMessage({ type:'__edit_mode_available' }, '*');
+
+  // ----- Custom scroll indicator -----
+  const thumb = document.getElementById('scrollthumb');
+  const pct = document.getElementById('scrollpct');
+  const rail = document.getElementById('scrollrail');
+  const RAIL_TOP = 80, RAIL_BOTTOM = 80;
+
+  function updateScroll() {
+    const vh = window.innerHeight;
+    const dh = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const maxScroll = Math.max(0, dh - vh);
+    const railH = vh - RAIL_TOP - RAIL_BOTTOM;
+    // Thumb height: proportional to viewport / doc, clamped
+    const tH = Math.max(40, Math.min(railH, (vh / dh) * railH));
+    thumb.style.height = tH + 'px';
+
+    const p = maxScroll > 0 ? (window.scrollY / maxScroll) : 0;
+    const travel = railH - tH;
+    const y = RAIL_TOP + p * travel;
+    thumb.style.top = y + 'px';
+
+    // If no overflow, still show the rail but dim
+    if (maxScroll <= 2) {
+      thumb.style.opacity = '0.35';
+      rail.style.opacity = '0.5';
+    } else {
+      thumb.style.opacity = '1';
+      rail.style.opacity = '1';
+    }
+
+    pct.textContent = String(Math.round(p * 100)).padStart(2,'0') + '%';
+    pct.style.top = (y + tH / 2) + 'px';
+  }
+  updateScroll();
+  window.addEventListener('scroll', updateScroll, { passive: true });
+  window.addEventListener('resize', updateScroll);
+  // also update when page changes (content height changes)
+  const mo = new MutationObserver(updateScroll);
+  mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
+
+  // Drag the thumb
+  let dragging = false, dragStartY = 0, dragStartScroll = 0;
+  thumb.addEventListener('pointerdown', e => {
+    dragging = true;
+    dragStartY = e.clientY;
+    dragStartScroll = window.scrollY;
+    thumb.classList.add('dragging');
+    thumb.setPointerCapture(e.pointerId);
+  });
+  thumb.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const vh = window.innerHeight;
+    const dh = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const maxScroll = Math.max(0, dh - vh);
+    const railH = vh - RAIL_TOP - RAIL_BOTTOM;
+    const tH = thumb.offsetHeight;
+    const travel = railH - tH;
+    const dy = e.clientY - dragStartY;
+    const newScroll = dragStartScroll + (dy / travel) * maxScroll;
+    window.scrollTo({ top: newScroll, behavior: 'instant' });
+  });
+  thumb.addEventListener('pointerup', e => {
+    dragging = false;
+    thumb.classList.remove('dragging');
+  });
+})();
+</script>
+</body>
+</html>
