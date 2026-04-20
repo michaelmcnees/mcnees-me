@@ -11,63 +11,68 @@ interface Props {
 
 const { date, updated, tags, minutesRead, slug } = Astro.props;
 
-const formattedDate = date.toLocaleDateString("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
-
-const hasUpdated = updated && updated.getTime() !== date.getTime();
-const formattedUpdated = hasUpdated
-  ? updated.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  : null;
+const pad = (n: number) => String(n).padStart(2, "0");
+const fmt = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
 ---
-<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-on-surface-variant">
-  <span class="inline-flex items-center gap-1 font-mono text-xs rounded px-2 py-0.5" style={`background: var(--color-surface-container-high); color: var(--color-outline);`}>
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="shrink-0" aria-hidden="true">
-      <circle cx="4" cy="3.5" r="1.5" fill="currentColor"/>
-      <circle cx="4" cy="10.5" r="1.5" fill="currentColor"/>
-      <circle cx="10" cy="3.5" r="1.5" fill="currentColor"/>
-      <line x1="4" y1="5" x2="4" y2="9" stroke="currentColor" stroke-width="1.2"/>
-      <path d="M4 5 Q4 3.5 5.5 3.5 L8.5 3.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
-    </svg>
-    {hasUpdated ? (
-      <>
-        <span style={`color: var(--color-outline);`}>Originally published</span>
-        <time datetime={date.toISOString()}>{formattedDate}</time>
-      </>
-    ) : (
-      <time datetime={date.toISOString()}>{formattedDate}</time>
-    )}
-  </span>
-  {hasUpdated && (
-    <span class="font-mono text-xs" style={`color: var(--color-outline);`}>
-      &middot; <span style={`color: var(--color-outline);`}>Updated</span> <time datetime={updated!.toISOString()}>{formattedUpdated}</time>
-    </span>
-  )}
-  {slug && <span id="view-count" class="font-mono text-xs hidden" style={`color: var(--color-outline);`} data-views={slug}>&middot; <span data-views-number></span></span>}
-  {minutesRead && <span class="font-mono text-xs" style={`color: var(--color-outline);`}>&middot; {minutesRead} min read</span>}
+<div class="sw-post-meta">
+  <span class="sw-pm-date">{fmt(date)}</span>
+  {updated && <span class="sw-pm-updated">· UPDATED {fmt(updated)}</span>}
+  {slug && <span id="view-count" class="sw-pm-views" data-views={slug}>· <span data-views-number></span></span>}
+  {minutesRead && <span class="sw-pm-read">· {minutesRead} MIN READ</span>}
 </div>
 {tags.length > 0 && (
-  <div class="flex flex-wrap gap-2 mt-2">
+  <div class="sw-pm-tags">
     {tags.map((tag) => {
       const hue = hashToHue(tag);
       return (
         <a
           href={`/blog?tag=${tag}`}
-          class="text-xs font-mono text-on-surface-variant px-2 py-0.5 rounded-sm no-underline hover:text-on-surface transition-colors"
-          style={`background: var(--color-surface-container-high); border-left: 3px solid oklch(0.72 0.15 ${hue}); box-shadow: 0 1px 2px rgba(0,0,0,0.4);`}
+          class="sw-pm-tag"
+          style={`border-color: oklch(0.72 0.15 ${hue}); color: oklch(0.85 0.15 ${hue});`}
         >
-          {tag}
+          {tag.toUpperCase()}
         </a>
       );
     })}
   </div>
 )}
+
+<style>
+  .sw-post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-2);
+    letter-spacing: 0.14em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .sw-pm-date { color: var(--mag-2); text-shadow: 0 0 6px rgba(255, 43, 214, 0.6); }
+  .sw-pm-updated, .sw-pm-views, .sw-pm-read { color: var(--sw-dim); }
+
+  .sw-pm-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+  .sw-pm-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 4px 10px;
+    border: 1px solid;
+    border-radius: 2px;
+    text-decoration: none;
+    background: rgba(10, 2, 32, 0.5);
+    text-transform: uppercase;
+    transition: box-shadow 0.18s;
+  }
+  .sw-pm-tag:hover { box-shadow: 0 0 8px currentColor; }
+</style>
 
 {slug && (
   <script is:inline>
@@ -78,13 +83,10 @@ const formattedUpdated = hasUpdated
       fetch("/api/views/" + slug, { method: "POST" })
         .then(function(r) { return r.json(); })
         .then(function(data) {
-          if (data.views > 0) {
-            var numberEl = el.querySelector("[data-views-number]");
-            if (numberEl) {
-              var label = data.views === 1 ? "view" : "views";
-              numberEl.textContent = data.views.toLocaleString() + " " + label;
-              el.classList.remove("hidden");
-            }
+          var num = el.querySelector("[data-views-number]");
+          if (num && data && data.count) {
+            num.textContent = data.count + " VIEWS";
+            el.classList.remove("hidden");
           }
         })
         .catch(function() {});

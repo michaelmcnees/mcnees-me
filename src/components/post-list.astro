@@ -12,23 +12,92 @@ const sorted = posts
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, limit);
 ---
-<ul class="space-y-6 list-none p-0">
+<div class="sw-post-list">
   {sorted.map((post) => {
-    const formattedDate = post.data.date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    const d = post.data.date;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const formatted = `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
     return (
-      <li>
-        <a href={`/blog/${post.id}`} class="group block no-underline transition-transform hover:translate-x-1">
-          <h3 class="text-lg text-on-surface font-medium group-hover:text-accent transition-colors">
-            {post.data.title}
-          </h3>
-          <p class="text-sm text-on-surface-variant mt-1">{post.data.description}</p>
-          <span class="text-sm text-on-surface-variant mt-1 block font-mono text-xs">{formattedDate}</span>
-        </a>
-      </li>
+      <a class="sw-post" href={`/blog/${post.id}`}>
+        <span class="sw-post-date">{formatted}</span>
+        <div>
+          <h3 class="sw-post-title">{post.data.title}</h3>
+          <p class="sw-post-desc">{post.data.description}</p>
+        </div>
+        <div class="sw-post-tags">
+          {post.data.tags.slice(0, 2).map((tag) => (
+            <span class="sw-tag">{tag.toUpperCase()}</span>
+          ))}
+        </div>
+      </a>
     );
   })}
-</ul>
+</div>
+
+<style>
+  .sw-post-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .sw-post {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: center;
+    gap: 28px;
+    padding: 22px 24px;
+    border-top: 1px solid rgba(34, 231, 255, 0.12);
+    text-decoration: none;
+    color: var(--sw-white);
+    transition: background 0.18s, transform 0.18s;
+    position: relative;
+  }
+  .sw-post:first-child { border-top: 1px solid rgba(34, 231, 255, 0.28); }
+  .sw-post:hover {
+    background: linear-gradient(90deg, rgba(255, 43, 214, 0.08), rgba(34, 231, 255, 0.05));
+  }
+  .sw-post:hover .sw-post-title {
+    color: var(--mag-2);
+    text-shadow: 0 0 10px rgba(255, 43, 214, 0.8);
+  }
+  .sw-post:hover::before {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--mag);
+    box-shadow: 0 0 10px var(--mag);
+  }
+  .sw-post-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-2);
+    letter-spacing: 0.12em;
+  }
+  .sw-post-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 0 0 4px;
+    color: var(--sw-white);
+    transition: color 0.18s;
+  }
+  .sw-post-desc {
+    font-size: 13.5px;
+    color: #bcb0d8;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .sw-post-tags { display: flex; gap: 6px; }
+  .sw-tag {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    border: 1px solid rgba(34, 231, 255, 0.45);
+    padding: 3px 8px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    background: rgba(34, 231, 255, 0.06);
+  }
+  @media (max-width: 880px) {
+    .sw-post { grid-template-columns: 1fr; gap: 6px; }
+    .sw-post-date { font-size: 10px; }
+  }
+</style>
