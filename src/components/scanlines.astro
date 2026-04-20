@@ -1,0 +1,19 @@
+---
+// CRT scanline overlay. Reads --scan-alpha from :root (tweaks panel + reading mode write this).
+---
+<div class="sw-scanlines" aria-hidden="true"></div>
+
+<style>
+  .sw-scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) 2px,
+      rgba(0,0,0, var(--scan-alpha)) 2px,
+      rgba(0,0,0, var(--scan-alpha)) 3px);
+    mix-blend-mode: multiply;
+  }
+</style>
