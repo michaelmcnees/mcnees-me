@@ -1,0 +1,218 @@
+---
+// Tweaks panel — hidden by default, toggled via backtick.
+// Controls: vibe (minimal|classic|full), accentHue (cyan|violet|magenta|sunset),
+// glow, horizon, gridFloor, scan. Persists to localStorage "dvflw.tweaks".
+---
+<div id="sw-tweaks" aria-hidden="true">
+  <h3>
+    <span>TWEAKS</span>
+    <span style="color: var(--cyan-2); font-size: 10px; letter-spacing: 0.2em;">NEON.CTRL</span>
+  </h3>
+
+  <label>VIBE</label>
+  <div class="sw-vibe-row" id="sw-vibe-row">
+    <button type="button" data-vibe="minimal">MINIMAL</button>
+    <button type="button" data-vibe="classic">CLASSIC</button>
+    <button type="button" data-vibe="full">FULL</button>
+  </div>
+
+  <label>ACCENT HUE</label>
+  <div class="sw-hue-row" id="sw-hue-row">
+    <button type="button" data-hue="cyan">CYAN</button>
+    <button type="button" data-hue="violet">VIOLET</button>
+    <button type="button" data-hue="magenta">MAGENTA</button>
+    <button type="button" data-hue="sunset">SUNSET</button>
+  </div>
+
+  <label>NEON GLOW · <span id="sw-v-glow">0.85</span></label>
+  <input id="sw-s-glow" type="range" min="0" max="1.2" step="0.05" value="0.85"/>
+
+  <label>HORIZON · <span id="sw-v-horizon">0.55</span></label>
+  <input id="sw-s-horizon" type="range" min="0.35" max="0.8" step="0.01" value="0.55"/>
+
+  <label>GRID FLOOR · <span id="sw-v-floor">0.7</span></label>
+  <input id="sw-s-floor" type="range" min="0" max="1" step="0.05" value="0.7"/>
+
+  <label>SCANLINES · <span id="sw-v-scan">0.30</span></label>
+  <input id="sw-s-scan" type="range" min="0" max="0.6" step="0.02" value="0.30"/>
+
+  <p class="sw-tweaks-hint">Press <kbd>`</kbd> to close</p>
+</div>
+
+<style>
+  #sw-tweaks {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 80;
+    width: 280px;
+    padding: 18px 18px 14px;
+    border: 1px solid rgba(34, 231, 255, 0.5);
+    background: linear-gradient(180deg, rgba(20, 8, 50, 0.95), rgba(10, 2, 32, 0.97));
+    border-radius: 4px;
+    box-shadow:
+      0 0 20px rgba(34, 231, 255, 0.4),
+      0 0 40px rgba(255, 43, 214, 0.25),
+      inset 0 0 0 1px rgba(255, 43, 214, 0.15);
+    font-family: var(--font-mono);
+    color: var(--sw-white);
+    display: none;
+    backdrop-filter: blur(6px);
+  }
+  #sw-tweaks.open { display: block; }
+  #sw-tweaks h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--mag-2);
+    margin: 0 0 12px;
+    text-shadow: 0 0 6px var(--mag);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #sw-tweaks label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    text-transform: uppercase;
+    margin: 10px 0 6px;
+  }
+  #sw-tweaks input[type="range"] {
+    width: 100%;
+    accent-color: var(--mag);
+  }
+  .sw-vibe-row, .sw-hue-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sw-vibe-row button, .sw-hue-row button {
+    flex: 1;
+    min-width: 60px;
+    background: rgba(10, 2, 32, 0.6);
+    color: var(--cyan-2);
+    border: 1px solid rgba(34, 231, 255, 0.3);
+    padding: 6px 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sw-vibe-row button.on, .sw-hue-row button.on {
+    color: #fff;
+    border-color: var(--mag);
+    background: rgba(255, 43, 214, 0.18);
+    box-shadow: 0 0 8px rgba(255, 43, 214, 0.5);
+  }
+  .sw-tweaks-hint {
+    margin: 12px 0 0;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--sw-dim);
+    text-transform: uppercase;
+  }
+  .sw-tweaks-hint kbd {
+    font-family: var(--font-mono);
+    border: 1px solid rgba(34, 231, 255, 0.3);
+    padding: 1px 4px;
+    border-radius: 2px;
+    color: var(--cyan-2);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const DEFAULTS = {
+      vibe: "classic",
+      accentHue: "cyan",
+      glow: 0.85,
+      horizon: 0.55,
+      gridFloor: 0.7,
+      scan: 0.30,
+    };
+    const STORAGE_KEY = "dvflw.tweaks";
+    const HUES = {
+      cyan:    { mag: "#ff2bd6", mag2: "#ff62e6", cyan: "#22e7ff", cyan2: "#7df4ff", violet: "#8a4cff" },
+      violet:  { mag: "#ff2bd6", mag2: "#ff62e6", cyan: "#22e7ff", cyan2: "#7df4ff", violet: "#8a4cff" },
+      magenta: { mag: "#ff1f9c", mag2: "#ff6ac4", cyan: "#ff9a4a", cyan2: "#ffc07d", violet: "#ff3672" },
+      sunset:  { mag: "#ff6a3d", mag2: "#ff9063", cyan: "#f9d65c", cyan2: "#ffe89c", violet: "#ff4da6" },
+    };
+
+    let T = Object.assign({}, DEFAULTS);
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      if (saved && typeof saved === "object") T = Object.assign(T, saved);
+    } catch (e) {}
+
+    const root = document.documentElement;
+    const panel = document.getElementById("sw-tweaks");
+    const scanlines = document.querySelector(".sw-scanlines");
+    const stars = document.querySelector(".sw-stars");
+    const vignette = document.querySelector(".sw-vignette");
+    const mountains = document.querySelector(".sw-mountains");
+    const planet = document.querySelector(".sw-planet");
+
+    function applyAll() {
+      root.style.setProperty("--glow", String(T.glow));
+      root.style.setProperty("--horizon", String(T.horizon));
+      root.style.setProperty("--floor-opacity", String(T.gridFloor));
+      root.style.setProperty("--scan-alpha", String(T.scan));
+
+      const h = HUES[T.accentHue] || HUES.cyan;
+      root.style.setProperty("--mag", h.mag);
+      root.style.setProperty("--mag-2", h.mag2);
+      root.style.setProperty("--cyan", h.cyan);
+      root.style.setProperty("--cyan-2", h.cyan2);
+      root.style.setProperty("--violet", h.violet);
+
+      if (scanlines) scanlines.style.display = (T.vibe === "minimal") ? "none" : "";
+      if (stars) stars.style.display = (T.vibe === "minimal") ? "none" : "";
+      if (vignette) vignette.style.opacity = (T.vibe === "minimal") ? "0.4" : "1";
+      if (mountains) mountains.style.display = (T.vibe === "minimal") ? "none" : "";
+      if (planet) planet.style.display = (T.vibe === "full") ? "" : "none";
+
+      document.getElementById("sw-v-glow").textContent = Number(T.glow).toFixed(2);
+      document.getElementById("sw-v-horizon").textContent = Number(T.horizon).toFixed(2);
+      document.getElementById("sw-v-floor").textContent = Number(T.gridFloor).toFixed(2);
+      document.getElementById("sw-v-scan").textContent = Number(T.scan).toFixed(2);
+      document.getElementById("sw-s-glow").value = T.glow;
+      document.getElementById("sw-s-horizon").value = T.horizon;
+      document.getElementById("sw-s-floor").value = T.gridFloor;
+      document.getElementById("sw-s-scan").value = T.scan;
+      document.querySelectorAll("#sw-vibe-row button").forEach((b) =>
+        b.classList.toggle("on", b.dataset.vibe === T.vibe));
+      document.querySelectorAll("#sw-hue-row button").forEach((b) =>
+        b.classList.toggle("on", b.dataset.hue === T.accentHue));
+    }
+
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(T)); } catch (e) {}
+    }
+
+    function set(key, val) {
+      T[key] = val;
+      applyAll();
+      save();
+    }
+
+    applyAll();
+
+    document.querySelectorAll("#sw-vibe-row button").forEach((b) =>
+      b.addEventListener("click", () => set("vibe", b.dataset.vibe)));
+    document.querySelectorAll("#sw-hue-row button").forEach((b) =>
+      b.addEventListener("click", () => set("accentHue", b.dataset.hue)));
+    document.getElementById("sw-s-glow").addEventListener("input", (e) => set("glow", parseFloat(e.target.value)));
+    document.getElementById("sw-s-horizon").addEventListener("input", (e) => set("horizon", parseFloat(e.target.value)));
+    document.getElementById("sw-s-floor").addEventListener("input", (e) => set("gridFloor", parseFloat(e.target.value)));
+    document.getElementById("sw-s-scan").addEventListener("input", (e) => set("scan", parseFloat(e.target.value)));
+
+    // Toggle on backtick (ignore while typing in inputs)
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "`") return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      e.preventDefault();
+      panel.classList.toggle("open");
+    });
+  })();
+</script>
