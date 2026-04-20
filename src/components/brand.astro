@@ -1,0 +1,61 @@
+---
+// Brand mark: neon triangle logo + wordmark. Ported from design lines 1310-1331.
+---
+<a class="sw-brand" href="/">
+  <span class="sw-logo">
+    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <polygon points="20,4 36,34 4,34" stroke="url(#sw-lg1)" stroke-width="2" fill="none"/>
+      <polygon points="20,14 30,32 10,32" stroke="url(#sw-lg2)" stroke-width="1.5" fill="none" opacity="0.8"/>
+      <defs>
+        <linearGradient id="sw-lg1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#22e7ff"/>
+          <stop offset="1" stop-color="#ff2bd6"/>
+        </linearGradient>
+        <linearGradient id="sw-lg2" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#ff2bd6"/>
+          <stop offset="1" stop-color="#22e7ff"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </span>
+  <span class="sw-brand-text">
+    <span class="sw-brand-name">MCNEES</span>
+    <span class="sw-brand-sub">//NEON.SYS v2.86</span>
+  </span>
+</a>
+
+<style>
+  .sw-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-self: start;
+    text-decoration: none;
+    color: var(--sw-white);
+  }
+  .sw-logo {
+    width: 38px; height: 38px;
+    position: relative;
+  }
+  .sw-logo svg {
+    display: block;
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 8px rgba(34, 231, 255, calc(0.9 * var(--glow))))
+            drop-shadow(0 0 12px rgba(255, 43, 214, calc(0.55 * var(--glow))));
+  }
+  .sw-brand-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    font-size: 14px;
+    display: block;
+  }
+  .sw-brand-sub {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan-2);
+    letter-spacing: 0.3em;
+    margin-top: 2px;
+  }
+</style>
