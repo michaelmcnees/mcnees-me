@@ -1,0 +1,144 @@
+---
+// Custom synthwave scroll indicator. Native scrollbars are hidden in synthwave.css.
+// JS ported from design source lines 2001-2064.
+---
+<div id="sw-scrollrail" aria-hidden="true"></div>
+<div id="sw-scrollthumb" aria-hidden="true"></div>
+<div id="sw-scrollpct" aria-hidden="true">00%</div>
+
+<style>
+  #sw-scrollrail {
+    position: fixed;
+    top: 80px;
+    bottom: 80px;
+    right: 10px;
+    width: 6px;
+    z-index: 60;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+      rgba(34, 231, 255, 0.0),
+      rgba(34, 231, 255, 0.18),
+      rgba(255, 43, 214, 0.18),
+      rgba(255, 43, 214, 0.0));
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(138, 76, 255, 0.2);
+  }
+  #sw-scrollrail::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    transform: translateX(-50%);
+    background: repeating-linear-gradient(180deg,
+      rgba(138, 76, 255, 0.35) 0 6px,
+      transparent 6px 12px);
+  }
+  #sw-scrollthumb {
+    position: fixed;
+    right: 6px;
+    width: 14px;
+    height: 60px;
+    z-index: 61;
+    pointer-events: auto;
+    cursor: grab;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--cyan) 0%, var(--mag) 100%);
+    box-shadow:
+      0 0 10px rgba(34, 231, 255, calc(0.8 * var(--glow))),
+      0 0 18px rgba(255, 43, 214, calc(0.6 * var(--glow))),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    transition: height 0.15s ease, transform 0.08s ease;
+  }
+  #sw-scrollthumb::before {
+    content: "";
+    position: absolute;
+    inset: 4px 4px;
+    border-left: 1px solid rgba(255, 255, 255, 0.45);
+    border-right: 1px solid rgba(255, 255, 255, 0.45);
+    background: repeating-linear-gradient(180deg,
+      rgba(255, 255, 255, 0.25) 0 1px,
+      transparent 1px 4px);
+  }
+  #sw-scrollthumb:hover { transform: scaleX(1.15); }
+  #sw-scrollthumb.dragging { cursor: grabbing; }
+  #sw-scrollpct {
+    position: fixed;
+    right: 26px;
+    z-index: 61;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    background: rgba(10, 2, 32, 0.8);
+    border: 1px solid rgba(34, 231, 255, 0.3);
+    padding: 2px 6px;
+    border-radius: 2px;
+    pointer-events: none;
+    text-shadow: 0 0 4px rgba(34, 231, 255, 0.6);
+    transform: translateY(-50%);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const thumb = document.getElementById('sw-scrollthumb');
+    const pct = document.getElementById('sw-scrollpct');
+    const rail = document.getElementById('sw-scrollrail');
+    if (!thumb || !pct || !rail) return;
+    const RAIL_TOP = 80, RAIL_BOTTOM = 80;
+
+    function updateScroll() {
+      const vh = window.innerHeight;
+      const dh = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      const maxScroll = Math.max(0, dh - vh);
+      const railH = vh - RAIL_TOP - RAIL_BOTTOM;
+      const tH = Math.max(40, Math.min(railH, (vh / dh) * railH));
+      thumb.style.height = tH + 'px';
+
+      const p = maxScroll > 0 ? (window.scrollY / maxScroll) : 0;
+      const travel = railH - tH;
+      const y = RAIL_TOP + p * travel;
+      thumb.style.top = y + 'px';
+
+      if (maxScroll <= 2) {
+        thumb.style.opacity = '0.35';
+        rail.style.opacity = '0.5';
+      } else {
+        thumb.style.opacity = '1';
+        rail.style.opacity = '1';
+      }
+
+      pct.textContent = String(Math.round(p * 100)).padStart(2, '0') + '%';
+      pct.style.top = (y + tH / 2) + 'px';
+    }
+    updateScroll();
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('resize', updateScroll);
+
+    let dragging = false, dragStartY = 0, dragStartScroll = 0;
+    thumb.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      dragStartY = e.clientY;
+      dragStartScroll = window.scrollY;
+      thumb.classList.add('dragging');
+      thumb.setPointerCapture(e.pointerId);
+    });
+    thumb.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const vh = window.innerHeight;
+      const dh = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      const maxScroll = Math.max(0, dh - vh);
+      const railH = vh - RAIL_TOP - RAIL_BOTTOM;
+      const tH = thumb.offsetHeight;
+      const travel = railH - tH;
+      const dy = e.clientY - dragStartY;
+      const newScroll = dragStartScroll + (dy / travel) * maxScroll;
+      window.scrollTo({ top: newScroll, behavior: 'instant' });
+    });
+    thumb.addEventListener('pointerup', () => {
+      dragging = false;
+      thumb.classList.remove('dragging');
+    });
+  })();
+</script>
