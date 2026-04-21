@@ -1,45 +1,44 @@
 ---
 import BaseLayout from "@/layouts/base-layout.astro";
-import { getCollection } from "astro:content";
-
-const posts = await getCollection("blog", ({ data }) => !data.draft);
-const randomPost = posts[Math.floor(Math.random() * posts.length)];
-const randomUrl = randomPost ? `/blog/${randomPost.id}` : "/blog";
+import Panel from "@/components/panel.astro";
 ---
-<BaseLayout title="404 — Michael McNees" description="Page not found.">
-  <section class="py-24 flex flex-col items-center justify-center text-center">
-    <div class="relative">
-      <!-- CRT scanline overlay -->
-      <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(to bottom, transparent 0 2px, oklch(0 0 0 / 0.06) 2px 4px);" aria-hidden="true"></div>
+<BaseLayout title="// SIGNAL LOST — Michael McNees" description="Page not found.">
+  <Panel title="// SIGNAL LOST" sub="ERR_404">
+    <div class="sw-404">
+      <pre class="sw-404-ascii">{`
+  ▄▀▄   ▄▀▄   █▄▄▄   █▄  █   █▀▀█   █     █▀▀▀█
+  █ █   █ █   █▄▄▄   █ ▀▄█   █▄▄█   █     █▄▄▄█
+  ▀ ▀   ▀ ▀   ▀▀▀▀   ▀   ▀   ▀  ▀   ▀▀▀▀  ▀▀▀▀▀
 
-      <h1
-        class="text-6xl font-bold font-mono tracking-widest motion-safe:animate-[flicker_4s_infinite]"
-        style="color: var(--color-accent); text-shadow: 0 0 12px oklch(0.70 0.15 220 / 0.5), 0 0 24px oklch(0.70 0.15 220 / 0.2);"
-      >
-        GAME OVER
-      </h1>
-
-      <p class="mt-6 text-lg font-mono" style="color: oklch(0.55 0.10 220);">
-        CONTINUE?
-        <a href="/" class="no-underline font-bold ml-2" style="color: var(--color-accent-hover);">[Y]</a>
-        <span class="mx-1">/</span>
-        <a href={randomUrl} class="no-underline" style="color: oklch(0.50 0.08 220);">[N]</a>
-      </p>
-
-      <p class="mt-8 text-sm text-outline font-mono">
-        ERR 404 — STAGE NOT FOUND
-      </p>
+   >> transmission lost.
+   >> requested coordinates not on this network.
+      `}</pre>
+      <p class="sw-404-msg">The page you're looking for isn't here. Broken link? Bad save? Either way — return to base.</p>
+      <a class="btn primary" href="/"><span>Return to base</span><span class="arrow">▷</span></a>
     </div>
-  </section>
-
-  <style>
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      92% { opacity: 1; }
-      93% { opacity: 0.97; }
-      94% { opacity: 1; }
-      96% { opacity: 0.98; }
-      97% { opacity: 1; }
-    }
-  </style>
+  </Panel>
 </BaseLayout>
+
+<style>
+  .sw-404 {
+    padding: 56px 32px;
+    text-align: center;
+  }
+  .sw-404-ascii {
+    font-family: var(--font-mono);
+    color: var(--cyan-2);
+    font-size: 12px;
+    line-height: 1.2;
+    margin: 0 auto 32px;
+    display: inline-block;
+    text-align: left;
+    text-shadow: 0 0 8px rgba(34, 231, 255, 0.5);
+  }
+  .sw-404-msg {
+    color: #cfc3ec;
+    font-size: 15px;
+    max-width: 420px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+</style>
