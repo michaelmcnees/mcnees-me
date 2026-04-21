@@ -1,6 +1,4 @@
 ---
-import StackChip from "@/components/stack-chip.astro";
-
 interface Props {
   role: string;
   timeframe: string;
@@ -13,39 +11,117 @@ interface Props {
 
 const { role, timeframe, client, stack, outcome, url, repo } = Astro.props;
 ---
-<aside class="text-sm space-y-4 md:sticky md:top-8 md:self-start">
-  <dl class="space-y-3">
+<aside class="sw-dossier">
+  <div class="sw-dossier-badge">DOSSIER</div>
+  <dl class="sw-dossier-list">
     {client && (
-      <div>
-        <dt class="text-outline font-mono text-xs uppercase tracking-wider">Client</dt>
-        <dd class="text-on-surface mt-1">{client}</dd>
+      <div class="sw-dossier-row">
+        <dt>CLIENT</dt>
+        <dd>{client}</dd>
       </div>
     )}
-    <div>
-      <dt class="text-outline font-mono text-xs uppercase tracking-wider">Role</dt>
-      <dd class="text-on-surface mt-1">{role}</dd>
+    <div class="sw-dossier-row">
+      <dt>ROLE</dt>
+      <dd>{role}</dd>
     </div>
-    <div>
-      <dt class="text-outline font-mono text-xs uppercase tracking-wider">Timeframe</dt>
-      <dd class="text-on-surface mt-1">{timeframe}</dd>
+    <div class="sw-dossier-row">
+      <dt>TIMEFRAME</dt>
+      <dd>{timeframe}</dd>
     </div>
-    <div>
-      <dt class="text-outline font-mono text-xs uppercase tracking-wider">Outcome</dt>
-      <dd class="text-on-surface mt-1">{outcome}</dd>
+    <div class="sw-dossier-row">
+      <dt>OUTCOME</dt>
+      <dd>{outcome}</dd>
     </div>
     {stack.length > 0 && (
-      <div>
-        <dt class="text-outline font-mono text-xs uppercase tracking-wider">Stack</dt>
-        <dd class="mt-2 flex flex-wrap gap-2">
-          {stack.map((s) => <StackChip label={s} />)}
+      <div class="sw-dossier-row sw-dossier-stack">
+        <dt>STACK</dt>
+        <dd>
+          {stack.map((s) => <span class="sw-chip">{s}</span>)}
         </dd>
       </div>
     )}
   </dl>
   {(url || repo) && (
-    <div class="flex flex-col gap-2 pt-2 border-t border-outline/20">
-      {url && <a href={url} target="_blank" rel="noopener" class="text-sm">Visit site &rarr;</a>}
-      {repo && <a href={repo} target="_blank" rel="noopener" class="text-sm">View repo &rarr;</a>}
+    <div class="sw-dossier-links">
+      {url && <a href={url} target="_blank" rel="noopener">VISIT ▷</a>}
+      {repo && <a href={repo} target="_blank" rel="noopener">REPO ▷</a>}
     </div>
   )}
 </aside>
+
+<style>
+  .sw-dossier {
+    padding: 20px;
+    border: 1px solid rgba(34, 231, 255, 0.3);
+    background: linear-gradient(180deg, rgba(20, 8, 50, 0.7), rgba(10, 2, 32, 0.9));
+    border-radius: 4px;
+    position: sticky;
+    top: 20px;
+    align-self: start;
+  }
+  .sw-dossier-badge {
+    position: absolute;
+    top: -8px; left: 12px;
+    background: var(--sw-bg-0);
+    padding: 0 8px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--mag-2);
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 6px var(--mag);
+  }
+  .sw-dossier-list { margin: 0; padding: 0; }
+  .sw-dossier-row {
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(34, 231, 255, 0.2);
+  }
+  .sw-dossier-row:last-child { border-bottom: none; }
+  .sw-dossier-row dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--sw-dim);
+    text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .sw-dossier-row dd {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--cyan-2);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .sw-dossier-stack dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sw-chip {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #d1c6ec;
+    padding: 3px 8px 3px 10px;
+    background: rgba(138, 76, 255, 0.12);
+    border-left: 2px solid var(--violet);
+    border-radius: 0 2px 2px 0;
+  }
+  .sw-dossier-links {
+    display: flex;
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(34, 231, 255, 0.2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+  }
+  .sw-dossier-links a {
+    color: var(--cyan-2);
+    text-decoration: none;
+  }
+  .sw-dossier-links a:hover {
+    color: var(--mag-2);
+    text-shadow: 0 0 6px var(--mag);
+  }
+</style>

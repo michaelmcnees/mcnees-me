@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
+import Panel from "@/components/panel.astro";
 import CaseStudySidebar from "@/components/case-study-sidebar.astro";
 
 export async function getStaticPaths() {
@@ -14,27 +15,102 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
-<BaseLayout title={`${entry.data.title} — Michael McNees`} description={entry.data.summary}>
-  <article class="py-12">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold text-on-surface mb-3 tracking-tight">{entry.data.title}</h1>
-      <p class="text-on-surface-variant">{entry.data.summary}</p>
-    </header>
-    <div class="grid gap-10 md:grid-cols-[1fr_16rem]">
-      <div class="prose prose-invert max-w-none order-2 md:order-1">
-        <Content />
-      </div>
-      <div class="order-1 md:order-2">
-        <CaseStudySidebar
-          role={entry.data.role}
-          timeframe={entry.data.timeframe}
-          client={entry.data.client}
-          stack={entry.data.stack}
-          outcome={entry.data.outcome}
-          url={entry.data.url}
-          repo={entry.data.repo}
-        />
+<BaseLayout
+  title={`${entry.data.title} — Michael McNees`}
+  description={entry.data.summary}
+  reading={true}
+>
+  <Panel title="// DOSSIER" sub={entry.data.client ?? entry.data.title}>
+    <div class="sw-cs-detail">
+      <header class="sw-cs-header">
+        <h1 class="sw-cs-title">{entry.data.title}</h1>
+        <p class="sw-cs-summary">{entry.data.summary}</p>
+      </header>
+      <div class="sw-cs-grid">
+        <div class="sw-cs-body sw-prose">
+          <Content />
+        </div>
+        <div class="sw-cs-side">
+          <CaseStudySidebar
+            role={entry.data.role}
+            timeframe={entry.data.timeframe}
+            client={entry.data.client}
+            stack={entry.data.stack}
+            outcome={entry.data.outcome}
+            url={entry.data.url}
+            repo={entry.data.repo}
+          />
+        </div>
       </div>
     </div>
-  </article>
+  </Panel>
 </BaseLayout>
+
+<style>
+  .sw-cs-detail { padding: 36px 32px; }
+  .sw-cs-header { margin-bottom: 32px; }
+  .sw-cs-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 4vw, 42px);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    background: linear-gradient(180deg, #fff 40%, #7df4ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 8px rgba(34, 231, 255, 0.5));
+    line-height: 1.1;
+  }
+  .sw-cs-summary { color: #cfc3ec; font-size: 15px; line-height: 1.6; margin: 0; }
+  .sw-cs-grid {
+    display: grid;
+    gap: 40px;
+    grid-template-columns: 1fr 280px;
+  }
+  .sw-cs-body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.75;
+    color: #cfc3ec;
+  }
+  /* Reuse sw-prose from Task 14 for h2/h3/code/blockquote styling */
+  .sw-cs-body :global(h2) {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cyan-2);
+    text-shadow: 0 0 6px rgba(34, 231, 255, 0.5);
+    margin: 48px 0 16px;
+  }
+  .sw-cs-body :global(h3) {
+    font-family: var(--font-display);
+    font-size: 17px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mag-2);
+    margin: 32px 0 12px;
+  }
+  .sw-cs-body :global(a) {
+    color: var(--cyan-2);
+    text-decoration: underline;
+    text-decoration-color: rgba(34, 231, 255, 0.4);
+    text-underline-offset: 3px;
+  }
+  .sw-cs-body :global(a:hover) { color: var(--mag-2); }
+  .sw-cs-body :global(code) {
+    font-family: var(--font-mono);
+    background: rgba(34, 231, 255, 0.08);
+    border: 1px solid rgba(34, 231, 255, 0.25);
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 0.9em;
+  }
+  @media (max-width: 880px) {
+    .sw-cs-grid { grid-template-columns: 1fr; }
+    .sw-cs-side { order: -1; }
+    .sw-cs-side .sw-dossier { position: static; }
+  }
+</style>
