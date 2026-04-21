@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
+import Panel from "@/components/panel.astro";
 import CaseStudyCard from "@/components/case-study-card.astro";
 
 const entries = await getCollection("case-studies", ({ data }) => !data.draft);
@@ -10,20 +11,32 @@ const sorted = entries.sort((a, b) => {
   return b.data.date.getTime() - a.data.date.getTime();
 });
 ---
-<BaseLayout title="Case Studies — Michael McNees" description="Long-form write-ups of client and community work.">
-  <section class="py-16">
-    <h1 class="text-4xl font-bold text-on-surface mb-3 tracking-tight" style="font-family: var(--font-heading);">Case Studies</h1>
-    <p class="text-lg text-on-surface-variant leading-relaxed max-w-lg">
-      Longer write-ups of work I've done for clients, communities, and friends.
-    </p>
-  </section>
-  <section class="pb-16">
+<BaseLayout title="Case Studies // DOSSIERS — Michael McNees" description="Long-form write-ups of client and community work.">
+  <Panel title="// NODE_03 :: DOSSIERS" sub="MISSION ARCHIVE">
+    <div class="sw-cs-top">
+      <h1 class="sw-cs-page-title">Dossiers</h1>
+      <p class="sw-cs-page-sub">Longer write-ups of work I've done for clients, communities, and friends.</p>
+    </div>
     {sorted.length === 0 ? (
-      <p class="text-on-surface-variant">No case studies yet.</p>
+      <p class="sw-empty">No dossiers yet.</p>
     ) : (
-      <div class="list-none p-0">
-        {sorted.map((entry) => <CaseStudyCard entry={entry} />)}
-      </div>
+      sorted.map((entry) => <CaseStudyCard entry={entry} />)
     )}
-  </section>
+  </Panel>
 </BaseLayout>
+
+<style>
+  .sw-cs-top { padding: 36px 32px 20px; }
+  .sw-cs-page-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 44px;
+    margin: 0 0 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(34, 231, 255, 0.7);
+  }
+  .sw-cs-page-sub { color: #c8bce4; font-size: 15px; margin: 0 0 12px; }
+  .sw-empty { padding: 36px 32px; color: var(--sw-dim); font-family: var(--font-mono); }
+</style>

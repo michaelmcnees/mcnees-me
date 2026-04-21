@@ -7,14 +7,75 @@ interface Props {
 
 const { entry } = Astro.props;
 ---
-<a href={`/case-studies/${entry.id}`} class="group block no-underline py-6 border-b border-outline/15 transition-transform hover:translate-x-1">
-  <h3 class="text-lg text-on-surface font-medium group-hover:text-accent transition-colors">
-    {entry.data.title}
-  </h3>
-  <p class="text-sm text-on-surface-variant mt-1">{entry.data.summary}</p>
-  <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-outline">
-    <span>{entry.data.role}</span>
-    <span aria-hidden="true">&middot;</span>
-    <span>{entry.data.timeframe}</span>
+<a href={`/case-studies/${entry.id}`} class="sw-cs-card">
+  <div class="sw-cs-head">
+    <h3 class="sw-cs-title">{entry.data.title}</h3>
+    <span class="sw-cs-timeframe">{entry.data.timeframe}</span>
   </div>
+  <p class="sw-cs-summary">{entry.data.summary}</p>
+  <div class="sw-cs-role">{entry.data.role}</div>
 </a>
+
+<style>
+  .sw-cs-card {
+    display: block;
+    padding: 26px 28px;
+    border-top: 1px solid rgba(34, 231, 255, 0.12);
+    text-decoration: none;
+    color: var(--sw-white);
+    transition: background 0.18s, transform 0.18s;
+    position: relative;
+  }
+  .sw-cs-card:first-child { border-top: 1px solid rgba(34, 231, 255, 0.28); }
+  .sw-cs-card:hover {
+    background: linear-gradient(90deg, rgba(255, 43, 214, 0.08), rgba(34, 231, 255, 0.05));
+    transform: translateX(2px);
+  }
+  .sw-cs-card:hover::before {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--mag);
+    box-shadow: 0 0 10px var(--mag);
+  }
+  .sw-cs-card:hover .sw-cs-title {
+    color: var(--mag-2);
+    text-shadow: 0 0 10px rgba(255, 43, 214, 0.8);
+  }
+  .sw-cs-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 6px;
+  }
+  .sw-cs-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+    transition: color 0.18s;
+  }
+  .sw-cs-timeframe {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--cyan-2);
+    text-transform: uppercase;
+  }
+  .sw-cs-summary {
+    font-size: 14px;
+    color: #bcb0d8;
+    line-height: 1.55;
+    margin: 0 0 8px;
+  }
+  .sw-cs-role {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--sw-dim);
+    text-transform: uppercase;
+  }
+</style>
