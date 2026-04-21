@@ -1,65 +1,110 @@
 ---
 interface TimelineEntry {
-    period: string;
-    role: string;
-    description: string;
+  period: string;
+  role: string;
+  description: string;
+  color?: "mag" | "cyan";
 }
 
-const timeline: TimelineEntry[] = [
-    {
-        period: "2025 — Present",
-        role: "Engineering Manager — WeGoLook / Crawford & Company",
-        description:
-            "Leading a multi-functional team spanning frontend, backend, mobile, and cloud engineering. Driving major platform migrations to React Native, Next.js, and Go while exploring how agentic engineering can augment the team.",
-    },
-    {
-        period: "2022 — 2025",
-        role: "Lead Frontend Engineer — WeGoLook",
-        description:
-            "Took over frontend leadership for a team in the middle of a modernization effort. Trained the team on TypeScript, Next.js, and Tailwind, led a full frontend ecosystem transition, and introduced internal component libraries and advanced deployment tooling.",
-    },
-    {
-        period: "2023",
-        role: "Software Engineer — Hygieia Inc.",
-        description:
-            "Led frontend engineering for a health-tech startup building a type 2 diabetes management platform. Loved the mission and the team.",
-    },
-    {
-        period: "2022",
-        role: "Senior Frontend Engineer — Rural Sourcing (now Sparq)",
-        description:
-            "Grew from frontend engineer to senior level, took on a direct report, and joined the interview team. First fully remote role, working across multiple client engagements.",
-    },
-    {
-        period: "2021 — 2022",
-        role: "Software Engineer — Sweetwater Sound",
-        description:
-            "Promoted from IT after completing my degree. Built and maintained internal applications in Laravel and WordPress, learning the full stack from databases to deployment.",
-    },
-    {
-        period: "2018 — 2021",
-        role: "IT Delivery Analyst — Sweetwater Sound",
-        description:
-            "Coordinated software releases and produced documentation for the company. Researched and implemented new tools for the internal dev environment, managed third-party developer relationships, and maintained multiple WordPress and PHP applications. Also provided support for Sweetwater's B2B vendor platform.",
-    },
-    {
-        period: "2015 — 2018",
-        role: "Support Technician — Sweetwater Sound",
-        description:
-            "Started in customer support helping studio engineers with complex networked audio systems. Earned certifications in digital control systems before moving to the internal IT team.",
-    },
+const entries: TimelineEntry[] = [
+  {
+    period: "2025 — Present",
+    role: "Engineering Manager — WeGoLook / Crawford & Company",
+    description:
+      "Leading a multi-functional team spanning frontend, backend, mobile, and cloud engineering. Driving major platform migrations to React Native, Next.js, and Go while exploring how agentic engineering can augment the team.",
+  },
+  {
+    period: "2022 — 2025",
+    role: "Lead Frontend Engineer — WeGoLook",
+    description:
+      "Took over frontend leadership for a team in the middle of a modernization effort. Trained the team on TypeScript, Next.js, and Tailwind, led a full frontend ecosystem transition, and introduced internal component libraries and advanced deployment tooling.",
+    color: "cyan",
+  },
+  {
+    period: "2023",
+    role: "Software Engineer — Hygieia Inc.",
+    description:
+      "Led frontend engineering for a health-tech startup building a type 2 diabetes management platform. Loved the mission and the team.",
+  },
+  {
+    period: "2022",
+    role: "Senior Frontend Engineer — Rural Sourcing (now Sparq)",
+    description:
+      "Grew from frontend engineer to senior level, took on a direct report, and joined the interview team. First fully remote role, working across multiple client engagements.",
+    color: "cyan",
+  },
+  {
+    period: "2021 — 2022",
+    role: "Software Engineer — Sweetwater Sound",
+    description:
+      "Promoted from IT after completing my degree. Built and maintained internal applications in Laravel and WordPress, learning the full stack from databases to deployment.",
+  },
+  {
+    period: "2018 — 2021",
+    role: "IT Delivery Analyst — Sweetwater Sound",
+    description:
+      "Coordinated software releases and produced documentation for the company. Researched and implemented new tools for the internal dev environment, managed third-party developer relationships, and maintained multiple WordPress and PHP applications. Also provided support for Sweetwater's B2B vendor platform.",
+    color: "cyan",
+  },
+  {
+    period: "2015 — 2018",
+    role: "Support Technician — Sweetwater Sound",
+    description:
+      "Started in customer support helping studio engineers with complex networked audio systems. Earned certifications in digital control systems before moving to the internal IT team.",
+  },
 ];
 ---
-
-<div class="space-y-8">
-    {
-        timeline.map((entry) => (
-            <div class="relative pl-6 border-l border-outline-variant">
-                <div class="absolute -left-1 top-1 w-2 h-2 rounded-full bg-outline" />
-                <p class="text-xs text-outline mb-1 font-mono">{entry.period}</p>
-                <h3 class="text-on-surface font-medium">{entry.role}</h3>
-                <p class="text-sm text-on-surface-variant mt-1">{entry.description}</p>
-            </div>
-        ))
-    }
+<div class="sw-timeline">
+  {entries.map((entry) => (
+    <div class:list={["sw-tl-item", entry.color === "cyan" && "sw-tl-item--cyan"]}>
+      <div class="sw-tl-period">{entry.period}</div>
+      <div class="sw-tl-role">{entry.role}</div>
+      <p class="sw-tl-desc">{entry.description}</p>
+    </div>
+  ))}
 </div>
+
+<style>
+  .sw-timeline { display: grid; gap: 26px; }
+  .sw-tl-item {
+    position: relative;
+    padding-left: 26px;
+    border-left: 1px solid rgba(138, 76, 255, 0.35);
+  }
+  .sw-tl-item::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 3px;
+    width: 11px;
+    height: 11px;
+    background: var(--mag);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--mag), 0 0 18px rgba(255, 43, 214, 0.5);
+  }
+  .sw-tl-item--cyan::before {
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan), 0 0 18px rgba(34, 231, 255, 0.5);
+  }
+  .sw-tl-period {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    color: var(--mag-2);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .sw-tl-role {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--sw-white);
+    margin: 0 0 6px;
+  }
+  .sw-tl-desc {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #c0b4dc;
+    margin: 0;
+  }
+</style>
