@@ -1,7 +1,9 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
+import Panel from "@/components/panel.astro";
 import PostMeta from "@/components/post-meta.astro";
+
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
   return posts.map((post) => ({
@@ -13,24 +15,119 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-// Estimate reading time: ~200 words per minute
 const wordCount = post.body?.split(/\s+/).length ?? 0;
 const minutesRead = Math.max(1, Math.ceil(wordCount / 200));
 ---
-<BaseLayout title={`${post.data.title} — Michael McNees`} description={post.data.description}>
-  <article class="py-12" data-pagefind-body>
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold text-on-surface mb-3 tracking-tight">{post.data.title}</h1>
-      <PostMeta
-        date={post.data.date}
-        updated={post.data.updated}
-        tags={post.data.tags}
-        minutesRead={minutesRead}
-        slug={post.id}
-      />
-    </header>
-    <div class="prose prose-invert">
-      <Content />
-    </div>
-  </article>
+<BaseLayout
+  title={`${post.data.title} — Michael McNees`}
+  description={post.data.description}
+  reading={true}
+>
+  <Panel title="// TRANSMISSION" sub={`MIN READ ${minutesRead}`}>
+    <article class="sw-article" data-pagefind-body>
+      <header class="sw-article-header">
+        <h1 class="sw-article-title">{post.data.title}</h1>
+        <PostMeta
+          date={post.data.date}
+          updated={post.data.updated}
+          tags={post.data.tags}
+          minutesRead={minutesRead}
+          slug={post.id}
+        />
+      </header>
+      <div class="sw-prose">
+        <Content />
+      </div>
+    </article>
+  </Panel>
 </BaseLayout>
+
+<style>
+  .sw-article { padding: 36px 32px; }
+  .sw-article-header { margin-bottom: 32px; }
+  .sw-article-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(28px, 4vw, 42px);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0 0 18px;
+    background: linear-gradient(180deg, #fff 40%, #ff62e6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 8px rgba(255, 43, 214, 0.5));
+    line-height: 1.1;
+  }
+  .sw-prose {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.75;
+    color: #cfc3ec;
+  }
+  .sw-prose :global(h2) {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cyan-2);
+    text-shadow: 0 0 6px rgba(34, 231, 255, 0.5);
+    margin: 48px 0 16px;
+  }
+  .sw-prose :global(h3) {
+    font-family: var(--font-display);
+    font-size: 17px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mag-2);
+    margin: 32px 0 12px;
+  }
+  .sw-prose :global(a) {
+    color: var(--cyan-2);
+    text-decoration: underline;
+    text-decoration-color: rgba(34, 231, 255, 0.4);
+    text-underline-offset: 3px;
+  }
+  .sw-prose :global(a:hover) {
+    color: var(--mag-2);
+    text-decoration-color: var(--mag);
+  }
+  .sw-prose :global(code) {
+    font-family: var(--font-mono);
+    background: rgba(34, 231, 255, 0.08);
+    border: 1px solid rgba(34, 231, 255, 0.25);
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 0.9em;
+  }
+  .sw-prose :global(pre) {
+    font-family: var(--font-mono);
+    background: rgba(10, 2, 32, 0.8);
+    border: 1px solid rgba(34, 231, 255, 0.25);
+    border-radius: 3px;
+    padding: 16px;
+    overflow-x: auto;
+    box-shadow: inset 0 0 12px rgba(34, 231, 255, 0.08);
+  }
+  .sw-prose :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .sw-prose :global(blockquote) {
+    border-left: 3px solid var(--mag);
+    box-shadow: -8px 0 14px -10px rgba(255, 43, 214, 0.7);
+    padding-left: 20px;
+    margin: 24px 0;
+    color: #c0b4dc;
+    font-style: italic;
+  }
+  .sw-prose :global(ul), .sw-prose :global(ol) { padding-left: 24px; }
+  .sw-prose :global(img) { border: 1px solid rgba(34, 231, 255, 0.2); border-radius: 3px; }
+  .sw-prose :global(hr) {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--mag), transparent);
+    margin: 40px 0;
+  }
+</style>
