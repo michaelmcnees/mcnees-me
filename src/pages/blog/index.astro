@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
+import Panel from "@/components/panel.astro";
 import Search from "@/components/search.tsx";
 import TagFilter from "@/components/tag-filter.tsx";
 
@@ -18,15 +19,31 @@ const serializedPosts = sortedPosts.map((p) => ({
   tags: p.data.tags,
 }));
 ---
-<BaseLayout title="Blog — Michael McNees" description="Writing about engineering leadership, technical topics, and more.">
-  <section class="py-12">
-    <h1 class="text-3xl font-bold text-on-surface mb-2 tracking-tight">Blog</h1>
-    <p class="text-on-surface-variant mb-8">Writing about leadership, tech, and the things in between.</p>
-
-    <div id="search-container" class="mb-8">
-      <Search client:load />
+<BaseLayout title="Blog // ARCHIVE — Michael McNees" description="Writing about engineering leadership, technical topics, and more.">
+  <Panel title="// NODE_02 :: ARCHIVE" sub="TRANSMISSION LOG">
+    <div class="sw-blog-top">
+      <h1 class="sw-blog-title">Archive</h1>
+      <p class="sw-blog-sub">Transmissions on engineering, management, homelab, and the side-quests in between.</p>
+      <div class="sw-search-wrap">
+        <Search client:load />
+      </div>
     </div>
-
     <TagFilter client:load posts={serializedPosts} allTags={allTags} />
-  </section>
+  </Panel>
 </BaseLayout>
+
+<style>
+  .sw-blog-top { padding: 36px 32px 28px; }
+  .sw-blog-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 44px;
+    margin: 0 0 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(34, 231, 255, 0.7);
+  }
+  .sw-blog-sub { color: #c8bce4; font-size: 15px; margin: 0 0 22px; }
+  .sw-search-wrap { margin-bottom: 18px; }
+</style>

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { hashToHue } from "@/utils/tag-color";
+import styles from "./tag-filter.module.css";
 
 interface Post {
   id: string;
@@ -40,19 +41,10 @@ export default function TagFilter({ posts, allTags }: Props) {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className={styles.swTagWrap}>
         <button
           onClick={() => selectTag(null)}
-          className={`text-xs font-mono px-2 py-0.5 rounded-sm transition-colors cursor-pointer ${
-            !activeTag
-              ? "text-[var(--color-on-surface)] border-l-[3px] border-l-[var(--color-primary)]"
-              : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]"
-          }`}
-          style={{
-            background: "var(--color-surface-container-high)",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
-            ...(!activeTag ? {} : { borderLeft: "3px solid transparent" }),
-          }}
+          className={`${styles.swTagbtn}${!activeTag ? ` ${styles.swTagbtnOn}` : ""}`}
         >
           All
         </button>
@@ -63,18 +55,8 @@ export default function TagFilter({ posts, allTags }: Props) {
             <button
               key={tag}
               onClick={() => selectTag(activeTag === tag ? null : tag)}
-              className={`text-xs font-mono px-2 py-0.5 rounded-sm transition-colors cursor-pointer ${
-                isActive
-                  ? "text-[var(--color-on-surface)]"
-                  : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]"
-              }`}
-              style={{
-                background: "var(--color-surface-container-high)",
-                borderLeft: `3px solid oklch(0.72 0.15 ${hue})`,
-                boxShadow: isActive
-                  ? `0 1px 2px rgba(0,0,0,0.4), 0 0 8px oklch(0.72 0.15 ${hue} / 0.3)`
-                  : "0 1px 2px rgba(0,0,0,0.4)",
-              }}
+              className={`${styles.swTagbtn}${isActive ? ` ${styles.swTagbtnOn}` : ""}`}
+              style={isActive ? undefined : { borderColor: `oklch(0.72 0.15 ${hue} / 0.6)` }}
             >
               {tag}
             </button>
@@ -82,21 +64,19 @@ export default function TagFilter({ posts, allTags }: Props) {
         })}
       </div>
 
-      <ul className="space-y-6 list-none p-0">
+      <ul className={styles.swPostList}>
         {filtered.map((post) => {
-          const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          });
+          const d = new Date(post.date);
+          const pad = (n: number) => String(n).padStart(2, "0");
+          const formatted = `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
           return (
             <li key={post.id}>
-              <a href={`/blog/${post.id}`} className="group block no-underline">
-                <h3 className="text-lg text-[var(--color-on-surface)] font-medium group-hover:text-[var(--color-primary)] transition-colors">
-                  {post.title}
-                </h3>
-                <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">{post.description}</p>
-                <span className="text-[var(--color-on-surface-variant)] mt-1 block font-mono text-xs">{formattedDate}</span>
+              <a href={`/blog/${post.id}`} className={styles.swPost}>
+                <span className={styles.swPostDate}>{formatted}</span>
+                <div>
+                  <h3 className={styles.swPostTitle}>{post.title}</h3>
+                  <p className={styles.swPostDesc}>{post.description}</p>
+                </div>
               </a>
             </li>
           );

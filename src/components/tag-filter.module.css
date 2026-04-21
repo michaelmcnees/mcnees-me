@@ -1,0 +1,98 @@
+.swTagWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.swTagbtn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  padding: 5px 10px;
+  border: 1px solid rgba(138, 76, 255, 0.45);
+  color: #c7bae4;
+  background: rgba(138, 76, 255, 0.08);
+  border-radius: 2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.swTagbtn:hover {
+  color: var(--cyan-2);
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px rgba(34, 231, 255, 0.4);
+}
+.swTagbtnOn {
+  color: #fff;
+  border-color: var(--mag);
+  background: rgba(255, 43, 214, 0.18);
+  box-shadow: 0 0 10px rgba(255, 43, 214, 0.5);
+}
+
+.swPostList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.swPost {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: start;
+  gap: 20px;
+  padding: 18px 24px;
+  border-top: 1px solid rgba(34, 231, 255, 0.12);
+  text-decoration: none;
+  color: var(--sw-white);
+  transition: background 0.18s;
+  position: relative;
+}
+.swPost:first-child { border-top: 1px solid rgba(34, 231, 255, 0.28); }
+.swPost:hover {
+  background: linear-gradient(90deg, rgba(255, 43, 214, 0.08), rgba(34, 231, 255, 0.05));
+}
+.swPost:hover::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--mag);
+  box-shadow: 0 0 10px var(--mag);
+}
+
+.swPostDate {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cyan-2);
+  letter-spacing: 0.12em;
+  padding-top: 2px;
+}
+
+.swPostTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 4px;
+  color: var(--sw-white);
+  transition: color 0.18s;
+}
+.swPost:hover .swPostTitle {
+  color: var(--mag-2);
+  text-shadow: 0 0 10px rgba(255, 43, 214, 0.8);
+}
+
+.swPostDesc {
+  font-size: 13px;
+  color: #bcb0d8;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 880px) {
+  .swPost { grid-template-columns: 1fr; gap: 4px; }
+  .swPostDate { font-size: 10px; }
+}

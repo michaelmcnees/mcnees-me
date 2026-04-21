@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import styles from "./search.module.css";
 
 interface PagefindResult {
   url: string;
@@ -63,30 +64,29 @@ export default function Search() {
   }, []);
 
   return (
-    <div className="relative">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Search posts..."
-        className="w-full bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)] rounded-lg px-4 py-2 text-sm text-[var(--color-on-surface-variant)] placeholder-[var(--color-outline)] focus:outline-none focus:border-[var(--color-outline)] focus-visible:ring-2 focus-visible:ring-accent/50"
-      />
+    <div>
+      <div className={styles.swSearchWrap}>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search posts..."
+          className={styles.swSearchInput}
+        />
+      </div>
       {isLoading && (
-        <p className="text-xs text-[var(--color-outline)] mt-2">Searching...</p>
+        <p className={styles.swSearchStatus}>Scanning archive...</p>
       )}
       {results.length > 0 && (
-        <ul className="mt-4 space-y-1 list-none p-0">
+        <ul className={styles.swResultList}>
           {results.map((result) => (
-            <li key={result.url}>
-              <a
-                href={result.url}
-                className="block no-underline group rounded-lg px-3 py-2.5 -mx-3 hover:bg-[var(--color-surface-container-low)] transition-colors"
-              >
-                <h4 className="text-[var(--color-on-surface)] text-sm font-medium group-hover:text-accent transition-colors">
+            <li key={result.url} className={styles.swResultItem}>
+              <a href={result.url}>
+                <h4 className={styles.swResultTitle}>
                   {result.meta.title}
                 </h4>
                 <p
-                  className="text-xs text-[var(--color-on-surface-variant)] mt-1 leading-relaxed line-clamp-2 [&_mark]:bg-accent/20 [&_mark]:text-accent-hover [&_mark]:rounded-sm [&_mark]:px-0.5"
+                  className={styles.swResultExcerpt}
                   dangerouslySetInnerHTML={{ __html: result.excerpt }}
                 />
               </a>
@@ -95,7 +95,7 @@ export default function Search() {
         </ul>
       )}
       {query && !isLoading && results.length === 0 && (
-        <p className="text-xs text-[var(--color-outline)] mt-2">No results found.</p>
+        <p className={styles.swSearchStatus}>No results found.</p>
       )}
     </div>
   );
