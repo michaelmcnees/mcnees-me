@@ -4,17 +4,35 @@ interface Props {
 }
 
 const { status } = Astro.props;
-
-const colors: Record<Props["status"], string> = {
-  alpha: "oklch(0.72 0.15 40)",
-  beta: "oklch(0.72 0.15 200)",
-  stable: "oklch(0.72 0.15 155)",
-};
-const color = colors[status];
 ---
-<span
-  class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded-sm"
-  style={`color: ${color}; background: var(--color-surface-container-high); border: 1px solid ${color};`}
->
-  {status}
-</span>
+<span class:list={["sw-status", `sw-status--${status}`]}>{status}</span>
+
+<style>
+  .sw-status {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .sw-status--alpha {
+    color: #ff9c3a;
+    border-color: #ff9c3a;
+    background: rgba(255, 156, 58, 0.08);
+    box-shadow: 0 0 8px rgba(255, 156, 58, 0.35);
+  }
+  .sw-status--beta {
+    color: var(--cyan-2);
+    border-color: var(--cyan);
+    background: rgba(34, 231, 255, 0.08);
+    box-shadow: 0 0 8px rgba(34, 231, 255, 0.35);
+  }
+  .sw-status--stable {
+    color: #6bff9e;
+    border-color: #6bff9e;
+    background: rgba(107, 255, 158, 0.08);
+    box-shadow: 0 0 8px rgba(107, 255, 158, 0.35);
+  }
+</style>
