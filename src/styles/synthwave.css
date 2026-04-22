@@ -313,8 +313,8 @@ body[data-reading="true"] .sw-floor::before {
   }
 }
 @media (max-width: 640px) {
-  .sw-brand-sub { display: none; }
-  .sw-sysbar > span:last-child { display: none; }
+  .sw-brand-sub { display: none !important; }
+  .sw-sysbar > span:last-child { display: none !important; }
 }
 
 /* ---- Mobile: universal panel interior padding overrides ---- */
@@ -352,7 +352,7 @@ body[data-reading="true"] .sw-floor::before {
   }
   .sw-hero-grid { gap: 24px; }
   /* Move PlayerCard BELOW hero text on mobile (was order: -1) */
-  .sw-hero-right { order: 2; padding-top: 0; }
+  .sw-hero-right { order: 2 !important; padding-top: 0 !important; }
 }
 
 /* ---- PlayerCard mobile slimming ---- */
@@ -408,9 +408,9 @@ body[data-reading="true"] .sw-floor::before {
 
 /* ---- Case study dossier: below article on mobile, not above ---- */
 @media (max-width: 880px) {
-  .sw-cs-grid { grid-template-columns: 1fr; gap: 24px; }
-  .sw-cs-side { order: 2; }
-  .sw-cs-side .sw-dossier { position: static; }
+  .sw-cs-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .sw-cs-side { order: 2 !important; }
+  .sw-cs-side .sw-dossier { position: static !important; }
 }
 @media (max-width: 640px) {
   .sw-dossier { padding: 14px; }
@@ -420,7 +420,7 @@ body[data-reading="true"] .sw-floor::before {
 
 /* ---- Projects: breakpoint refactor (keep 2-col on tablets) ---- */
 @media (min-width: 641px) and (max-width: 880px) {
-  .sw-projects-grid { grid-template-columns: repeat(2, 1fr); }
+  .sw-projects-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 @media (max-width: 640px) {
   .sw-projects-grid { grid-template-columns: 1fr !important; }
@@ -432,7 +432,7 @@ body[data-reading="true"] .sw-floor::before {
 
 /* ---- About: breakpoint refactor ---- */
 @media (min-width: 641px) and (max-width: 880px) {
-  .sw-about-grid { grid-template-columns: 1fr 260px; gap: 32px; }
+  .sw-about-grid { grid-template-columns: 1fr 260px !important; gap: 32px !important; }
 }
 
 /* ---- Blog search input: larger touch target ---- */
