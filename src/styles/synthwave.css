@@ -204,3 +204,22 @@ body[data-reading="true"] .sw-floor::before {
   text-transform: uppercase;
 }
 .section-head .right:hover { text-shadow: 0 0 6px var(--mag); }
+
+/* Mobile tweaks: fix header crowding + panel title collisions */
+@media (max-width: 880px) {
+  /* Give panels breathing room from the element above so the -9px title badge doesn't overlap */
+  .sw-page > .panel { margin-top: 24px; }
+
+  /* Keep panel-sub from crowding panel-title on narrow screens */
+  .panel-sub { display: none; }
+
+  /* Nav: start from left so first items aren't clipped when content overflows */
+  .sw-nav {
+    justify-content: flex-start !important;
+    padding: 0 12px !important;
+    scroll-padding-inline: 12px;
+  }
+
+  /* Hero inner card (PlayerCard) needs its own badge clearance when stacked */
+  .sw-hero-right { padding-top: 12px; }
+}
