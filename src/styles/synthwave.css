@@ -443,3 +443,51 @@ body[data-reading="true"] .sw-floor::before {
     font-size: 14px !important;
   }
 }
+
+/* ============================================================
+   2026-04-24 fixes: scoped-style bypass + missing margins
+   ============================================================ */
+
+/* Hero styles — moved here unscoped because Panel owns the <section>
+   so index.astro's scoped .sw-hero rule never matches. */
+.sw-hero { padding: 64px 48px 56px; margin-top: 24px; }
+.sw-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 880px) {
+  .sw-hero { padding: 48px 24px 40px; }
+  .sw-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 640px) {
+  .sw-hero { padding: 36px 18px 28px; }
+}
+
+/* Tag filter: horizontal padding so chips don't touch panel edge.
+   Match post-list's 24px so the column is consistent. */
+[class*="swTagWrap"] {
+  padding-inline: 24px;
+  padding-bottom: 4px;
+}
+@media (max-width: 640px) {
+  [class*="swTagWrap"] { padding-inline: 14px; }
+}
+
+/* Blog post paragraph spacing — Tailwind v4 preflight strips default p margin.
+   Unscoped file, so no :global() wrapper. */
+.sw-prose p,
+.sw-cs-body p {
+  margin: 0 0 1.2em;
+}
+.sw-prose p:last-child,
+.sw-cs-body p:last-child {
+  margin-bottom: 0;
+}
+.sw-prose ul,
+.sw-prose ol,
+.sw-cs-body ul,
+.sw-cs-body ol {
+  margin: 0 0 1.2em;
+}
