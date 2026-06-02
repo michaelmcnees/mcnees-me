@@ -30,9 +30,9 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonResponse(0, 400);
   }
 
-  const db = locals.runtime.env.PAGE_VIEWS_DB;
-
-  // If binding isn't available (local dev without wrangler), return 0
+  // `locals.runtime` only exists on the Cloudflare adapter. On Vercel previews
+  // (and local dev without wrangler) there's no D1 binding, so degrade to 0.
+  const db = (locals as any).runtime?.env?.PAGE_VIEWS_DB;
   if (!db) {
     return jsonResponse(0);
   }
