@@ -1,114 +1,132 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
-import Panel from "@/components/panel.astro";
-import PlayerCard from "@/components/player-card.astro";
-import PostList from "@/components/post-list.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
+const latest = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())[0];
+
+// The programs on the cabinet. Each carries its own accent so the menu
+// reads like a shelf of cartridges. `launch` is a URL, or "comms" for the
+// SOCIAL overlay handled by the layout.
+const programs = [
+  { id: "about", icon: "BIO", label: "About", desc: "Operator profile & player bio", launch: "/about", accent: "#22e7ff" },
+  { id: "work", icon: "WRK", label: "Work", desc: "Case studies & shipped missions", launch: "/case-studies", accent: "#f9d65c" },
+  { id: "projects", icon: "PRJ", label: "Projects", desc: "Side-quest builds & experiments", launch: "/projects", accent: "#58ff9b" },
+  { id: "blog", icon: "LOG", label: "Blog", desc: "Transmission log & field notes", launch: "/blog", accent: "#ff2bd6" },
+  { id: "social", icon: "NET", label: "Social", desc: "Comms uplink — email, GitHub, GitLab", launch: "comms", accent: "#8a4cff" },
+];
 ---
-<BaseLayout title="Michael McNees // NEON.SYS">
-  <Panel title="// NODE_01 :: IDENTITY" sub="INSERT COIN ⟶" class="sw-hero">
-    <div class="sw-hero-grid">
-      <div>
-        <div class="sw-hero-tagline">Player Profile · West Michigan, USA</div>
-        <h1 class="sw-hero-title">
-          Michael<br />McNees
-          <span class="sub">Engineering Manager</span>
-        </h1>
-        <p class="sw-hero-bio">
-          I lead engineering teams and tinker with TypeScript, React, Go, and whatever else
-          catches my attention. Currently shipping platform migrations by day, building
-          side-quests by night — mostly from a homelab somewhere north of the 43rd parallel.
-        </p>
-        <div class="sw-hero-ctas">
-          <a class="btn primary" href="mailto:mcnees.michael@gmail.com">
-            <span>Get in touch</span><span class="arrow">▷</span>
-          </a>
-          <a class="btn ghost" href="https://github.com/michaelmcnees" target="_blank" rel="noopener">
-            <span>GitHub</span><span class="arrow">▷</span>
-          </a>
-        </div>
-      </div>
-      <div class="sw-hero-right">
-        <PlayerCard size="hero" />
-      </div>
+<BaseLayout title="Michael McNees // MCNEES.OS" app="menu">
+  <section class="menu-screen">
+    <div class="menu-head">
+      <div class="menu-kicker">★ PLAYER 1 — MICHAEL McNEES ★</div>
+      <h1 class="menu-title">Select Program</h1>
+      <p class="menu-sub">Engineering manager · builder · writer — West Michigan, USA</p>
     </div>
-  </Panel>
 
-  <div class="section-head">
-    <h2>Latest Transmissions <span class="meta">// /blog</span></h2>
-    <a class="right" href="/blog">View all ▷</a>
-  </div>
+    <ul class="menu-list" id="menu-list">
+      {programs.map((p, i) => (
+        <li>
+          <a
+            class:list={["menu-item", i === 0 && "selected"]}
+            style={`--ia: ${p.accent}`}
+            href={p.launch === "comms" ? "#" : p.launch}
+            data-launch={p.launch}
+            data-index={i}
+          >
+            <span class="menu-sel" aria-hidden="true">▶</span>
+            <span class="menu-icon" aria-hidden="true">{p.icon}</span>
+            <span class="menu-text">
+              <span class="menu-label">{p.label}</span>
+              <span class="menu-desc">{p.desc}</span>
+            </span>
+            <span class="menu-chev">PRESS&nbsp;⏎</span>
+          </a>
+        </li>
+      ))}
+    </ul>
 
-  <Panel>
-    <PostList posts={posts} limit={5} />
-  </Panel>
+    <div class="menu-foot">
+      <span class="menu-coin">● INSERT COIN</span>
+      {latest && (
+        <span class="menu-ticker">
+          NOW PLAYING: <a href={`/blog/${latest.id}`}>{latest.data.title}</a>
+        </span>
+      )}
+      <span class="menu-hint">
+        <kbd>↑</kbd><kbd>↓</kbd> SELECT · <kbd>⏎</kbd> LAUNCH
+      </span>
+    </div>
+  </section>
 </BaseLayout>
 
-<style>
-  .sw-hero { padding: 64px 48px 56px; margin-top: 24px; }
-  .sw-hero-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 48px;
-    align-items: center;
-  }
-  .sw-hero-tagline {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--cyan-2);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    margin-bottom: 22px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .sw-hero-tagline::before {
-    content: "";
-    width: 24px; height: 1px;
-    background: var(--cyan);
-    box-shadow: 0 0 6px var(--cyan);
-  }
-  .sw-hero-title {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: clamp(40px, 6vw, 72px);
-    line-height: 0.98;
-    letter-spacing: 0.01em;
-    margin: 0 0 24px;
-    background: linear-gradient(180deg, #fff 0%, #fff 45%, #ff62e6 70%, #b03cff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 12px rgba(255, 43, 214, calc(0.55 * var(--glow))))
-            drop-shadow(0 0 2px rgba(34, 231, 255, 0.6));
-    text-transform: uppercase;
-  }
-  .sw-hero-title .sub {
-    display: block;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(14px, 1.4vw, 18px);
-    letter-spacing: 0.6em;
-    color: var(--cyan-2);
-    background: none;
-    -webkit-text-fill-color: var(--cyan-2);
-    margin-top: 14px;
-    filter: drop-shadow(0 0 4px rgba(34, 231, 255, 0.8));
-  }
-  .sw-hero-bio {
-    font-size: 16px;
-    line-height: 1.65;
-    color: #cbc1e8;
-    max-width: 500px;
-    margin: 0 0 32px;
-  }
-  .sw-hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
-  @media (max-width: 880px) {
-    .sw-hero { padding: 48px 24px 40px; }
-    .sw-hero-grid { grid-template-columns: 1fr; gap: 32px; }
-    .sw-hero-right { order: -1; }
-  }
-</style>
+<script is:inline>
+  (function () {
+    const list = document.getElementById("menu-list");
+    if (!list) return;
+    const items = Array.from(list.querySelectorAll(".menu-item"));
+    if (!items.length) return;
+    let sel = items.findIndex((el) => el.classList.contains("selected"));
+    if (sel < 0) sel = 0;
+
+    function select(next) {
+      sel = (next + items.length) % items.length;
+      items.forEach((el, i) => el.classList.toggle("selected", i === sel));
+      items[sel].focus({ preventScroll: false });
+    }
+
+    function launch(el) {
+      const target = el.getAttribute("data-launch");
+      if (target === "comms") {
+        const btn = document.querySelector("[data-comms-open]");
+        if (btn) btn.click();
+        return;
+      }
+      // Quick screen fade, then navigate — the destination plays its own
+      // boot splash, so the launch feels continuous.
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) { window.location.href = target; return; }
+      document.body.style.transition = "opacity .2s ease";
+      document.body.style.opacity = "0.35";
+      setTimeout(() => { window.location.href = target; }, 170);
+    }
+
+    // Pointer: hover tracks selection; click launches (comms intercepts).
+    items.forEach((el, i) => {
+      el.addEventListener("mouseenter", () => {
+        sel = i;
+        items.forEach((x, j) => x.classList.toggle("selected", j === i));
+      });
+      el.addEventListener("click", (e) => {
+        if (el.getAttribute("data-launch") === "comms") {
+          e.preventDefault();
+          launch(el);
+        }
+        // real URLs fall through to the anchor + fade handled below
+      });
+    });
+
+    // Keyboard: arrows move, Enter launches the highlighted program.
+    document.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); select(sel + 1); }
+      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); select(sel - 1); }
+      else if (e.key === "Enter" && (!t || !t.classList || !t.classList.contains("menu-item"))) {
+        e.preventDefault();
+        launch(items[sel]);
+      }
+    });
+
+    // Anchor click on real programs → fade transition.
+    items.forEach((el) => {
+      if (el.getAttribute("data-launch") !== "comms") {
+        el.addEventListener("click", (e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let new-tab through
+          e.preventDefault();
+          launch(el);
+        });
+      }
+    });
+  })();
+</script>
