@@ -1,6 +1,5 @@
 ---
 import "@/styles/global.css";
-import Backdrop from "@/components/backdrop.astro";
 import Scanlines from "@/components/scanlines.astro";
 import Vignette from "@/components/vignette.astro";
 import ScrollIndicator from "@/components/scroll-indicator.astro";
@@ -64,7 +63,6 @@ const navItems = [
     <title>{title}</title>
   </head>
   <body class="arcade" data-reading={reading ? "true" : undefined}>
-    <Backdrop />
     <Vignette />
     <Scanlines />
     <ScrollIndicator />
