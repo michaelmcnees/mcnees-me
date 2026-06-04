@@ -47,7 +47,7 @@ const navItems = [
 <html lang="en" data-app={app}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -69,23 +69,46 @@ const navItems = [
     <Scanlines />
     <ScrollIndicator />
 
-    <!-- ===== CABINET CHROME (fixed beige bezel) ===== -->
-    <header class="cab-marquee cab-plastic">
-      <span class="cab-speaker" aria-hidden="true"></span>
-      <a class="cab-sign" href="/" aria-label="MCNEES Arcade — main menu">
-        <span class="cab-title">MCNEES&nbsp;ARCADE</span>
-        <span class="cab-subtitle">INSERT COIN · SELECT PROGRAM</span>
-      </a>
-      <span class="cab-speaker" aria-hidden="true"></span>
-    </header>
+    <!-- Plastic bezel only — counter-scaled on pinch/page zoom (see --vv-scale). -->
+    <div class="cab-chrome">
+      <header class="cab-marquee cab-plastic">
+        <span class="cab-speaker" aria-hidden="true"></span>
+        <a class="cab-sign" href="/" aria-label="MCNEES Arcade — main menu">
+          <span class="cab-title">MCNEES&nbsp;ARCADE</span>
+          <span class="cab-subtitle">INSERT COIN · SELECT PROGRAM</span>
+        </a>
+        <span class="cab-speaker" aria-hidden="true"></span>
+      </header>
 
-    <div class="cab-rail cab-rail-l cab-plastic" aria-hidden="true">
-      <span class="cab-screw top"></span>
-      <span class="cab-screw bottom"></span>
-    </div>
-    <div class="cab-rail cab-rail-r cab-plastic" aria-hidden="true">
-      <span class="cab-screw top"></span>
-      <span class="cab-screw bottom"></span>
+      <div class="cab-rail cab-rail-l cab-plastic" aria-hidden="true">
+        <span class="cab-screw top"></span>
+        <span class="cab-screw bottom"></span>
+      </div>
+      <div class="cab-rail cab-rail-r cab-plastic" aria-hidden="true">
+        <span class="cab-screw top"></span>
+        <span class="cab-screw bottom"></span>
+      </div>
+
+      <footer class="cab-deck cab-plastic">
+        <div class="cab-controls" aria-hidden="true">
+          <span class="cab-stick">
+            <span class="base"></span><span class="shaft"></span><span class="ball"></span>
+          </span>
+          <span class="cab-abtn red"></span>
+          <span class="cab-abtn blue"></span>
+        </div>
+        <nav class="cab-nav" aria-label="Programs">
+          {navItems.map(({ label, href, match }) => (
+            <a href={href} class:list={["cab-btn", match(currentPath) && "active"]}>{label}</a>
+          ))}
+          <button type="button" class="cab-btn" data-comms-open>SOCIAL</button>
+        </nav>
+        <div class="cab-power">
+          <span class="led" aria-hidden="true"></span>
+          <span class="pwr-label">SYS ONLINE</span>
+          <span class="cab-coin" id="cab-clock">--:--:--</span>
+        </div>
+      </footer>
     </div>
 
     <div class="cab-glass" aria-hidden="true"></div>
@@ -99,27 +122,6 @@ const navItems = [
         <div class="cab-boot-status">LOADING {meta.file}…</div>
       </div>
     </div>
-
-    <footer class="cab-deck cab-plastic">
-      <div class="cab-controls" aria-hidden="true">
-        <span class="cab-stick">
-          <span class="base"></span><span class="shaft"></span><span class="ball"></span>
-        </span>
-        <span class="cab-abtn red"></span>
-        <span class="cab-abtn blue"></span>
-      </div>
-      <nav class="cab-nav" aria-label="Programs">
-        {navItems.map(({ label, href, match }) => (
-          <a href={href} class:list={["cab-btn", match(currentPath) && "active"]}>{label}</a>
-        ))}
-        <button type="button" class="cab-btn" data-comms-open>SOCIAL</button>
-      </nav>
-      <div class="cab-power">
-        <span class="led" aria-hidden="true"></span>
-        <span class="pwr-label">SYS ONLINE</span>
-        <span class="cab-coin" id="cab-clock">--:--:--</span>
-      </div>
-    </footer>
 
     <!-- ===== RUNNING APP ===== -->
     <div class="sw-shell">
@@ -153,6 +155,20 @@ const navItems = [
     <TweaksPanel />
 
     <script is:inline>
+      // ---- Pinch / page zoom: scale CRT content, keep plastic bezel fixed ----
+      (function () {
+        const root = document.documentElement;
+        const sync = () => {
+          const raw = window.visualViewport?.scale;
+          const scale = raw && raw > 0 ? raw : 1;
+          root.style.setProperty("--vv-scale", String(scale));
+        };
+        sync();
+        window.visualViewport?.addEventListener("resize", sync);
+        window.visualViewport?.addEventListener("scroll", sync);
+        window.addEventListener("resize", sync);
+      })();
+
       // ---- Control-deck clock ----
       (function () {
         const el = document.getElementById("cab-clock");
@@ -233,7 +249,7 @@ const navItems = [
               const toast = document.createElement("div");
               toast.textContent = "↑↑↓↓←→←→BA · 30 extra lives granted";
               Object.assign(toast.style, {
-                position: "fixed", bottom: "calc(var(--deck-h) + 1rem)", left: "50%",
+                position: "fixed", bottom: "calc((var(--deck-h) + 1rem) / var(--vv-scale, 1))", left: "50%",
                 transform: "translateX(-50%) translateY(1rem)",
                 fontFamily: "var(--font-mono)", fontSize: "0.875rem",
                 color: "var(--mag-2)", padding: "0.5rem 1rem",

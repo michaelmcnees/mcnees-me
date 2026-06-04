@@ -3,6 +3,7 @@ import { getCollection, render } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
 import Panel from "@/components/panel.astro";
 import PostMeta from "@/components/post-meta.astro";
+import PostViews from "@/components/post-views.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
@@ -24,7 +25,7 @@ const minutesRead = Math.max(1, Math.ceil(wordCount / 200));
   reading={true}
   app="blog"
 >
-  <Panel title="// TRANSMISSION" sub={`MIN READ ${minutesRead}`}>
+  <Panel>
     <article class="sw-article" data-pagefind-body>
       <header class="sw-article-header">
         <h1 class="sw-article-title">{post.data.title}</h1>
@@ -33,12 +34,12 @@ const minutesRead = Math.max(1, Math.ceil(wordCount / 200));
           updated={post.data.updated}
           tags={post.data.tags}
           minutesRead={minutesRead}
-          slug={post.id}
         />
       </header>
       <div class="sw-prose">
         <Content />
       </div>
+      <PostViews slug={post.id} />
     </article>
   </Panel>
 </BaseLayout>

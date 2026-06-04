@@ -12,12 +12,15 @@
      vignette  49 / scanlines 50   CRT texture
      glass     51   tube curvature + glare (inset to the screen opening)
      boot      52   per-app launch splash (sits "on the screen")
-     bezel     54   beige plastic frame (opaque, covers world at edges)
+     bezel     54   beige plastic frame (counter-scaled on page zoom)
      comms     70   modal uplink overlay
      tweaks    80   pre-existing dev panel (backtick)
    ============================================================ */
 
 :root {
+  /* Pinch/page zoom factor (written by base-layout; 1 = no zoom). */
+  --vv-scale: 1;
+
   /* Bezel geometry — content padding is derived from these. */
   --marq-h: 92px;
   --deck-h: 88px;
@@ -55,17 +58,41 @@ body.arcade {
 }
 
 /* ----------------------------------------------------------------
+   Plastic bezel shell — counter-scaled so pinch zoom grows the CRT only.
+   (Glass, boot, scanlines, and .sw-shell zoom with the page.)
+   ---------------------------------------------------------------- */
+.cab-chrome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 54;
+  width: calc(100vw * var(--vv-scale));
+  height: calc(100vh * var(--vv-scale));
+  height: calc(100dvh * var(--vv-scale));
+  pointer-events: none;
+  transform: scale(calc(1 / var(--vv-scale)));
+  transform-origin: top left;
+}
+.cab-chrome > * {
+  pointer-events: auto;
+}
+
+/* ----------------------------------------------------------------
    Content clearance — push the document inside the screen opening so
-   it scrolls beneath the fixed bezel.
+   it scrolls beneath the fixed bezel. Insets shrink when zoomed so they
+   still line up with the counter-scaled plastic frame.
    ---------------------------------------------------------------- */
 .arcade .sw-shell {
   max-width: none;
   margin: 0;
   padding:
-    calc(var(--marq-h) + var(--screen-pad))
-    calc(var(--rail) + var(--screen-pad))
-    calc(var(--deck-h) + var(--screen-pad));
+    calc((var(--marq-h) + var(--screen-pad)) / var(--vv-scale))
+    calc((var(--rail) + var(--screen-pad) + env(safe-area-inset-right, 0px)) / var(--vv-scale))
+    calc((var(--deck-h) + var(--screen-pad)) / var(--vv-scale));
+  padding-left: calc((var(--rail) + var(--screen-pad) + env(safe-area-inset-left, 0px)) / var(--vv-scale));
   min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
 }
 .arcade .sw-content {
   max-width: 1120px;
@@ -715,31 +742,145 @@ body.arcade {
    RESPONSIVE — slim the cabinet on small screens.
    ============================================================ */
 @media (max-width: 880px) {
-  :root { --marq-h: 64px; --deck-h: 66px; --rail: 12px; --screen-pad: 12px; }
+  :root {
+    --marq-h: calc(64px + env(safe-area-inset-top, 0px));
+    --deck-h: calc(108px + env(safe-area-inset-bottom, 0px));
+    --rail: 12px;
+    --screen-pad: 12px;
+  }
+  /* Speakers are hidden — use a single centered column so the sign isn't stuck in col 1. */
+  .cab-marquee {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding:
+      10px
+      max(10px, env(safe-area-inset-right, 0px))
+      10px
+      max(10px, env(safe-area-inset-left, 0px));
+  }
   .cab-speaker { display: none; }
-  .cab-sign { padding: 7px 16px; }
+  .cab-sign {
+    width: 100%;
+    max-width: 100%;
+    padding: 7px 16px;
+    justify-self: center;
+  }
+  .cab-title {
+    font-size: clamp(14px, 4.2vw, 22px);
+    letter-spacing: 0.22em;
+    text-align: center;
+    text-indent: 0;
+    padding-inline: 0.11em; /* optical center with wide tracking */
+  }
+  .cab-subtitle {
+    text-align: center;
+    text-indent: 0;
+    padding-inline: 0.21em;
+  }
   .cab-controls { display: none; }
   .cab-power .pwr-label, .cab-coin { display: none; }
-  .cab-deck { grid-template-columns: 1fr auto; gap: 10px; padding: 0 10px; }
-  .cab-nav {
-    justify-self: start;
-    overflow-x: auto;
-    width: 100%;
-    padding: 6px 2px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+  .cab-deck {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    box-sizing: border-box;
+    height: var(--deck-h);
+    gap: 6px;
+    padding:
+      10px
+      max(10px, env(safe-area-inset-right, 0px))
+      max(8px, env(safe-area-inset-bottom, 0px))
+      max(10px, env(safe-area-inset-left, 0px));
   }
-  .cab-nav::-webkit-scrollbar { display: none; }
-  .cab-btn { padding: 8px 11px; font-size: 9px; }
+  .cab-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    min-height: 0;
+    padding: 0;
+  }
+  .cab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    padding: 6px 4px;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .cab-power {
+    justify-content: center;
+    width: 100%;
+  }
+  .cab-glass,
+  .cab-boot { border-radius: 12px; }
   .menu-item { grid-template-columns: 22px 44px 1fr; gap: 12px; padding: 13px 14px; }
   .menu-item .menu-chev { display: none; }
   .menu-label { font-size: 15px; }
+  .menu-foot { justify-content: center; text-align: center; }
+  .appbar { flex-wrap: wrap; row-gap: 8px; }
+  .appbar-state { display: none; }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --marq-h: calc(56px + env(safe-area-inset-top, 0px));
+    --deck-h: calc(104px + env(safe-area-inset-bottom, 0px));
+    --rail: 8px;
+    --screen-pad: 10px;
+  }
+  .cab-marquee { gap: 0; padding-top: 8px; padding-bottom: 8px; }
+  .cab-sign { padding: 6px 10px; }
+  .cab-btn { padding: 8px 3px; font-size: 7px; letter-spacing: 0.08em; }
+  .menu-screen { gap: 14px; min-height: 0; }
+  .menu-title { font-size: clamp(24px, 8vw, 36px); }
+  .menu-kicker { font-size: 9px; letter-spacing: 0.28em; }
+  .menu-sub { font-size: 11px; }
+  .menu-desc { font-size: 10px; }
+  .menu-foot .menu-hint,
+  .menu-foot .menu-ticker { display: none; }
+  .appbar { margin-bottom: 16px; padding: 8px 10px; }
+  .appbar-name { font-size: 10px; letter-spacing: 0.18em; }
+  .appbar-eject { font-size: 9px; padding: 5px 8px; }
+  .cab-comms { padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (max-width: 520px) {
+  :root {
+    --deck-h: calc(148px + env(safe-area-inset-bottom, 0px));
+  }
   .cab-subtitle { display: none; }
+  .cab-deck {
+    gap: 8px;
+    padding:
+      8px
+      max(12px, env(safe-area-inset-right, 0px))
+      max(8px, env(safe-area-inset-bottom, 0px))
+      max(12px, env(safe-area-inset-left, 0px));
+  }
+  .cab-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    max-width: none;
+  }
+  .cab-btn {
+    padding: 8px 12px;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+  }
   .menu-item { grid-template-columns: 44px 1fr; }
   .menu-item .menu-sel { display: none; }
+  .menu-label { font-size: 14px; letter-spacing: 0.12em; }
 }
 
 /* Respect reduced motion — kill the looping animations. */

@@ -1,0 +1,127 @@
+---
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<footer class="sw-plays" data-views={slug} aria-label="Page views">
+  <span class="sw-plays-label">COIN SLOT</span>
+  <span class="sw-plays-meter" aria-hidden="true">
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </span>
+  <span class="sw-plays-readout">
+    <span class="sw-plays-num" data-views-number>----</span>
+    <span class="sw-plays-unit">PLAYS</span>
+  </span>
+</footer>
+
+<style>
+  .sw-plays {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 18px;
+    margin-top: 40px;
+    padding: 14px 16px;
+    border: 1px solid color-mix(in srgb, var(--app) 45%, transparent);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(20, 8, 50, 0.65), rgba(10, 2, 32, 0.85));
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 0 16px color-mix(in srgb, var(--app) 15%, transparent);
+  }
+  .sw-plays-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    color: var(--app-2);
+    text-transform: uppercase;
+  }
+  .sw-plays-meter {
+    display: flex;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 80px;
+    max-width: 200px;
+  }
+  .sw-plays-meter i {
+    flex: 1;
+    height: 10px;
+    border-radius: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid color-mix(in srgb, var(--app) 25%, transparent);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .sw-plays-meter i.is-lit {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--app-2) 70%, #fff), var(--app));
+    box-shadow: 0 0 6px color-mix(in srgb, var(--app) 60%, transparent);
+    opacity: 1;
+  }
+  .sw-plays-meter i:not(.is-lit) {
+    opacity: 0.35;
+  }
+  .sw-plays-readout {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .sw-plays-num {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    color: #fff;
+    text-shadow: 0 0 8px var(--app), 0 0 18px color-mix(in srgb, var(--app) 50%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  .sw-plays-unit {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: var(--sw-dim);
+    text-transform: uppercase;
+  }
+  @media (max-width: 640px) {
+    .sw-plays { justify-content: center; text-align: center; }
+    .sw-plays-readout { margin-left: 0; width: 100%; justify-content: center; }
+    .sw-plays-meter { max-width: none; width: 100%; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector("[data-views]");
+    if (!root) return;
+    var slug = root.getAttribute("data-views");
+    var num = root.querySelector("[data-views-number]");
+    var bars = root.querySelectorAll(".sw-plays-meter i");
+    if (!slug || !num) return;
+
+    function setBars(views) {
+      var lit = views <= 0 ? 0 : Math.min(8, Math.max(1, Math.ceil(Math.log10(views + 1) * 2.5)));
+      bars.forEach(function (bar, i) {
+        bar.classList.toggle("is-lit", i < lit);
+      });
+    }
+
+    fetch("/api/views/" + slug, { method: "POST" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var views = data && typeof data.views === "number" ? data.views : 0;
+        if (views > 0) {
+          num.textContent = String(views).padStart(4, "0");
+          root.classList.add("is-live");
+          setBars(views);
+        } else {
+          num.textContent = "0000";
+        }
+      })
+      .catch(function () {
+        num.textContent = "----";
+      });
+  })();
+</script>
