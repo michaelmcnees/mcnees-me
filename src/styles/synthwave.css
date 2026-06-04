@@ -229,12 +229,12 @@ body[data-reading="true"] .sw-floor::before {
    Three-tier breakpoints: ≤640 phone, 641–880 large phone, 881+ desktop.
    ============================================================ */
 
-/* ---- Shell side padding (was 28px 32px 32px desktop only) ---- */
+/* ---- Shell side padding (pre-arcade layout only; cabinet chrome sets .arcade .sw-shell) ---- */
 @media (max-width: 640px) {
-  .sw-shell { padding: 16px 14px 24px !important; }
+  body:not(.arcade) .sw-shell { padding: 16px 14px 24px !important; }
 }
 @media (min-width: 641px) and (max-width: 880px) {
-  .sw-shell { padding: 20px 20px 28px !important; }
+  body:not(.arcade) .sw-shell { padding: 20px 20px 28px !important; }
 }
 
 /* ---- Section head rhythm ---- */

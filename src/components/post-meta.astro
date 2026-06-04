@@ -6,10 +6,9 @@ interface Props {
   updated?: Date;
   tags: string[];
   minutesRead?: number;
-  slug?: string;
 }
 
-const { date, updated, tags, minutesRead, slug } = Astro.props;
+const { date, updated, tags, minutesRead } = Astro.props;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const fmt = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
@@ -17,7 +16,6 @@ const fmt = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.ge
 <div class="sw-post-meta">
   <span class="sw-pm-date">{fmt(date)}</span>
   {updated && <span class="sw-pm-updated">· UPDATED {fmt(updated)}</span>}
-  {slug && <span id="view-count" class="sw-pm-views" data-views={slug}>· <span data-views-number></span></span>}
   {minutesRead && <span class="sw-pm-read">· {minutesRead} MIN READ</span>}
 </div>
 {tags.length > 0 && (
@@ -50,7 +48,8 @@ const fmt = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.ge
     text-transform: uppercase;
   }
   .sw-pm-date { color: var(--mag-2); text-shadow: 0 0 6px rgba(255, 43, 214, 0.6); }
-  .sw-pm-updated, .sw-pm-views, .sw-pm-read { color: var(--sw-dim); }
+  .sw-pm-updated,
+  .sw-pm-read { color: var(--sw-dim); }
 
   .sw-pm-tags {
     display: flex;
@@ -73,23 +72,3 @@ const fmt = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.ge
   }
   .sw-pm-tag:hover { box-shadow: 0 0 8px currentColor; }
 </style>
-
-{slug && (
-  <script is:inline>
-    (function() {
-      var el = document.querySelector("[data-views]");
-      if (!el) return;
-      var slug = el.dataset.views;
-      fetch("/api/views/" + slug, { method: "POST" })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          var num = el.querySelector("[data-views-number]");
-          if (num && data && data.count) {
-            num.textContent = data.count + " VIEWS";
-            el.classList.remove("hidden");
-          }
-        })
-        .catch(function() {});
-    })();
-  </script>
-)}
