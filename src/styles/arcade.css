@@ -48,7 +48,6 @@
 [data-app="about"]    { --app: #22e7ff; --app-2: #8a4cff; }
 [data-app="work"]     { --app: #f9d65c; --app-2: #ff6a3d; }
 [data-app="projects"] { --app: #58ff9b; --app-2: #22e7ff; }
-[data-app="blog"]     { --app: #ff2bd6; --app-2: #8a4cff; }
 [data-app="error"]    { --app: #ff6a3d; --app-2: #ff2bd6; }
 
 /* The room the cabinet sits in. */
