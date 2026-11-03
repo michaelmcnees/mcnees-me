@@ -1,16 +1,10 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
-import Panel from "@/components/panel.astro";
 import ProjectCard from "@/components/project-card.astro";
+import { sortProjects } from "@/utils/projects";
 
-const entries = await getCollection("projects", ({ data }) => !data.draft);
-const sorted = entries.sort((a, b) => {
-  const orderDelta = (a.data.order ?? Infinity) - (b.data.order ?? Infinity);
-  if (orderDelta !== 0) return orderDelta;
-  return a.data.name.localeCompare(b.data.name);
-});
-
+const sorted = sortProjects(await getCollection("projects", ({ data }) => !data.draft));
 const rendered = await Promise.all(
   sorted.map(async (entry) => {
     const { Content } = await render(entry);
@@ -18,50 +12,28 @@ const rendered = await Promise.all(
   }),
 );
 ---
-<BaseLayout title="Projects // BUILDS — Michael McNees" description="Side projects, tools, and experiments." app="projects">
-  <Panel title="// NODE_04 :: BUILDS" sub="SIDE-QUEST LOG">
-    <div class="sw-projects-top">
-      <h1 class="sw-projects-title">Builds</h1>
-      <p class="sw-projects-sub">Side projects, tools, and experiments — some shipping, some still finding their shape.</p>
-    </div>
-    <div class="sw-projects-grid">
-      {rendered.length === 0 ? (
-        <p class="sw-empty">No builds yet.</p>
-      ) : (
-        rendered.map(({ entry, Content }) => (
-          <ProjectCard entry={entry}>
-            <Content />
-          </ProjectCard>
-        ))
-      )}
-    </div>
-  </Panel>
+<BaseLayout title="Projects · Michael McNees" description="Side projects, tools, and experiments by Michael McNees.">
+  <section class="section">
+    <h1 class="lede">Projects</h1>
+    <p class="body">Side projects, tools, and experiments. Some are shipping, some are still finding their shape.</p>
+  </section>
+
+  <section class="project-stack" aria-label="All projects">
+    {rendered.length === 0 ? (
+      <p class="body">Nothing here yet.</p>
+    ) : (
+      rendered.map(({ entry, Content }) => (
+        <ProjectCard entry={entry}>
+          <Content />
+        </ProjectCard>
+      ))
+    )}
+  </section>
 </BaseLayout>
 
 <style>
-  .sw-projects-top { padding: 36px 32px 20px; }
-  .sw-projects-title {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 44px;
-    margin: 0 0 10px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    background: linear-gradient(180deg, #fff 40%, #7df4ff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 6px rgba(34, 231, 255, 0.55));
+  .project-stack {
+    display: flex;
+    flex-direction: column;
   }
-  .sw-projects-sub { color: #c8bce4; font-size: 15px; margin: 0; }
-  .sw-projects-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-    padding: 0 32px 36px;
-  }
-  @media (max-width: 880px) {
-    .sw-projects-grid { grid-template-columns: 1fr; padding: 0 20px 32px; }
-  }
-  .sw-empty { padding: 36px; color: var(--sw-dim); font-family: var(--font-mono); grid-column: 1/-1; }
 </style>

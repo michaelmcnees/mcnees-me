@@ -1,139 +1,164 @@
-@import "./synthwave.css";
-@import "./arcade.css";
-@import "tailwindcss";
-@plugin "@tailwindcss/typography";
+/* Plain index, dark. One narrow column, text first, quiet chrome. */
+:root {
+  --bg: #111317;
+  --fg: #e7e9ec;
+  --fg-soft: #b3b8c0;
+  --muted: #9ba1ab;
+  --faint: #8e949e;
+  --rule: #262a31;
+  --underline: #41464f;
+  --accent: #9db8ff;
 
-@theme {
-  /* Surfaces */
-  --color-surface: #0e0e0e;
-  --color-surface-container-lowest: #000000;
-  --color-surface-container-low: #131313;
-  --color-surface-container: #1a1919;
-  --color-surface-container-high: #201f1f;
-  --color-surface-container-highest: #262626;
-  --color-surface-variant: #262626;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
-  /* Accent — electric blue */
-  --color-primary: #a4d4ff;
-  --color-primary-dim: #00b4ff;
-  --color-secondary: #72d4fb;
-  --color-tertiary: #7ee6ff;
+  --measure: 680px;
+  color-scheme: dark;
+}
 
-  /* Text */
-  --color-on-surface: #ffffff;
-  --color-on-surface-variant: #adaaaa;
-  --color-outline: #777575;
-  --color-outline-variant: #494847;
-
-  /* Error */
-  --color-error: #ff716c;
-
-  /* Legacy aliases (for Tailwind classes using 'accent') */
-  --color-accent: #a4d4ff;
-  --color-accent-hover: #00b4ff;
-  --color-accent-glow: oklch(0.70 0.15 230 / 0.15);
-
-  /* Fonts */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
-  --font-heading: "Space Grotesk", system-ui, sans-serif;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html {
-  background-color: var(--color-surface);
-  color: var(--color-on-surface-variant);
-  @apply antialiased;
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
 }
 
 body {
-  @apply min-h-screen font-sans;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(
-      30deg,
-      oklch(0.14 0.01 220) 0px,
-      oklch(0.14 0.01 220) 1px,
-      transparent 1px,
-      transparent 40px
-    ),
-    repeating-linear-gradient(
-      150deg,
-      oklch(0.14 0.01 220) 0px,
-      oklch(0.14 0.01 220) 1px,
-      transparent 1px,
-      transparent 40px
-    );
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 a {
-  @apply text-accent hover:text-accent-hover transition-colors;
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--underline);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
-
-/* Focus states for keyboard navigation */
+a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
 a:focus-visible,
 button:focus-visible {
-  @apply outline-2 outline-offset-2 outline-accent/50 rounded-sm;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
-/* Prose color theming for dark background */
+::selection {
+  background: #2c3a5c;
+  color: var(--fg);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 56px max(24px, env(safe-area-inset-right, 0px)) 80px max(24px, env(safe-area-inset-left, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.lede {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--fg-soft);
+}
+
 .prose {
-  color: var(--color-on-surface-variant);
-  @apply max-w-none text-lg leading-relaxed;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--fg-soft);
 }
-.prose h1, .prose h2, .prose h3, .prose h4 {
-  color: var(--color-on-surface);
-  @apply tracking-tight;
-}
-.prose a {
-  color: var(--color-primary);
-  @apply no-underline;
-}
-.prose a:hover {
-  color: var(--color-primary-dim);
-}
-.prose strong {
-  color: var(--color-on-surface);
-}
-.prose em {
-  color: var(--color-on-surface-variant);
-}
-.prose code {
-  color: var(--color-on-surface-variant);
-  background: var(--color-surface-container-low);
-  @apply px-1.5 py-0.5 rounded text-sm font-mono;
-}
-.prose pre {
-  background: var(--color-surface-container-low);
-  border: 1px solid var(--color-outline-variant);
-  @apply rounded-lg p-4 overflow-x-auto;
-}
-.prose pre code {
-  @apply bg-transparent p-0 rounded-none text-sm;
-}
-.prose blockquote {
-  border-left: 2px solid var(--color-outline-variant);
-  color: var(--color-outline);
-  @apply pl-4 italic;
-}
-.prose ul > li::marker, .prose ol > li::marker {
-  color: var(--color-outline);
-}
-.prose hr {
-  border-color: var(--color-outline-variant);
-}
-.prose img {
-  @apply rounded-lg;
+.prose h2 {
+  margin: 24px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
-/* Animations */
-@keyframes pulse-led {
-  0%, 100% { box-shadow: 0 0 6px oklch(0.65 0.18 155 / 0.6), 0 0 12px oklch(0.65 0.18 155 / 0.2); }
-  50% { box-shadow: 0 0 4px oklch(0.65 0.18 155 / 0.4), 0 0 8px oklch(0.65 0.18 155 / 0.1); }
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--faint);
+}
+
+@media (max-width: 520px) {
+  .wrap {
+    padding-top: 40px;
+    gap: 56px;
+  }
+  .lede {
+    font-size: 27px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
 }

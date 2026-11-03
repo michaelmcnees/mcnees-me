@@ -1,121 +1,84 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/base-layout.astro";
+import SocialLinks from "@/components/social-links.astro";
+import { sortProjects } from "@/utils/projects";
 
-// The programs on the cabinet. Each carries its own accent so the menu
-// reads like a shelf of cartridges. `launch` is a URL, or "comms" for the
-// SOCIAL overlay handled by the layout.
-const programs = [
-  { id: "about", icon: "BIO", label: "About", desc: "Operator profile & player bio", launch: "/about", accent: "#22e7ff" },
-  { id: "projects", icon: "PRJ", label: "Projects", desc: "Side-quest builds & experiments", launch: "/projects", accent: "#58ff9b" },
-  { id: "social", icon: "NET", label: "Social", desc: "Comms uplink — email, GitHub, GitLab", launch: "comms", accent: "#8a4cff" },
-];
+const projects = sortProjects(await getCollection("projects", ({ data }) => !data.draft));
 ---
-<BaseLayout title="Michael McNees // MCNEES.OS" app="menu">
-  <section class="menu-screen">
-    <div class="menu-head">
-      <div class="menu-kicker">★ PLAYER 1 — MICHAEL McNEES ★</div>
-      <h1 class="menu-title">Select Program</h1>
-      <p class="menu-sub">Director of Application Development · builder · writer — West Michigan, USA</p>
-    </div>
+<BaseLayout title="Michael McNees">
+  <section class="section intro">
+    <h1 class="lede">I lead engineering teams by day and build my own software on nights and weekends.</h1>
+    <p class="body">
+      I care about teams that ship reliable software without burning out, and I spend a lot of time on
+      how agentic tooling changes the way engineers work. Frontend is home base. Lately I spend more time
+      in Go, Postgres and Cloudflare. I live in West Michigan.
+    </p>
+  </section>
 
-    <ul class="menu-list" id="menu-list">
-      {programs.map((p, i) => (
+  <section class="section" aria-labelledby="projects-heading">
+    <h2 id="projects-heading" class="label">Projects</h2>
+    <ul class="project-list">
+      {projects.map(({ id, data }) => (
         <li>
-          <a
-            class:list={["menu-item", i === 0 && "selected"]}
-            style={`--ia: ${p.accent}`}
-            href={p.launch === "comms" ? "#" : p.launch}
-            data-launch={p.launch}
-            data-index={i}
-          >
-            <span class="menu-sel" aria-hidden="true">▶</span>
-            <span class="menu-icon" aria-hidden="true">{p.icon}</span>
-            <span class="menu-text">
-              <span class="menu-label">{p.label}</span>
-              <span class="menu-desc">{p.desc}</span>
-            </span>
-            <span class="menu-chev">PRESS&nbsp;⏎</span>
+          <a href={`/projects#${id}`}>
+            <span class="name">{data.name}</span>
+            <span class="mono status">{data.status}</span>
+            <span class="tagline">{data.tagline}</span>
           </a>
         </li>
       ))}
     </ul>
+  </section>
 
-    <div class="menu-foot">
-      <span class="menu-coin">● INSERT COIN</span>
-      <span class="menu-hint">
-        <kbd>↑</kbd><kbd>↓</kbd> SELECT · <kbd>⏎</kbd> LAUNCH
-      </span>
-    </div>
+  <section class="section" aria-labelledby="now-heading">
+    <h2 id="now-heading" class="label">Now</h2>
+    <p class="body">
+      Building Mantle and Honeydew, moving the house off Home Assistant and onto Homey, and upgrading the
+      homelab. Off the clock: two kids, retro games, and a bass I don't play enough.
+    </p>
+  </section>
+
+  <section class="section" id="contact" aria-labelledby="contact-heading">
+    <h2 id="contact-heading" class="label">Elsewhere</h2>
+    <SocialLinks />
   </section>
 </BaseLayout>
 
-<script is:inline>
-  (function () {
-    const list = document.getElementById("menu-list");
-    if (!list) return;
-    const items = Array.from(list.querySelectorAll(".menu-item"));
-    if (!items.length) return;
-    let sel = items.findIndex((el) => el.classList.contains("selected"));
-    if (sel < 0) sel = 0;
-
-    function select(next) {
-      sel = (next + items.length) % items.length;
-      items.forEach((el, i) => el.classList.toggle("selected", i === sel));
-      items[sel].focus({ preventScroll: false });
-    }
-
-    function launch(el) {
-      const target = el.getAttribute("data-launch");
-      if (target === "comms") {
-        const btn = document.querySelector("[data-comms-open]");
-        if (btn) btn.click();
-        return;
-      }
-      // Quick screen fade, then navigate — the destination plays its own
-      // boot splash, so the launch feels continuous.
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reduce) { window.location.href = target; return; }
-      document.body.style.transition = "opacity .2s ease";
-      document.body.style.opacity = "0.35";
-      setTimeout(() => { window.location.href = target; }, 170);
-    }
-
-    // Pointer: hover tracks selection; click launches (comms intercepts).
-    items.forEach((el, i) => {
-      el.addEventListener("mouseenter", () => {
-        sel = i;
-        items.forEach((x, j) => x.classList.toggle("selected", j === i));
-      });
-      el.addEventListener("click", (e) => {
-        if (el.getAttribute("data-launch") === "comms") {
-          e.preventDefault();
-          launch(el);
-        }
-        // real URLs fall through to the anchor + fade handled below
-      });
-    });
-
-    // Keyboard: arrows move, Enter launches the highlighted program.
-    document.addEventListener("keydown", (e) => {
-      const t = e.target;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); select(sel + 1); }
-      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); select(sel - 1); }
-      else if (e.key === "Enter" && (!t || !t.classList || !t.classList.contains("menu-item"))) {
-        e.preventDefault();
-        launch(items[sel]);
-      }
-    });
-
-    // Anchor click on real programs → fade transition.
-    items.forEach((el) => {
-      if (el.getAttribute("data-launch") !== "comms") {
-        el.addEventListener("click", (e) => {
-          if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let new-tab through
-          e.preventDefault();
-          launch(el);
-        });
-      }
-    });
-  })();
-</script>
+<style>
+  .intro {
+    gap: 20px;
+  }
+  .project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .project-list a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 24px;
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
+    text-decoration: none;
+  }
+  .project-list li:last-child a {
+    border-bottom: 1px solid var(--rule);
+  }
+  .name {
+    font-weight: 600;
+    font-size: 17px;
+  }
+  .status {
+    align-self: center;
+  }
+  .tagline {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--fg-soft);
+  }
+  .project-list a:hover .name {
+    color: var(--accent);
+  }
+</style>

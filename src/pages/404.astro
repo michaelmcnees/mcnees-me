@@ -1,44 +1,10 @@
 ---
 import BaseLayout from "@/layouts/base-layout.astro";
-import Panel from "@/components/panel.astro";
 ---
-<BaseLayout title="// SIGNAL LOST — Michael McNees" description="Page not found." app="error">
-  <Panel title="// SIGNAL LOST" sub="ERR_404">
-    <div class="sw-404">
-      <pre class="sw-404-ascii">{`
-  ▄▀▄   ▄▀▄   █▄▄▄   █▄  █   █▀▀█   █     █▀▀▀█
-  █ █   █ █   █▄▄▄   █ ▀▄█   █▄▄█   █     █▄▄▄█
-  ▀ ▀   ▀ ▀   ▀▀▀▀   ▀   ▀   ▀  ▀   ▀▀▀▀  ▀▀▀▀▀
-
-   >> transmission lost.
-   >> requested coordinates not on this network.
-      `}</pre>
-      <p class="sw-404-msg">The page you're looking for isn't here. Broken link? Bad save? Either way — return to base.</p>
-      <a class="btn primary" href="/"><span>Return to base</span><span class="arrow">▷</span></a>
-    </div>
-  </Panel>
+<BaseLayout title="Not found · Michael McNees" description="Page not found.">
+  <section class="section">
+    <p class="mono">404</p>
+    <h1 class="lede">This page doesn't exist.</h1>
+    <p class="body">The link may be old, or the page may have moved. <a href="/">Go to the home page</a>.</p>
+  </section>
 </BaseLayout>
-
-<style>
-  .sw-404 {
-    padding: 56px 32px;
-    text-align: center;
-  }
-  .sw-404-ascii {
-    font-family: var(--font-mono);
-    color: var(--cyan-2);
-    font-size: 12px;
-    line-height: 1.2;
-    margin: 0 auto 32px;
-    display: inline-block;
-    text-align: left;
-    text-shadow: 0 0 8px rgba(34, 231, 255, 0.5);
-  }
-  .sw-404-msg {
-    color: #cfc3ec;
-    font-size: 15px;
-    max-width: 420px;
-    margin: 0 auto 28px;
-    line-height: 1.6;
-  }
-</style>

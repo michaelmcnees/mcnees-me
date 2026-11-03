@@ -1,7 +1,5 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import StatusBadge from "@/components/status-badge.astro";
-import StackChip from "@/components/stack-chip.astro";
 
 interface Props {
   entry: CollectionEntry<"projects">;
@@ -10,100 +8,68 @@ interface Props {
 const { entry } = Astro.props;
 const { name, tagline, status, stack, url, repo } = entry.data;
 ---
-<article class="sw-project">
-  <header class="sw-project-head">
-    <h3 class="sw-project-name">{name}</h3>
-    <StatusBadge status={status} />
+<article class="project" id={entry.id}>
+  <header class="head">
+    <h2 class="name">{name}</h2>
+    <span class="mono">{status}</span>
   </header>
-  <p class="sw-project-tag">{tagline}</p>
-  <div class="sw-project-body sw-prose-compact">
+  <p class="tagline">{tagline}</p>
+  <div class="body-text">
     <slot />
   </div>
-  {stack.length > 0 && (
-    <div class="sw-project-stack">
-      {stack.map((s) => <StackChip label={s} />)}
-    </div>
-  )}
+  {stack.length > 0 && <p class="mono stack">{stack.join(" · ")}</p>}
   {(url || repo) && (
-    <div class="sw-project-links">
-      {url && <a href={url} target="_blank" rel="noopener">VISIT ▷</a>}
-      {repo && <a href={repo} target="_blank" rel="noopener">REPO ▷</a>}
-    </div>
+    <p class="links">
+      {url && <a href={url} target="_blank" rel="noopener">Visit site</a>}
+      {repo && <a href={repo} target="_blank" rel="noopener">Source</a>}
+    </p>
   )}
 </article>
 
 <style>
-  .sw-project {
-    position: relative;
-    padding: 26px 24px 22px;
-    border: 1px solid rgba(34, 231, 255, 0.22);
-    border-radius: 4px;
-    background: linear-gradient(180deg, rgba(20, 8, 50, 0.55), rgba(10, 2, 32, 0.8));
-    overflow: hidden;
-    transition: border-color 0.18s, transform 0.18s;
-  }
-  .sw-project::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--cyan), var(--mag), transparent);
-    opacity: 0.4;
-    transition: opacity 0.18s;
-  }
-  .sw-project:hover { border-color: var(--mag); transform: translateY(-2px); }
-  .sw-project:hover::after { opacity: 1; }
-  .sw-project-head {
+  .project {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 12px;
-    margin-bottom: 10px;
+    padding: 32px 0;
+    border-top: 1px solid var(--rule);
+    scroll-margin-top: 24px;
   }
-  .sw-project-name {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--sw-white);
-    text-transform: uppercase;
-    text-shadow: 0 0 8px rgba(34, 231, 255, 0.45);
+  .project:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .name {
     margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
-  .sw-project-tag {
-    font-size: 13.5px;
-    color: #c6b9e6;
-    line-height: 1.5;
-    margin: 0 0 12px;
+  .tagline {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--fg);
   }
-  .sw-project-body {
-    font-size: 13.5px;
-    color: #bcb0d8;
+  .body-text {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--fg-soft);
+  }
+  .body-text :global(p + p) {
+    margin-top: 12px;
+  }
+  .stack {
     line-height: 1.6;
-    margin-bottom: 14px;
   }
-  .sw-project-body :global(p) { margin: 0 0 10px; }
-  .sw-project-body :global(p:last-child) { margin-bottom: 0; }
-  .sw-project-body :global(a) { color: var(--cyan-2); }
-  .sw-project-stack {
+  .links {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 14px;
-  }
-  .sw-project-links {
-    display: flex;
-    gap: 14px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.2em;
-  }
-  .sw-project-links a {
-    color: var(--cyan-2);
-    text-decoration: none;
-  }
-  .sw-project-links a:hover {
-    color: var(--mag-2);
-    text-shadow: 0 0 6px var(--mag);
+    gap: 8px 24px;
+    font-size: 15px;
   }
 </style>
