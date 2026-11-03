@@ -5,7 +5,7 @@ import Vignette from "@/components/vignette.astro";
 import ScrollIndicator from "@/components/scroll-indicator.astro";
 import TweaksPanel from "@/components/tweaks-panel.astro";
 
-type App = "menu" | "about" | "work" | "projects" | "error";
+type App = "menu" | "about" | "projects" | "blog" | "error";
 
 interface Props {
   title: string;
@@ -27,8 +27,8 @@ const currentPath = Astro.url.pathname;
 const APPS: Record<App, { file: string; tag: string }> = {
   menu: { file: "MCNEES.OS", tag: "Personal operating system" },
   about: { file: "ABOUT.EXE", tag: "Operator profile" },
-  work: { file: "WORK.EXE", tag: "Case studies" },
   projects: { file: "PROJECTS.EXE", tag: "Side-quest builds" },
+  blog: { file: "BLOG.EXE", tag: "Transmission log" },
   error: { file: "SIGNAL.LOST", tag: "Connection dropped" },
 };
 const meta = APPS[app];
@@ -37,8 +37,8 @@ const meta = APPS[app];
 const navItems = [
   { label: "MENU", href: "/", match: (p: string) => p === "/" },
   { label: "ABOUT", href: "/about", match: (p: string) => p.startsWith("/about") },
-  { label: "WORK", href: "/case-studies", match: (p: string) => p.startsWith("/case-studies") },
   { label: "PROJECTS", href: "/projects", match: (p: string) => p.startsWith("/projects") },
+  { label: "BLOG", href: "/blog", match: (p: string) => p.startsWith("/blog") },
 ];
 ---
 <html lang="en" data-app={app}>
