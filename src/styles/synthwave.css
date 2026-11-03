@@ -53,7 +53,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Reading mode: dim backdrop on blog/case-study detail pages */
+/* Reading mode: dim backdrop on blog detail pages */
 body[data-reading="true"] {
   --scan-alpha: 0.12;
   --floor-opacity: 0.38;
@@ -321,10 +321,8 @@ body[data-reading="true"] .sw-floor::before {
 @media (max-width: 640px) {
   .sw-hero { padding: 36px 18px 28px !important; }
   .sw-blog-top,
-  .sw-projects-top,
-  .sw-cs-top { padding: 24px 16px 16px !important; }
-  .sw-article,
-  .sw-cs-detail { padding: 24px 16px !important; }
+  .sw-projects-top { padding: 24px 16px 16px !important; }
+  .sw-article { padding: 24px 16px !important; }
   .sw-about-grid { padding: 24px 16px !important; gap: 24px !important; }
   .sw-projects-grid { padding: 0 12px 24px !important; }
   .sw-post { padding: 16px 14px !important; gap: 8px !important; }
@@ -369,7 +367,6 @@ body[data-reading="true"] .sw-floor::before {
 /* ---- Page titles: clamp fixed 44px headings ---- */
 .sw-blog-title,
 .sw-projects-title,
-.sw-cs-page-title,
 .sw-about-main h1 {
   font-size: clamp(30px, 7vw, 44px) !important;
 }
@@ -377,14 +374,12 @@ body[data-reading="true"] .sw-floor::before {
 /* ---- Prose tuning on mobile ---- */
 @media (max-width: 640px) {
   .sw-prose { font-size: 15.5px; line-height: 1.65; }
-  .sw-prose :global(h2),
-  .sw-cs-body :global(h2) {
+  .sw-prose :global(h2) {
     font-size: 17px;
     margin: 32px 0 12px;
     letter-spacing: 0.08em;
   }
-  .sw-prose :global(h3),
-  .sw-cs-body :global(h3) {
+  .sw-prose :global(h3) {
     font-size: 14.5px;
     margin: 24px 0 10px;
   }
@@ -404,18 +399,6 @@ body[data-reading="true"] .sw-floor::before {
   #sw-scrollrail,
   #sw-scrollthumb,
   #sw-scrollpct { display: none !important; }
-}
-
-/* ---- Case study dossier: below article on mobile, not above ---- */
-@media (max-width: 880px) {
-  .sw-cs-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
-  .sw-cs-side { order: 2 !important; }
-  .sw-cs-side .sw-dossier { position: static !important; }
-}
-@media (max-width: 640px) {
-  .sw-dossier { padding: 14px; }
-  .sw-dossier-row { padding: 8px 0; }
-  .sw-dossier-row dd { font-size: 11.5px; }
 }
 
 /* ---- Projects: breakpoint refactor (keep 2-col on tablets) ---- */
@@ -477,17 +460,13 @@ body[data-reading="true"] .sw-floor::before {
 
 /* Blog post paragraph spacing — Tailwind v4 preflight strips default p margin.
    Unscoped file, so no :global() wrapper. */
-.sw-prose p,
-.sw-cs-body p {
+.sw-prose p {
   margin: 0 0 1.2em;
 }
-.sw-prose p:last-child,
-.sw-cs-body p:last-child {
+.sw-prose p:last-child {
   margin-bottom: 0;
 }
 .sw-prose ul,
-.sw-prose ol,
-.sw-cs-body ul,
-.sw-cs-body ol {
+.sw-prose ol {
   margin: 0 0 1.2em;
 }
