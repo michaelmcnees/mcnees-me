@@ -1,135 +1,60 @@
 ---
 import BaseLayout from "@/layouts/base-layout.astro";
-import Panel from "@/components/panel.astro";
-import PlayerCard from "@/components/player-card.astro";
 import AboutTimeline from "@/components/about-timeline.astro";
+import SocialLinks from "@/components/social-links.astro";
 ---
-<BaseLayout title="About // OPERATOR — Michael McNees" description="About Michael McNees — engineering leader, builder, writer." app="about">
-  <Panel title="// OPERATOR" sub="PLAYER 1 BIO">
-    <div class="sw-about-grid">
-      <div class="sw-about-main">
-        <h1>About</h1>
-        <p>
-          I'm Director of Application Development at Crawford &amp; Company, where I lead three
-          engineering teams and oversee a broad portfolio of customer-facing and internal
-          applications. Before that I was an engineering manager at WeGoLook, a Crawford subsidiary,
-          leading a multi-functional team of frontend, backend, mobile, and cloud engineers. My path here
-          wasn't exactly traditional — I started in customer support at Sweetwater Sound helping
-          studio engineers troubleshoot complex networked audio systems, fell in love with
-          technology, and never looked back.
-        </p>
-        <p>
-          After earning certifications in digital control systems and moving to Sweetwater's IT team,
-          I enrolled at Full Sail University and got my BS in Web Design &amp; Development. That kicked
-          off a career in software engineering that's taken me from building Laravel apps and wrangling
-          legacy WordPress codebases to leading frontend architecture across React, TypeScript, and
-          Next.js. Frontend has always been my sweet spot, but I've been really enjoying going deeper
-          into backend and cloud engineering lately.
-        </p>
-        <p>
-          These days I spend a lot of my time looking for ways to make my team's work more efficient.
-          I've been digging deeply into how agentic engineering can augment engineering teams — I think
-          it's one of the most interesting problems in our field right now. I also care a lot about
-          the operational side: distributed, event-driven systems, good observability, and the
-          on-call and design review habits that keep production reliable.
-        </p>
+<BaseLayout title="About · Michael McNees" description="About Michael McNees: engineering leader and builder.">
+  <section class="section">
+    <h1 class="lede">About</h1>
+  </section>
 
-        <h2>Timeline</h2>
-        <AboutTimeline />
+  <section class="prose">
+    <p>
+      I lead engineering teams that build and run a broad portfolio of customer-facing and internal
+      applications. My path here wasn't exactly traditional. I started in customer support at Sweetwater
+      Sound, helping studio engineers troubleshoot complex networked audio systems, fell in love with
+      technology, and never looked back.
+    </p>
+    <p>
+      After earning certifications in digital control systems and moving to Sweetwater's IT team, I
+      enrolled at Full Sail University and got my BS in Web Design &amp; Development. That kicked off a
+      career in software engineering that's taken me from building Laravel apps and wrangling legacy
+      WordPress codebases to leading frontend architecture across React, TypeScript, and Next.js.
+      Frontend has always been my sweet spot, but I've been enjoying going deeper into backend and cloud
+      engineering lately.
+    </p>
+    <p>
+      These days I spend a lot of my time looking for ways to make my teams' work more efficient. I've
+      been digging into how agentic engineering can augment engineering teams, which I think is one of
+      the most interesting problems in our field right now. I also care a lot about the operational side:
+      distributed, event-driven systems, good observability, and the on-call and design review habits
+      that keep production reliable.
+    </p>
 
-        <h2>Outside of Work</h2>
-        <p>
-          I live in West Michigan with my wife and two kids. I love the beach in the summer and
-          the fall colors even more.
-        </p>
-        <p>
-          When I'm not writing code for work, I'm usually writing code for fun. I have a few side
-          projects I tinker with — a budgeting app called <a href="https://budget.mcnees.me" target="_blank" rel="noopener">Autobudget</a>, a home maintenance system
-          called <a href="https://honeydewdone.app" target="_blank" rel="noopener">Honeydew</a>, and a small business toolkit called Workflow. I'm also deep into
-          homelabbing, where I experiment with smart home tech, Plex, and security tooling.
-        </p>
-        <p>
-          I collect retro video games — my favorite is Pokemon Ruby, and I built a custom Gameboy
-          Advance with USB-C charging and an IPS backlit screen. I also play bass and used to run
-          a pop-punk cover band called Never Live This Down before moving back to Michigan in 2022.
-          One of my favorite parts of the band was the technical side — building out backing tracks
-          with clicks, extra instruments, and the ability to trigger lights in sync with the music.
-        </p>
+    <h2>Experience</h2>
+    <AboutTimeline />
 
-        <h2>Get in Touch</h2>
-        <p>
-          <a href="mailto:michael@mcnees.me">Email</a> &nbsp;·&nbsp;
-          <a href="https://github.com/michaelmcnees" target="_blank" rel="noopener">GitHub</a> &nbsp;·&nbsp;
-          <a href="https://gitlab.com/mmcnees" target="_blank" rel="noopener">GitLab</a>
-        </p>
-      </div>
-      <aside class="sw-about-side">
-        <PlayerCard
-          size="about"
-          rows={[
-            { k: "TITLE", v: "DIRECTOR" },
-            { k: "LOCATION", v: "WEST MICHIGAN" },
-            { k: "CLASS", v: "BUILDER / WRITER" },
-            { k: "STACK", v: "TS · GO · RN" },
-            { k: "CURRENT BUILD", v: "MANTLE // HONEYDEW" },
-          ]}
-        />
-      </aside>
-    </div>
-  </Panel>
+    <h2>Outside of work</h2>
+    <p>
+      I live in West Michigan with my wife and two kids. I love the beach in the summer and the fall
+      colors even more.
+    </p>
+    <p>
+      When I'm not writing code for work, I'm usually writing code for fun. I tinker with a budgeting
+      app called <a href="https://budget.mcnees.me" target="_blank" rel="noopener">Autobudget</a>, a home
+      maintenance system called <a href="https://honeydewdone.app" target="_blank" rel="noopener">Honeydew</a>,
+      and a small business toolkit called Workflow. I'm also deep into homelabbing, where I experiment
+      with smart home tech, Plex, and security tooling.
+    </p>
+    <p>
+      I collect retro video games. My favorite is Pokemon Ruby, and I built a custom Game Boy Advance with
+      USB-C charging and an IPS backlit screen. I also play bass and used to run a pop-punk cover band
+      called Never Live This Down before moving back to Michigan in 2022. One of my favorite parts of the
+      band was the technical side: building backing tracks with clicks, extra instruments, and lights
+      triggered in sync with the music.
+    </p>
+
+    <h2>Get in touch</h2>
+    <SocialLinks />
+  </section>
 </BaseLayout>
-
-<style>
-  .sw-about-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 48px;
-    padding: 36px 32px;
-  }
-  .sw-about-main h1 {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 44px;
-    margin: 0 0 24px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    background: linear-gradient(180deg, #fff 40%, #ff62e6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 8px rgba(255, 43, 214, 0.5));
-  }
-  .sw-about-main p {
-    line-height: 1.75;
-    color: #cfc3ec;
-    font-size: 15.5px;
-    margin: 0 0 16px;
-  }
-  .sw-about-main a {
-    color: var(--cyan-2);
-    text-decoration: underline;
-    text-decoration-color: rgba(34, 231, 255, 0.4);
-  }
-  .sw-about-main a:hover {
-    color: var(--cyan);
-    text-decoration-color: var(--cyan);
-  }
-  .sw-about-main h2 {
-    font-family: var(--font-display);
-    font-size: 15px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    margin: 36px 0 16px;
-    color: var(--cyan-2);
-    text-shadow: 0 0 6px rgba(34, 231, 255, 0.6);
-  }
-  .sw-about-side {
-    position: sticky;
-    top: 20px;
-    align-self: start;
-  }
-  @media (max-width: 880px) {
-    .sw-about-grid { grid-template-columns: 1fr; padding: 28px 20px; }
-    .sw-about-side { position: static; order: -1; }
-  }
-</style>

@@ -3,115 +3,109 @@ interface TimelineEntry {
   period: string;
   role: string;
   description: string;
-  color?: "mag" | "cyan";
 }
 
 const entries: TimelineEntry[] = [
   {
-    period: "2026 — Present",
-    role: "Director of Application Development — Crawford & Company",
+    period: "2026 – now",
+    role: "Director of Application Development, Crawford & Company",
     description:
       "Leading three engineering teams and providing technical oversight for a portfolio of 50+ customer-facing, internal, and hybrid applications. Modernizing legacy Angular apps to React and React Native, and running a follow-the-sun support model with global coverage, incident retrospectives, and RFC-based design reviews.",
   },
   {
-    period: "2025 — 2026",
-    role: "Engineering Manager — WeGoLook / Crawford & Company",
+    period: "2025 – 2026",
+    role: "Engineering Manager, WeGoLook / Crawford & Company",
     description:
       "Led a multi-functional team spanning frontend, backend, mobile, and cloud engineering. Drove major platform migrations to React Native, Next.js, and Go, moved core workflows to event-driven services, and brought agentic engineering tooling into the team's everyday workflow.",
-    color: "cyan",
   },
   {
-    period: "2022 — 2024",
-    role: "Lead Frontend Engineer — WeGoLook",
+    period: "2022 – 2024",
+    role: "Lead Frontend Engineer, WeGoLook",
     description:
       "Took over frontend leadership for a team in the middle of a modernization effort. Trained the team on TypeScript, Next.js, and Tailwind, led a full frontend ecosystem transition, and introduced internal component libraries and advanced deployment tooling.",
   },
   {
     period: "2023",
-    role: "Senior Web Developer (Part-time) — Hygieia Inc.",
+    role: "Senior Web Developer (Part-time), Hygieia Inc.",
     description:
       "Led frontend engineering for a health-tech startup building a type 2 diabetes management platform. Loved the mission and the team.",
-    color: "cyan",
   },
   {
     period: "2022",
-    role: "Senior Consultant — Rural Sourcing (now Sparq)",
+    role: "Senior Consultant, Rural Sourcing (now Sparq)",
     description:
       "Grew from frontend engineer to senior level, took on a direct report, and joined the interview team. First fully remote role, working across multiple client engagements.",
   },
   {
-    period: "2021 — 2022",
-    role: "Software Engineer — Sweetwater Sound",
+    period: "2021 – 2022",
+    role: "Software Engineer, Sweetwater Sound",
     description:
       "Promoted from IT after completing my degree. Built and maintained internal applications in Laravel and WordPress, learning the full stack from databases to deployment.",
-    color: "cyan",
   },
   {
-    period: "2018 — 2021",
-    role: "IT Delivery Specialist — Sweetwater Sound",
+    period: "2018 – 2021",
+    role: "IT Delivery Specialist, Sweetwater Sound",
     description:
       "Coordinated software releases and produced documentation for the company. Researched and implemented new tools for the internal dev environment, managed third-party developer relationships, and maintained multiple WordPress and PHP applications. Also provided support for Sweetwater's B2B vendor platform.",
   },
   {
-    period: "2015 — 2018",
-    role: "Technical Support Technician — Sweetwater Sound",
+    period: "2015 – 2018",
+    role: "Technical Support Technician, Sweetwater Sound",
     description:
       "Started in customer support helping studio engineers with complex networked audio systems. Earned certifications in digital control systems before moving to the internal IT team.",
-    color: "cyan",
   },
 ];
 ---
-<div class="sw-timeline">
+<ol class="timeline">
   {entries.map((entry) => (
-    <div class:list={["sw-tl-item", entry.color === "cyan" && "sw-tl-item--cyan"]}>
-      <div class="sw-tl-period">{entry.period}</div>
-      <div class="sw-tl-role">{entry.role}</div>
-      <p class="sw-tl-desc">{entry.description}</p>
-    </div>
+    <li>
+      <span class="period">{entry.period}</span>
+      <div class="detail">
+        <h3 class="role">{entry.role}</h3>
+        <p class="desc">{entry.description}</p>
+      </div>
+    </li>
   ))}
-</div>
+</ol>
 
 <style>
-  .sw-timeline { display: grid; gap: 26px; }
-  .sw-tl-item {
-    position: relative;
-    padding-left: 26px;
-    border-left: 1px solid rgba(138, 76, 255, 0.35);
-  }
-  .sw-tl-item::before {
-    content: "";
-    position: absolute;
-    left: -6px;
-    top: 3px;
-    width: 11px;
-    height: 11px;
-    background: var(--mag);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--mag), 0 0 18px rgba(255, 43, 214, 0.5);
-  }
-  .sw-tl-item--cyan::before {
-    background: var(--cyan);
-    box-shadow: 0 0 10px var(--cyan), 0 0 18px rgba(34, 231, 255, 0.5);
-  }
-  .sw-tl-period {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    letter-spacing: 0.2em;
-    color: var(--mag-2);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-  .sw-tl-role {
-    font-family: var(--font-display);
-    font-size: 15px;
-    letter-spacing: 0.06em;
-    color: var(--sw-white);
-    margin: 0 0 6px;
-  }
-  .sw-tl-desc {
-    font-size: 13.5px;
-    line-height: 1.6;
-    color: #c0b4dc;
+  .timeline {
+    list-style: none;
     margin: 0;
+    padding: 0;
+  }
+  .timeline li {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 4px 20px;
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .timeline li:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  .period {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .role {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--fg);
+  }
+  .desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg-soft);
+  }
+  @media (max-width: 520px) {
+    .timeline li {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>
